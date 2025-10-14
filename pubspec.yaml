@@ -1,0 +1,117 @@
+name: jenix_event_manager
+description: Jenix Event Manager App
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  bmprogresshud: 1.0.3
+  cloud_firestore: ^5.4.4
+  cupertino_icons: ^1.0.8
+  easy_localization: ^3.0.7+1
+  either_dart: 1.0.0
+  firebase_auth: ^5.6.1
+  firebase_core: ^3.14.0
+  firebase_database: ^11.3.9
+  firebase_messaging: ^15.2.7
+  firebase_storage: ^12.4.8
+  flutter:
+    sdk: flutter
+  flutter_riverpod: 2.6.1
+  flutter_svg: ^2.2.0
+  fluttertoast: ^8.2.4
+  http: ^1.4.0
+  image_picker: ^1.1.2
+  intl: ^0.20.2
+  intl_phone_field: ^3.2.0
+  overlay_support: ^2.0.1
+  phosphor_flutter: ^2.1.0
+  riverpod_annotation: ^2.6.1
+  sane_uuid: ^1.1.0
+  shared_preferences: ^2.2.2
+  table_calendar: ^3.0.9
+
+dev_dependencies:
+  build_runner: ^2.4.6
+  flutter_launcher_icons: ^0.13.1
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+  msix: ^3.16.9
+  riverpod_generator: ^2.6.5
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/playstore_logo.png"
+  windows:
+    generate: true
+    image_path: "assets/images/playstore_logo.png"
+    icon_size: 48
+
+flutter:
+  fonts:
+    - family: OpenSansHebrew
+      fonts:
+        - asset: assets/fonts/open_sans_hebrew/OpenSansHebrew-Light.ttf
+          weight: 300
+        - asset: assets/fonts/open_sans_hebrew/OpenSansHebrew-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/open_sans_hebrew/OpenSansHebrew-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/open_sans_hebrew/OpenSansHebrew-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/open_sans_hebrew/OpenSansHebrew-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/open_sans_hebrew/OpenSansHebrew-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/open_sans_hebrew/OpenSansHebrew-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/open_sans_hebrew/OpenSansHebrew-ExtraBoldItalic.ttf
+          weight: 800
+          style: italic
+
+    - family: OpenSansHebrewCondensed
+      fonts:
+        - asset: assets/fonts/open_sans_hebrew_condensed/OpenSansHebrewCondensed-Light.ttf
+          weight: 300
+        - asset: assets/fonts/open_sans_hebrew_condensed/OpenSansHebrewCondensed-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/open_sans_hebrew_condensed/OpenSansHebrewCondensed-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/open_sans_hebrew_condensed/OpenSansHebrewCondensed-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/open_sans_hebrew_condensed/OpenSansHebrewCondensed-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/open_sans_hebrew_condensed/OpenSansHebrewCondensed-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/open_sans_hebrew_condensed/OpenSansHebrewCondensed-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/open_sans_hebrew_condensed/OpenSansHebrewCondensed-ExtraBoldItalic.ttf
+          weight: 800
+          style: italic
+
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/
+    - assets/images/
+    - assets/images/icons/
+    - assets/translations/
+    - assets/fonts/
+
+msix_config:
+  display_name: Jenix Event Manager
+  publisher_display_name: JENIX EVENT MANAGER
+  languages: en-US, es-ES
+  capabilities: internetClient, location, microphone, webcam, privateNetworkClientServer
