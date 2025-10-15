@@ -23,7 +23,8 @@ class JenixEventManagerApp extends ConsumerStatefulWidget {
   const JenixEventManagerApp({super.key});
 
   @override
-  ConsumerState<JenixEventManagerApp> createState() => _JenixEventManagerAppState();
+  ConsumerState<JenixEventManagerApp> createState() =>
+      _JenixEventManagerAppState();
 }
 
 class _JenixEventManagerAppState extends ConsumerState<JenixEventManagerApp> {
@@ -46,9 +47,9 @@ class _JenixEventManagerAppState extends ConsumerState<JenixEventManagerApp> {
               supportedLocales: context.supportedLocales,
               locale: context.locale,
               title: EnvironmentConfig.nameApp,
-              theme: AppTheme.lightTheme,      
-              darkTheme: AppTheme.lightTheme,
-              themeMode: themeMode,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: ThemeMode.dark,
               navigatorObservers: [NavigationService.myTransitionObserver],
               initialRoute: RoutesApp.index,
               onGenerateRoute: RoutesApp.generateRoute,
