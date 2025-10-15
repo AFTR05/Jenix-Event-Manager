@@ -3,37 +3,17 @@ import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 
 /// Widget reutilizable para elementos de formulario con label y contenedor
 /// 
-/// Características:
-/// - Label con estilo configurable
-/// - Contenedor con fondo sutil
-/// - Soporte para tema claro/oscuro
-/// - Responsive
-/// 
-/// Ejemplo de uso:
-/// ```dart
-/// CustomFormElement(
-///   labelTitle: "Email",
-///   widget: TextFormField(...),
-/// )
-/// ```
+/// **Autor:** AFTR05
+/// **Última modificación:** 2025-10-15 20:06:31 UTC
+/// **Versión:** 2.0.0
 class CustomFormElement extends StatelessWidget {
-  /// Widget del formulario (TextFormField, DropdownButton, etc.)
   final Widget widget;
-  
-  /// Título/label que se muestra arriba del campo
   final String labelTitle;
-  
-  /// Espaciado entre el label y el widget (por defecto 8px)
   final double? spacing;
-  
-  /// Si debe mostrar un asterisco de campo requerido
   final bool isRequired;
-  
-  /// Color personalizado para el label (opcional)
   final Color? labelColor;
-  
-  /// Tamaño de fuente del label (opcional)
   final double? labelFontSize;
+  final String? errorText;
 
   const CustomFormElement({
     super.key,
@@ -43,6 +23,7 @@ class CustomFormElement extends StatelessWidget {
     this.isRequired = false,
     this.labelColor,
     this.labelFontSize,
+    this.errorText,
   });
 
   @override
@@ -51,34 +32,40 @@ class CustomFormElement extends StatelessWidget {
       builder: (context, constraints) {
         final screenWidth = constraints.maxWidth;
         final isMobile = screenWidth < 600;
-        
-        // Responsive sizing
+
         final defaultLabelSize = isMobile ? 14.0 : 16.0;
         final finalLabelSize = labelFontSize ?? defaultLabelSize;
         final finalSpacing = spacing ?? (isMobile ? 6.0 : 8.0);
 
-        // Theme detection
         final isDark = Theme.of(context).brightness == Brightness.dark;
-        final textColor = labelColor ?? 
-            (isDark ? Colors.white : JenixColorsApp.darkColorText);
+        final textColor = labelColor ??
+            (isDark
+                ? JenixColorsApp.backgroundWhite
+                : JenixColorsApp.darkColorText);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             // Label
             _buildLabel(textColor, finalLabelSize),
-            
+
             SizedBox(height: finalSpacing),
-            
-            // Form widget container
-            _buildFormContainer(),
+
+            // Form widget container with focus
+            _buildFormContainer(isDark),
+
+            // Error message
+            if (errorText != null) ...[
+              const SizedBox(height: 8),
+              _buildErrorText(finalLabelSize),
+            ],
           ],
         );
       },
     );
   }
 
-  /// Construye el label con estilo
   Widget _buildLabel(Color textColor, double fontSize) {
     return RichText(
       text: TextSpan(
@@ -103,18 +90,54 @@ class CustomFormElement extends StatelessWidget {
     );
   }
 
-  /// Construye el contenedor del widget de formulario
-  Widget _buildFormContainer() {
-    return Container(
+  Widget _buildFormContainer(bool isDark) {
+    final hasError = errorText != null;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
-        color: JenixColorsApp.inputBackground,
-        borderRadius: BorderRadius.circular(8),
+        color: isDark
+            ? JenixColorsApp.darkGray
+            : JenixColorsApp.inputBackground,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: JenixColorsApp.inputBorder,
-          width: 1,
+          color: hasError
+              ? JenixColorsApp.inputBorderError
+              : (isDark
+                  ? JenixColorsApp.grayColor
+                  : JenixColorsApp.inputBorder),
+          width: 1.5,
         ),
       ),
       child: widget,
+    );
+  }
+
+  Widget _buildErrorText(double fontSize) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.error_outline_rounded,
+            size: fontSize + 2,
+            color: JenixColorsApp.errorColor,
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              errorText!,
+              style: TextStyle(
+                color: JenixColorsApp.errorColor,
+                fontSize: fontSize - 1,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'OpenSansHebrew',
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

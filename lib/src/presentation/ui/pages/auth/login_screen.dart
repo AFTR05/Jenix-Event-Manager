@@ -3,10 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:jenix_event_manager/src/core/validators/fields_validators.dart';
-import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/buttons/custom_red_button_widget.dart';
-import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/inputs/custom_input_text_field_widget.dart';
+import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/buttons/custom_button_widget.dart';
+import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/form/custom_form_element.dart';
+import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/inputs/custom_auth_text_field_widget.dart';
 import 'package:jenix_event_manager/src/routes_app.dart';
 
+/// LoginScreen - Alexander von Humboldt Event Manager
+///
+/// **Autor:** AFTR05
+/// **Última modificación:** 2025-10-15 20:06:31 UTC
+/// **Versión:** 2.0.0
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -43,19 +49,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Gradient background
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                tileMode: TileMode.clamp,
                 begin: Alignment.topLeft,
-                end: Alignment.centerRight,
-                stops: const [0.4, 0.75],
+                end: Alignment.bottomRight,
                 colors: isDark
-                    ? [
-                        JenixColorsApp.darkBackground,
-                        JenixColorsApp.darkGray,
-                      ]
+                    ? [JenixColorsApp.darkBackground, JenixColorsApp.darkGray]
                     : [
                         JenixColorsApp.loginBeginGradient,
                         JenixColorsApp.loginEndGradient,
@@ -65,19 +65,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: SafeArea(
               child: Column(
                 children: [
-                  // Logo section
-                  Expanded(
-                    flex: 2,
+                  // Logo
+                  SizedBox(
+                    height: isMobile ? 110 : 130,
                     child: Center(
                       child: Hero(
                         tag: 'app_logo',
                         child: SvgPicture.asset(
-                          'assets/images/jenix_logo.svg',
-                          width: isMobile ? 100 : 120,
-                          height: isMobile ? 100 : 120,
+                          'assets/images/humboldt_logo.svg',
+                          width: isMobile ? 90 : 110,
+                          height: isMobile ? 90 : 110,
                           colorFilter: ColorFilter.mode(
-                            isDark 
-                                ? JenixColorsApp.primaryRedLight 
+                            isDark
+                                ? JenixColorsApp.primaryBlueLight
                                 : JenixColorsApp.backgroundWhite,
                             BlendMode.srcIn,
                           ),
@@ -86,9 +86,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
 
-                  // Form section
+                  // Form
                   Expanded(
-                    flex: 5,
                     child: Container(
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(
@@ -101,8 +100,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           topLeft: Radius.circular(24),
                           topRight: Radius.circular(24),
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: JenixColorsApp.shadowColor,
+                            blurRadius: 20,
+                            offset: const Offset(0, -5),
+                          ),
+                        ],
                       ),
                       child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
                         child: Center(
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
@@ -113,13 +120,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Welcome text
                                   Text(
                                     'Welcome back',
                                     style: TextStyle(
                                       fontSize: isMobile ? 24 : 28,
                                       fontWeight: FontWeight.w700,
-                                      color: theme.colorScheme.onSurface,
+                                      color: isDark
+                                          ? JenixColorsApp.backgroundWhite
+                                          : JenixColorsApp.primaryBlue,
                                       fontFamily: 'OpenSansHebrew',
                                       letterSpacing: -0.5,
                                     ),
@@ -130,65 +138,77 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
-                                      color: isDark 
-                                          ? JenixColorsApp.lightGray 
+                                      color: isDark
+                                          ? JenixColorsApp.lightGray
                                           : JenixColorsApp.subtitleColor,
                                       fontFamily: 'OpenSansHebrew',
                                     ),
                                   ),
                                   SizedBox(height: isMobile ? 24 : 32),
 
-                                  // Email field
-                                  CustomInputTextFieldWidget(
-                                    controller: _emailController,
+                                  // ✅ EMAIL con CustomFormElement
+                                  CustomFormElement(
                                     labelTitle: "Email",
-                                    hintText: "Enter your email",
-                                    textInputType: TextInputType.emailAddress,
-                                    textInputAction: TextInputAction.next,
                                     isRequired: true,
                                     errorText: _emailError,
-                                    prefix: Icon(
-                                      Icons.email_outlined,
-                                      color: JenixColorsApp.greyColorIcon,
-                                      size: 20,
+                                    widget: CustomAuthTextFieldWidget(
+                                      controller: _emailController,
+                                      hintText:
+                                          "Enter your institutional email",
+                                      keyboardType: TextInputType.emailAddress,
+                                      textInputAction: TextInputAction.next,
+                                      prefix: Icon(
+                                        Icons.email_outlined,
+                                        color: isDark
+                                            ? JenixColorsApp.lightGray
+                                            : JenixColorsApp.greyColorIcon,
+                                        size: 20,
+                                      ),
+                                      validator:
+                                          FieldsValidators.emailValidator,
+                                      onChanged: (_) {
+                                        if (_emailError != null) {
+                                          setState(() => _emailError = null);
+                                        }
+                                      },
                                     ),
-                                    validator: FieldsValidators.emailValidator,
-                                    onChanged: (_) {
-                                      if (_emailError != null) {
-                                        setState(() => _emailError = null);
-                                      }
-                                    },
                                   ),
 
                                   const SizedBox(height: 20),
 
-                                  // Password field
-                                  CustomInputTextFieldWidget(
-                                    controller: _passwordController,
+                                  // ✅ PASSWORD con CustomFormElement
+                                  CustomFormElement(
                                     labelTitle: "Password",
-                                    hintText: "Enter your password",
-                                    isPassword: true,
-                                    textInputAction: TextInputAction.done,
                                     isRequired: true,
                                     errorText: _passwordError,
-                                    validator: FieldsValidators.fieldIsRequired,
-                                    onFieldSubmitted: (_) => _loginValidation(),
-                                    onChanged: (_) {
-                                      if (_passwordError != null) {
-                                        setState(() => _passwordError = null);
-                                      }
-                                    },
+                                    widget: CustomAuthTextFieldWidget(
+                                      controller: _passwordController,
+                                      hintText: "Enter your password",
+                                      isPasswordField: true,
+                                      textInputAction: TextInputAction.done,
+                                      validator:
+                                          FieldsValidators.fieldIsRequired,
+                                      onFieldSubmitted: (_) =>
+                                          _loginValidation(),
+                                      onChanged: (_) {
+                                        if (_passwordError != null) {
+                                          setState(() => _passwordError = null);
+                                        }
+                                      },
+                                    ),
                                   ),
 
                                   const SizedBox(height: 12),
 
-                                  // Remember me & Forgot password
+                                  // Remember me & Forgot
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      // Remember me checkbox
                                       InkWell(
-                                        onTap: () => setState(() => _rememberMe = !_rememberMe),
+                                        onTap: () => setState(
+                                          () => _rememberMe = !_rememberMe,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(
@@ -204,14 +224,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                                 child: Checkbox(
                                                   value: _rememberMe,
                                                   onChanged: (value) {
-                                                    setState(() => _rememberMe = value ?? false);
+                                                    setState(
+                                                      () => _rememberMe =
+                                                          value ?? false,
+                                                    );
                                                   },
-                                                  activeColor: JenixColorsApp.primaryRed,
-                                                  checkColor: theme.colorScheme.onPrimary,
-                                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                  visualDensity: VisualDensity.compact,
+                                                  activeColor: isDark
+                                                      ? JenixColorsApp
+                                                            .primaryBlueLight
+                                                      : JenixColorsApp
+                                                            .primaryBlue,
+                                                  checkColor: JenixColorsApp
+                                                      .backgroundWhite,
+                                                  materialTapTargetSize:
+                                                      MaterialTapTargetSize
+                                                          .shrinkWrap,
+                                                  visualDensity:
+                                                      VisualDensity.compact,
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(4),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          4,
+                                                        ),
                                                   ),
                                                 ),
                                               ),
@@ -220,9 +254,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                                 'Remember me',
                                                 style: TextStyle(
                                                   fontSize: 14,
-                                                  color: isDark 
-                                                      ? JenixColorsApp.lightGray 
-                                                      : JenixColorsApp.subtitleColor,
+                                                  color: isDark
+                                                      ? JenixColorsApp.lightGray
+                                                      : JenixColorsApp
+                                                            .subtitleColor,
                                                   fontWeight: FontWeight.w500,
                                                   fontFamily: 'OpenSansHebrew',
                                                 ),
@@ -231,8 +266,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                           ),
                                         ),
                                       ),
-
-                                      // Forgot password button
                                       TextButton(
                                         onPressed: _handleForgotPassword,
                                         style: TextButton.styleFrom(
@@ -241,18 +274,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                             vertical: 4,
                                           ),
                                           minimumSize: const Size(0, 0),
-                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                          foregroundColor: isDark 
-                                              ? JenixColorsApp.primaryRedLight 
-                                              : JenixColorsApp.primaryRed,
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                          foregroundColor: isDark
+                                              ? JenixColorsApp.primaryBlueLight
+                                              : JenixColorsApp.primaryBlue,
                                         ),
                                         child: Text(
                                           'Forgot Password?',
                                           style: TextStyle(
                                             fontSize: 14,
-                                            color: isDark 
-                                                ? JenixColorsApp.primaryRedLight 
-                                                : JenixColorsApp.primaryRed,
+                                            color: isDark
+                                                ? JenixColorsApp
+                                                      .primaryBlueLight
+                                                : JenixColorsApp.primaryBlue,
                                             fontWeight: FontWeight.w600,
                                             fontFamily: 'OpenSansHebrew',
                                           ),
@@ -263,35 +298,40 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                                   SizedBox(height: isMobile ? 20 : 24),
 
-                                  // Login button
-                                  CustomRedButtonWidget(
+                                  CustomButtonWidget(
                                     onPressed: _loginValidation,
                                     title: "Login",
+                                    backgroundColor: isDark
+                                        ? JenixColorsApp.primaryBlueLight
+                                        : JenixColorsApp.buttonPrimary,
                                     isLoading: _isLoading,
-                                    icon: _isLoading ? null : Icons.login_rounded,
+                                    icon: _isLoading
+                                        ? null
+                                        : Icons.login_rounded,
                                   ),
 
                                   const SizedBox(height: 20),
 
-                                  // Divider
                                   Row(
                                     children: [
                                       Expanded(
                                         child: Divider(
-                                          color: isDark 
-                                              ? JenixColorsApp.grayColor 
+                                          color: isDark
+                                              ? JenixColorsApp.grayColor
                                               : JenixColorsApp.inputBorder,
                                           thickness: 1,
                                         ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                        ),
                                         child: Text(
                                           'OR',
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: isDark 
-                                                ? JenixColorsApp.lightGray 
+                                            color: isDark
+                                                ? JenixColorsApp.lightGray
                                                 : JenixColorsApp.subtitleColor,
                                             fontWeight: FontWeight.w500,
                                             fontFamily: 'OpenSansHebrew',
@@ -300,8 +340,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       ),
                                       Expanded(
                                         child: Divider(
-                                          color: isDark 
-                                              ? JenixColorsApp.grayColor 
+                                          color: isDark
+                                              ? JenixColorsApp.grayColor
                                               : JenixColorsApp.inputBorder,
                                           thickness: 1,
                                         ),
@@ -311,18 +351,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                                   const SizedBox(height: 20),
 
-                                  // Sign up link
                                   Center(
                                     child: Wrap(
                                       alignment: WrapAlignment.center,
-                                      crossAxisAlignment: WrapCrossAlignment.center,
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
                                       children: [
                                         Text(
                                           "Don't have an account? ",
                                           style: TextStyle(
                                             fontSize: 14,
-                                            color: isDark 
-                                                ? JenixColorsApp.lightGray 
+                                            color: isDark
+                                                ? JenixColorsApp.lightGray
                                                 : JenixColorsApp.slateGray,
                                             fontWeight: FontWeight.w400,
                                             fontFamily: 'OpenSansHebrew',
@@ -330,7 +370,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         ),
                                         InkWell(
                                           onTap: _handleSignUp,
-                                          borderRadius: BorderRadius.circular(4),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 4,
@@ -340,20 +382,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                               'Sign Up',
                                               style: TextStyle(
                                                 fontSize: 14,
-                                                color: isDark 
-                                                    ? JenixColorsApp.primaryRedLight 
-                                                    : JenixColorsApp.primaryRed,
                                                 fontWeight: FontWeight.w600,
                                                 fontFamily: 'OpenSansHebrew',
-                                                decoration: TextDecoration.underline,
-                                                decorationColor: isDark 
-                                                    ? JenixColorsApp.primaryRedLight 
-                                                    : JenixColorsApp.primaryRed,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                color: isDark
+                                                    ? JenixColorsApp
+                                                          .primaryBlueLight
+                                                    : JenixColorsApp
+                                                          .primaryBlue,
+                                                decorationColor: isDark
+                                                    ? JenixColorsApp
+                                                          .primaryBlueLight
+                                                    : JenixColorsApp
+                                                          .primaryBlue,
                                               ),
                                             ),
                                           ),
                                         ),
                                       ],
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 16),
+
+                                  Center(
+                                    child: Text(
+                                      '© 2025 Alexander von Humboldt',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: isDark
+                                            ? JenixColorsApp.grayColor
+                                            : JenixColorsApp.lightGray,
+                                        fontWeight: FontWeight.w400,
+                                        fontFamily: 'OpenSansHebrew',
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -369,12 +432,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
 
-          // Loading overlay
           if (_isLoading)
             Positioned.fill(
               child: Container(
                 color: JenixColorsApp.overlayColor,
-                child: Center(
+                child: const Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -384,15 +446,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         child: CircularProgressIndicator(
                           strokeWidth: 4,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            theme.colorScheme.onPrimary,
+                            JenixColorsApp.backgroundWhite,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16),
                       Text(
                         'Signing in...',
                         style: TextStyle(
-                          color: theme.colorScheme.onPrimary,
+                          color: JenixColorsApp.backgroundWhite,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           fontFamily: 'OpenSansHebrew',
@@ -408,10 +470,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  // ============================================================================
-  // VALIDATION & ACTIONS
-  // ============================================================================
-
   void _loginValidation() {
     setState(() {
       _emailError = null;
@@ -419,7 +477,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     final emailError = FieldsValidators.emailValidator(_emailController.text);
-    final passwordError = FieldsValidators.fieldIsRequired(_passwordController.text);
+    final passwordError = FieldsValidators.fieldIsRequired(
+      _passwordController.text,
+    );
 
     if (emailError != null || passwordError != null) {
       setState(() {
@@ -437,21 +497,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Implementar lógica de login con provider
-      // await ref.read(authControllerProvider).login(
-      //   email: _emailController.text,
-      //   password: _passwordController.text,
-      //   rememberMe: _rememberMe,
-      // );
-
       await Future.delayed(const Duration(seconds: 2));
 
       if (mounted) {
-        // TODO: Navegar a home
-        // Navigator.pushReplacementNamed(context, RoutesApp.home);
-
         _showSnackBar(
-          message: 'Login successful!',
+          message: 'Login successful! Welcome to Humboldt Event Manager',
           icon: Icons.check_circle_outline_rounded,
           backgroundColor: JenixColorsApp.successColor,
         );
@@ -459,7 +509,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _emailError = 'Invalid credentials');
-        
+
         _showSnackBar(
           message: 'Login failed. Please check your credentials.',
           icon: Icons.error_outline_rounded,
@@ -476,7 +526,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _handleForgotPassword() {
     _showSnackBar(
-      message: 'Forgot Password feature coming soon...',
+      message: 'Please contact IT support for password recovery',
       icon: Icons.info_outline_rounded,
       backgroundColor: JenixColorsApp.infoColor,
     );
@@ -492,21 +542,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     required Color backgroundColor,
     Duration duration = const Duration(seconds: 2),
   }) {
-    final theme = Theme.of(context);
-    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            Icon(icon, color: theme.colorScheme.onPrimary, size: 22),
+            Icon(icon, color: JenixColorsApp.backgroundWhite, size: 22),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 message,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'OpenSansHebrew',
                   fontWeight: FontWeight.w500,
-                  color: theme.colorScheme.onPrimary,
+                  color: JenixColorsApp.backgroundWhite,
                 ),
               ),
             ),
@@ -514,9 +562,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         backgroundColor: backgroundColor,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         duration: duration,
         margin: const EdgeInsets.all(16),
       ),

@@ -4,105 +4,110 @@ import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 
 /// Campo de texto personalizado para formularios de autenticación
 /// 
-/// Características:
-/// - Soporte para validación
-/// - Modo password con toggle visibility
-/// - Bordes redondeados configurables
-/// - Prefijos y sufijos personalizables
-/// - Formateo de entrada (InputFormatter)
-/// - Responsive
-/// - Soporte para tema claro/oscuro
-/// 
-/// Ejemplo de uso:
-/// ```dart
-/// CustomAuthTextFieldWidget(
-///   hintText: "Enter your email",
-///   controller: _emailController,
-///   keyboardType: TextInputType.emailAddress,
-///   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-/// )
-/// ```
+/// **Autor:** AFTR05
+/// **Última modificación:** 2025-10-15 19:57:43 UTC
+/// **Versión:** 1.0.0
 class CustomAuthTextFieldWidget extends StatefulWidget {
-  /// Controlador del campo de texto
-  final TextEditingController controller;
+  // ============================================================================
+  // REQUIRED PARAMETERS
+  // ============================================================================
   
-  /// Texto de ayuda (placeholder)
+  final TextEditingController controller;
   final String hintText;
   
-  /// Tipo de teclado
+  // ============================================================================
+  // OPTIONAL PARAMETERS - INPUT CONFIGURATION
+  // ============================================================================
+  
   final TextInputType? keyboardType;
-  
-  /// Si es un campo de contraseña (muestra/oculta texto)
   final bool isPasswordField;
-  
-  /// Widget personalizado para el prefijo
-  final Widget? prefix;
-  
-  /// Widget personalizado para el sufijo
-  final Widget? suffix;
-  
-  /// Función de validación
-  final String? Function(String?)? validator;
-  
-  /// Formateador de entrada (ej: máscaras)
+  final TextInputAction? textInputAction;
   final TextInputFormatter? pattern;
+  final bool enabled;
+  final bool autofocus;
   
-  /// Borde personalizado del contenedor
+  // ============================================================================
+  // OPTIONAL PARAMETERS - VALIDATION
+  // ============================================================================
+  
+  final String? Function(String?)? validator;
+  final String? errorText;
+  
+  // ============================================================================
+  // OPTIONAL PARAMETERS - STYLING
+  // ============================================================================
+  
+  final Widget? prefix;
+  final Widget? suffix;
+  final BorderRadius? borderRadius;
   final BoxBorder? boxBorder;
+  final Color? borderColor;
+  final Color? textColor;
   
-  /// Si tiene borde redondeado arriba (deprecated, usar borderRadius)
+  // ============================================================================
+  // NEW PARAMETERS (para compatibilidad)
+  // ============================================================================
+  
+  /// Título del campo (ej: "Email", "Password")
+  final String? labelTitle;
+  
+  /// Si el campo es requerido (para mostrar asterisco)
+  final bool isRequired;
+  
+  /// Callback para cambios en el texto
+  final Function(String)? onChanged;
+  
+  /// Tipo de campo (password usa este en lugar de isPasswordField)
+  final bool isPassword;
+  
+  // ============================================================================
+  // DEPRECATED PARAMETERS
+  // ============================================================================
+  
   @Deprecated('Use borderRadius instead')
   final bool isTop;
   
-  /// Si tiene borde redondeado abajo (deprecated, usar borderRadius)
   @Deprecated('Use borderRadius instead')
   final bool isBottom;
   
-  /// Radio de borde personalizado (reemplaza isTop/isBottom)
-  final BorderRadius? borderRadius;
+  // ============================================================================
+  // CALLBACKS
+  // ============================================================================
   
-  /// Color del borde
-  final Color? borderColor;
-  
-  /// Color del texto
-  final Color? textColor;
-  
-  /// Acción del teclado (done, next, etc.)
-  final TextInputAction? textInputAction;
-  
-  /// Callback cuando se presiona enter/done
   final Function(String)? onFieldSubmitted;
-  
-  /// Si el campo está habilitado
-  final bool enabled;
-  
-  /// Texto de error a mostrar
-  final String? errorText;
-  
-  /// Auto focus
-  final bool autofocus;
 
   const CustomAuthTextFieldWidget({
     super.key,
+    // Required
     required this.hintText,
     required this.controller,
+    // Input configuration
     this.keyboardType,
     this.isPasswordField = false,
+    this.isPassword = false,  // Alias para isPasswordField
+    this.textInputAction,
+    this.pattern,
+    this.enabled = true,
+    this.autofocus = false,
+    // Validation
+    this.validator,
+    this.errorText,
+    // Styling
     this.prefix,
     this.suffix,
-    this.validator,
-    this.pattern,
-    this.boxBorder,
-    @Deprecated('Use borderRadius instead') this.isTop = false,
-    @Deprecated('Use borderRadius instead') this.isBottom = false,
     this.borderRadius,
+    this.boxBorder,
     this.borderColor,
     this.textColor,
-    this.textInputAction,
+    // New
+    this.labelTitle,
+    this.isRequired = false,
+    this.onChanged,
+    // Deprecated
+    this.isTop = false,
+    this.isBottom = false,
+    // Callbacks
     this.onFieldSubmitted,
-    this.enabled = true,
-    this.errorText,
-    this.autofocus = false,
   });
 
   @override
@@ -134,6 +139,9 @@ class _CustomAuthTextFieldWidgetState extends State<CustomAuthTextFieldWidget> {
     });
   }
 
+  // Determina si es un campo de contraseña (usa ambos parámetros)
+  bool get _isPasswordType => widget.isPasswordField || widget.isPassword;
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -141,25 +149,31 @@ class _CustomAuthTextFieldWidgetState extends State<CustomAuthTextFieldWidget> {
         final screenWidth = constraints.maxWidth;
         final isMobile = screenWidth < 600;
 
-        // Responsive sizing
         final fontSize = isMobile ? 14.0 : 16.0;
         final horizontalPadding = isMobile ? 16.0 : 20.0;
         final verticalPadding = isMobile ? 12.0 : 16.0;
 
-        // Theme detection
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
+            // Label opcional
+            if (widget.labelTitle != null) ...[
+              _buildLabel(fontSize, isDark),
+              const SizedBox(height: 8),
+            ],
+            
             _buildTextField(
               isDark,
               fontSize,
               horizontalPadding,
               verticalPadding,
             ),
+            
             if (widget.errorText != null) ...[
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               _buildErrorText(fontSize),
             ],
           ],
@@ -168,7 +182,34 @@ class _CustomAuthTextFieldWidgetState extends State<CustomAuthTextFieldWidget> {
     );
   }
 
-  /// Construye el campo de texto principal
+  /// Construye el label del campo
+  Widget _buildLabel(double fontSize, bool isDark) {
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.w500,
+          color: isDark
+              ? JenixColorsApp.backgroundWhite
+              : JenixColorsApp.darkColorText,
+          fontFamily: 'OpenSansHebrew',
+        ),
+        children: [
+          TextSpan(text: widget.labelTitle!),
+          if (widget.isRequired)
+            TextSpan(
+              text: ' *',
+              style: TextStyle(
+                color: isDark
+                    ? JenixColorsApp.errorColor.withOpacity(0.8)
+                    : JenixColorsApp.errorColor,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTextField(
     bool isDark,
     double fontSize,
@@ -177,58 +218,51 @@ class _CustomAuthTextFieldWidgetState extends State<CustomAuthTextFieldWidget> {
   ) {
     final borderColor = _getBorderColor(isDark);
     final borderRadius = _getBorderRadius();
+    final hasError = widget.errorText != null;
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
-        color: _isFocused
-            ? JenixColorsApp.inputBackgroundFocus
-            : JenixColorsApp.inputBackground,
+        color: _getBackgroundColor(isDark),
         borderRadius: borderRadius,
-        border: widget.boxBorder ??
-            Border.all(
-              color: _isFocused
-                  ? JenixColorsApp.inputBorderFocus
-                  : (widget.errorText != null
-                      ? JenixColorsApp.inputBorderError
-                      : borderColor),
-              width: _isFocused ? 2 : 1,
-            ),
-        boxShadow: _isFocused
-            ? [
-                BoxShadow(
-                  color: JenixColorsApp.primaryRed.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ]
-            : null,
+        border: widget.boxBorder ?? _getBorder(borderColor, hasError),
+        boxShadow: _getFocusShadow(isDark),
       ),
       child: TextField(
         controller: widget.controller,
         focusNode: _focusNode,
         keyboardType: widget.keyboardType,
-        obscureText: widget.isPasswordField ? _obscurePassword : false,
+        obscureText: _isPasswordType && _obscurePassword,
         inputFormatters: widget.pattern != null ? [widget.pattern!] : null,
-        textInputAction: widget.textInputAction,
+        textInputAction: widget.textInputAction ?? TextInputAction.done,
         onSubmitted: widget.onFieldSubmitted,
+        onChanged: widget.onChanged,  // Agregado
         enabled: widget.enabled,
         autofocus: widget.autofocus,
         style: TextStyle(
-          color: widget.textColor ??
-              (isDark ? Colors.white : JenixColorsApp.darkColorText),
+          color: _getTextColor(isDark),
           fontSize: fontSize,
+          fontWeight: FontWeight.w400,
+          fontFamily: 'OpenSansHebrew',
         ),
         decoration: InputDecoration(
           hintText: widget.hintText,
           hintStyle: TextStyle(
-            color: JenixColorsApp.placeholderColor,
+            color: isDark
+                ? JenixColorsApp.lightGray
+                : JenixColorsApp.placeholderColor,
             fontSize: fontSize,
+            fontFamily: 'OpenSansHebrew',
           ),
-          prefixIcon: _buildPrefixIcon(),
-          suffixIcon: _buildSuffixIcon(),
+          prefixIcon: widget.prefix,
+          suffixIcon: _buildSuffixIcon(isDark),
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 48,
+            minHeight: 48,
+          ),
           suffixIconConstraints: const BoxConstraints(
-            minWidth: 40,
-            minHeight: 20,
+            minWidth: 48,
+            minHeight: 48,
           ),
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
@@ -240,49 +274,49 @@ class _CustomAuthTextFieldWidgetState extends State<CustomAuthTextFieldWidget> {
     );
   }
 
-  /// Construye el icono de prefijo
-  Widget? _buildPrefixIcon() {
-    if (widget.isPasswordField) {
+  Widget? _buildSuffixIcon(bool isDark) {
+    if (_isPasswordType && widget.suffix == null) {
       return IconButton(
         icon: Icon(
-          _obscurePassword ? Icons.lock_outline : Icons.lock_open_outlined,
+          _obscurePassword
+              ? Icons.visibility_outlined
+              : Icons.visibility_off_outlined,
           size: 20,
-          color: JenixColorsApp.greyColorIcon,
+          color: isDark
+              ? JenixColorsApp.lightGray
+              : JenixColorsApp.greyColorIcon,
         ),
         onPressed: () {
           setState(() {
             _obscurePassword = !_obscurePassword;
           });
         },
+        tooltip: _obscurePassword ? 'Show password' : 'Hide password',
       );
     }
-    return widget.prefix;
-  }
-
-  /// Construye el icono de sufijo
-  Widget? _buildSuffixIcon() {
     return widget.suffix;
   }
 
-  /// Construye el mensaje de error
   Widget _buildErrorText(double fontSize) {
     return Padding(
       padding: const EdgeInsets.only(left: 12),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
-            Icons.error_outline,
-            size: fontSize,
+            Icons.error_outline_rounded,
+            size: fontSize + 2,
             color: JenixColorsApp.errorColor,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 6),
           Expanded(
             child: Text(
               widget.errorText!,
               style: TextStyle(
                 color: JenixColorsApp.errorColor,
-                fontSize: fontSize - 2,
-                fontWeight: FontWeight.w400,
+                fontSize: fontSize - 1,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'OpenSansHebrew',
               ),
             ),
           ),
@@ -291,26 +325,89 @@ class _CustomAuthTextFieldWidgetState extends State<CustomAuthTextFieldWidget> {
     );
   }
 
-  /// Obtiene el color del borde según el tema
-  Color _getBorderColor(bool isDark) {
-    if (widget.borderColor != null) return widget.borderColor!;
-    return isDark ? Colors.white : JenixColorsApp.inputBorder;
+  Color _getBackgroundColor(bool isDark) {
+    if (!widget.enabled) {
+      return isDark
+          ? JenixColorsApp.darkGray.withOpacity(0.5)
+          : JenixColorsApp.inputBackground.withOpacity(0.5);
+    }
+
+    if (_isFocused) {
+      return isDark
+          ? JenixColorsApp.darkGray
+          : JenixColorsApp.inputBackgroundFocus;
+    }
+
+    return isDark ? JenixColorsApp.darkGray : JenixColorsApp.inputBackground;
   }
 
-  /// Obtiene el radio de borde
+  Border _getBorder(Color borderColor, bool hasError) {
+    Color finalBorderColor;
+    double borderWidth;
+
+    if (hasError) {
+      finalBorderColor = JenixColorsApp.inputBorderError;
+      borderWidth = 1.5;
+    } else if (_isFocused) {
+      finalBorderColor = JenixColorsApp.inputBorderFocus;
+      borderWidth = 2;
+    } else {
+      finalBorderColor = borderColor;
+      borderWidth = 1.5;
+    }
+
+    return Border.all(color: finalBorderColor, width: borderWidth);
+  }
+
+  List<BoxShadow>? _getFocusShadow(bool isDark) {
+    if (!_isFocused || widget.errorText != null) return null;
+
+    return [
+      BoxShadow(
+        color:
+            (isDark
+                    ? JenixColorsApp.primaryBlueLight
+                    : JenixColorsApp.primaryBlue)
+                .withOpacity(0.15),
+        blurRadius: 12,
+        offset: const Offset(0, 4),
+      ),
+    ];
+  }
+
+  Color _getBorderColor(bool isDark) {
+    if (widget.borderColor != null) return widget.borderColor!;
+
+    return isDark ? JenixColorsApp.grayColor : JenixColorsApp.inputBorder;
+  }
+
+  Color _getTextColor(bool isDark) {
+    if (widget.textColor != null) return widget.textColor!;
+
+    return isDark
+        ? JenixColorsApp.backgroundWhite
+        : JenixColorsApp.darkColorText;
+  }
+
   BorderRadius _getBorderRadius() {
-    // Priorizar borderRadius personalizado
-    if (widget.borderRadius != null) return widget.borderRadius!;
-
-    // Fallback a los parámetros deprecated
-    if (widget.isTop) {
-      return const BorderRadius.only(topRight: Radius.circular(30));
-    }
-    if (widget.isBottom) {
-      return const BorderRadius.only(bottomRight: Radius.circular(30));
+    if (widget.borderRadius != null) {
+      return widget.borderRadius!;
     }
 
-    // Por defecto: bordes redondeados suaves
-    return BorderRadius.circular(8);
+    if (widget.isTop && !widget.isBottom) {
+      return const BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      );
+    }
+
+    if (widget.isBottom && !widget.isTop) {
+      return const BorderRadius.only(
+        bottomLeft: Radius.circular(12),
+        bottomRight: Radius.circular(12),
+      );
+    }
+
+    return BorderRadius.circular(12);
   }
 }
