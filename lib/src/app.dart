@@ -3,7 +3,7 @@ import 'package:bmprogresshud/progresshud.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:jenix_event_manager/environment_config.dart';
-import 'package:jenix_event_manager/src/inject/app_states/theme_provider.dart';
+import 'package:jenix_event_manager/src/inject/states_providers/app_states/theme_provider.dart';
 import 'package:jenix_event_manager/src/routes_app.dart';
 import 'package:jenix_event_manager/src/utils/navigation_service.dart';
 import 'package:jenix_event_manager/src/utils/theme/app_theme.dart';
@@ -49,7 +49,7 @@ class _JenixEventManagerAppState extends ConsumerState<JenixEventManagerApp> {
               title: EnvironmentConfig.nameApp,
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
-              themeMode: ThemeMode.dark,
+              themeMode: themeMode,
               navigatorObservers: [NavigationService.myTransitionObserver],
               initialRoute: RoutesApp.index,
               onGenerateRoute: RoutesApp.generateRoute,
