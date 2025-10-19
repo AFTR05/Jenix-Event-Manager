@@ -15,13 +15,16 @@ class CodegenLoader extends AssetLoader{
   }
 
   static const Map<String,dynamic> _en = {
-  "fieldIsRequired": "Field is required"
+  "fieldIsRequired": "Field is required",
+  "unknownError": "Unknown Error"
 };
 static const Map<String,dynamic> _es = {
-  "fieldIsRequired": "El campo es requerido"
+  "fieldIsRequired": "El campo es requerido",
+  "unknownError": "Error desconocido"
 };
 static const Map<String,dynamic> _zh = {
-  "fieldIsRequired": "此字段为必填项"
+  "fieldIsRequired": "此字段为必填项",
+  "unknownError": "未知错误"
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": _en, "es": _es, "zh": _zh};
 }
