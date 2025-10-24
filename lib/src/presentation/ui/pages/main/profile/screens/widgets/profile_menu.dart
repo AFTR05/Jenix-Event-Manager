@@ -93,7 +93,11 @@ class ProfileMenuTile extends ConsumerWidget {
             (route) => false,
           );
         } else if (logOutResult.isLeft) {
-          // Mostrar error si el logout falló
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            RoutesApp.login,
+            (route) => false,
+          );
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -111,6 +115,7 @@ class ProfileMenuTile extends ConsumerWidget {
               duration: const Duration(seconds: 3),
             ),
           );
+          
         }
       }
     }

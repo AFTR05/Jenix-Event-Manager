@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:either_dart/src/either.dart';
 import 'package:jenix_event_manager/src/core/exceptions/failure.dart';
 import 'package:jenix_event_manager/src/data/sources/api_source.dart';
@@ -13,7 +14,10 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     return "http://localhost:3000/api/v1/auth";
   }
 
-  Map<String, String> _getHeaders({required String token, bool includeContentType = false}) {
+  Map<String, String> _getHeaders({
+    required String token,
+    bool includeContentType = false,
+  }) {
     final headers = {"Authorization": "Bearer $token"};
     if (includeContentType) {
       headers["Content-Type"] = "application/json";
@@ -42,28 +46,20 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   @override
   Future<Either<Failure, bool>> logOut({required String accessToken}) async {
     final url = "$path/logout";
-    
-    print("🔓 Logout - URL: $url");
-    print("🔑 Logout - Token: ${accessToken.substring(0, 20)}...");
-    
-    // Usar processData en lugar de requestJSON porque el logout puede devolver respuesta vacía
-    final resultRequest = await ConsumerAPI.processData(
+    // Use processData so we don't accidentally send a JSON body of "null"
+    final resultRequest = await ConsumerAPI.requestJSON(
       url: url,
       method: HTTPMethod.post,
-      headers: _getHeaders(token: accessToken, includeContentType: true),
-      params: null, // No enviar body
+      jsonObject: {},
+      headers: _getHeaders(token: accessToken),
     );
-    
-    return resultRequest.fold(
-      (failure) {
-        print("❌ Logout - Error: ${failure.toString()}");
-        return Left(failure);
-      },
-      (response) {
-        print("✅ Logout - Success: $response");
+
+    return resultRequest.fold((failure) => Left(failure), (response) {
+      if (response['message'] == "Logout successful") {
         return const Right(true);
-      },
-    );
+      }
+      return const Right(true);
+    });
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jenix_event_manager/src/presentation/providers_ui/bottom_nav_bar_state.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/schedule/screens/schedule_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/widgets/bottom_nav_bar_widget.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/profile_screen.dart';
 
@@ -12,7 +13,6 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
-  
   final List<Widget> _screens = [
     // Home Screen - Placeholder temporal
     Container(
@@ -29,19 +29,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       ),
     ),
     // Schedule Screen - Placeholder temporal
-    Container(
-      color: Colors.blue,
-      child: const Center(
-        child: Text(
-          'Schedule Screen',
-          style: TextStyle(
-            fontFamily: 'OpenSansHebrew',
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-    ),
+    ScheduleScreen(),
     // Events Screen - Placeholder temporal
     Container(
       color: Colors.green,
@@ -65,7 +53,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     final currentIndex = ref.watch(bottomNavBarStateProvider);
 
     return Scaffold(
-      body:_screens[currentIndex],
+      body: _screens[currentIndex],
       bottomNavigationBar: BottomNavBarWidget(
         currentIndex: currentIndex,
         onTap: (index) {
