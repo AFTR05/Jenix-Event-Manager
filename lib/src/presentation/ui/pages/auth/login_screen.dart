@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:jenix_event_manager/src/core/validators/fields_validators.dart';
+import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/buttons/custom_button_widget.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/form/custom_form_element.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/inputs/custom_auth_text_field_widget.dart';
@@ -384,8 +385,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w600,
                                                 fontFamily: 'OpenSansHebrew',
-                                                decoration:
-                                                    TextDecoration.underline,
                                                 color: isDark
                                                     ? JenixColorsApp
                                                           .primaryBlueLight
@@ -497,29 +496,65 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
+      // Get authentication controller
+      final authController = ref.read(authenticationControllerProvider);
 
-      if (mounted) {
-        _showSnackBar(
-          message: 'Login successful! Welcome to Humboldt Event Manager',
-          icon: Icons.check_circle_outline_rounded,
-          backgroundColor: JenixColorsApp.successColor,
-        );
-      }
+      // Attempt login
+      final result = await authController.logIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        rememberMe: _rememberMe,
+      );
+
+      if (!mounted) return;
+
+      // Handle result
+      result.fold(
+        // Error case
+        (failure) {
+          setState(() {
+            _emailError = failure.message;
+            _isLoading = false;
+          });
+
+          _showSnackBar(
+            message: failure.message,
+            icon: Icons.error_outline_rounded,
+            backgroundColor: JenixColorsApp.errorColor,
+            duration: const Duration(seconds: 3),
+          );
+        },
+        // Success case
+        (user) {
+          setState(() => _isLoading = false);
+
+          _showSnackBar(
+            message: 'Welcome back, ${user.name}!',
+            icon: Icons.check_circle_outline_rounded,
+            backgroundColor: JenixColorsApp.successColor,
+          );
+
+          // Navigate to home after short delay
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) {
+              Navigator.pushReplacementNamed(context, RoutesApp.home);
+            }
+          });
+        },
+      );
     } catch (e) {
       if (mounted) {
-        setState(() => _emailError = 'Invalid credentials');
+        setState(() {
+          _emailError = 'An unexpected error occurred';
+          _isLoading = false;
+        });
 
         _showSnackBar(
-          message: 'Login failed. Please check your credentials.',
+          message: 'An unexpected error occurred. Please try again.',
           icon: Icons.error_outline_rounded,
           backgroundColor: JenixColorsApp.errorColor,
           duration: const Duration(seconds: 3),
         );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
       }
     }
   }
