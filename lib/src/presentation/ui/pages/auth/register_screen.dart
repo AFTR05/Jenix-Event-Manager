@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:jenix_event_manager/src/core/validators/fields_validators.dart';
+import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/buttons/custom_button_widget.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/form/custom_form_element.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/inputs/custom_auth_text_field_widget.dart';
@@ -27,11 +28,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // CONTROLLERS & STATE
   // ============================================================================
 
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   bool _acceptTerms = false;
   bool disableValidationInPhone = true;
@@ -39,18 +41,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   bool _loading = false;
 
-  String? _firstNameError;
-  String? _lastNameError;
+  String? _nameError;
   String? _emailError;
   String? _passwordError;
+  String? _confirmPasswordError;
 
   @override
   void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
+    _nameController.dispose();
     _phoneNumberController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -65,9 +67,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // ============================================================================
-          // GRADIENT BACKGROUND
-          // ============================================================================
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -170,15 +169,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   ),
                                 ),
                                 SizedBox(height: isMobile ? 20 : 28),
-
-                                // ✅ FIRST NAME con CustomFormElement
                                 CustomFormElement(
-                                  labelTitle: "First Name",
+                                  labelTitle: "Name",
                                   isRequired: true,
-                                  errorText: _firstNameError,
+                                  errorText: _nameError,
                                   widget: CustomAuthTextFieldWidget(
-                                    controller: _firstNameController,
-                                    hintText: "Enter your first name",
+                                    controller: _nameController,
+                                    hintText: "Enter your name",
                                     keyboardType: TextInputType.name,
                                     textInputAction: TextInputAction.next,
                                     prefix: Icon(
@@ -190,44 +187,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     ),
                                     validator: FieldsValidators.fieldIsRequired,
                                     onChanged: (_) {
-                                      if (_firstNameError != null) {
-                                        setState(() => _firstNameError = null);
+                                      if (_nameError != null) {
+                                        setState(() => _nameError = null);
                                       }
                                     },
                                   ),
                                 ),
 
                                 const SizedBox(height: 14),
-
-                                // ✅ LAST NAME con CustomFormElement
-                                CustomFormElement(
-                                  labelTitle: "Last Name",
-                                  isRequired: true,
-                                  errorText: _lastNameError,
-                                  widget: CustomAuthTextFieldWidget(
-                                    controller: _lastNameController,
-                                    hintText: "Enter your last name",
-                                    keyboardType: TextInputType.name,
-                                    textInputAction: TextInputAction.next,
-                                    prefix: Icon(
-                                      Icons.person_outline,
-                                      color: isDark
-                                          ? JenixColorsApp.lightGray
-                                          : JenixColorsApp.greyColorIcon,
-                                      size: 20,
-                                    ),
-                                    validator: FieldsValidators.fieldIsRequired,
-                                    onChanged: (_) {
-                                      if (_lastNameError != null) {
-                                        setState(() => _lastNameError = null);
-                                      }
-                                    },
-                                  ),
-                                ),
-
-                                const SizedBox(height: 14),
-
-                                // ✅ EMAIL con CustomFormElement
                                 CustomFormElement(
                                   labelTitle: "Email",
                                   isRequired: true,
@@ -269,7 +236,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     controller: _passwordController,
                                     hintText: "At least 6 characters",
                                     isPasswordField: true,
-                                    textInputAction: TextInputAction.done,
+                                    textInputAction: TextInputAction.next,
                                     validator: (value) =>
                                         FieldsValidators.passwordValidator(
                                           value,
@@ -278,6 +245,36 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     onChanged: (_) {
                                       if (_passwordError != null) {
                                         setState(() => _passwordError = null);
+                                      }
+                                      // Clear confirm password error if passwords match now
+                                      if (_confirmPasswordError != null &&
+                                          _passwordController.text ==
+                                              _confirmPasswordController.text) {
+                                        setState(
+                                          () => _confirmPasswordError = null,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ),
+
+                                const SizedBox(height: 14),
+
+                                // ✅ CONFIRM PASSWORD
+                                CustomFormElement(
+                                  labelTitle: "Confirm Password",
+                                  isRequired: true,
+                                  errorText: _confirmPasswordError,
+                                  widget: CustomAuthTextFieldWidget(
+                                    controller: _confirmPasswordController,
+                                    hintText: "Re-enter your password",
+                                    isPasswordField: true,
+                                    textInputAction: TextInputAction.done,
+                                    onChanged: (_) {
+                                      if (_confirmPasswordError != null) {
+                                        setState(
+                                          () => _confirmPasswordError = null,
+                                        );
                                       }
                                     },
                                     onFieldSubmitted: (_) => _registerAction(),
@@ -378,8 +375,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
                                               fontFamily: 'OpenSansHebrew',
-                                              decoration:
-                                                  TextDecoration.underline,
                                               color: isDark
                                                   ? JenixColorsApp
                                                         .primaryBlueLight
@@ -650,10 +645,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   void _registerAction() {
     setState(() {
-      _firstNameError = null;
-      _lastNameError = null;
+      _nameError = null;
       _emailError = null;
       _passwordError = null;
+      _confirmPasswordError = null;
     });
 
     if (!_acceptTerms) {
@@ -665,27 +660,30 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
-    final firstNameError = FieldsValidators.fieldIsRequired(
-      _firstNameController.text,
-    );
-    final lastNameError = FieldsValidators.fieldIsRequired(
-      _lastNameController.text,
-    );
+    final nameError = FieldsValidators.fieldIsRequired(_nameController.text);
     final emailError = FieldsValidators.emailValidator(_emailController.text);
     final passwordError = FieldsValidators.passwordValidator(
       _passwordController.text,
       minLength: 6,
     );
 
-    if (firstNameError != null ||
-        lastNameError != null ||
+    // Validate password confirmation
+    String? confirmPasswordError;
+    if (_confirmPasswordController.text.isEmpty) {
+      confirmPasswordError = 'Please confirm your password';
+    } else if (_passwordController.text != _confirmPasswordController.text) {
+      confirmPasswordError = 'Passwords do not match';
+    }
+
+    if (nameError != null ||
         emailError != null ||
-        passwordError != null) {
+        passwordError != null ||
+        confirmPasswordError != null) {
       setState(() {
-        _firstNameError = firstNameError;
-        _lastNameError = lastNameError;
+        _nameError = nameError;
         _emailError = emailError;
         _passwordError = passwordError;
+        _confirmPasswordError = confirmPasswordError;
       });
       return;
     }
@@ -698,32 +696,70 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     setState(() => _loading = true);
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
+      // Get authentication controller
+      final authController = ref.read(authenticationControllerProvider);
 
-      if (mounted) {
-        _showSnackBar(
-          message: 'Account created successfully! Welcome to Humboldt',
-          icon: Icons.check_circle_outline_rounded,
-          backgroundColor: JenixColorsApp.successColor,
-        );
+      // Prepare phone number (combine code + number)
+      final fullPhone = '$_phoneCode${_phoneNumberController.text.trim()}';
 
-        await Future.delayed(const Duration(seconds: 1));
-        if (mounted) {
-          Navigator.pushReplacementNamed(context, RoutesApp.login);
-        }
-      }
+      // Attempt registration
+      final result = await authController.register(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        name: _nameController.text.trim(),
+        phone: fullPhone,
+        role: 'user',
+        rememberMe: true,
+      );
+
+      if (!mounted) return;
+
+      // Handle result
+      result.fold(
+        // Error case
+        (failure) {
+          setState(() {
+            _emailError = failure.message;
+            _loading = false;
+          });
+
+          _showSnackBar(
+            message: failure.message,
+            icon: Icons.error_outline_rounded,
+            backgroundColor: JenixColorsApp.errorColor,
+            duration: const Duration(seconds: 3),
+          );
+        },
+        // Success case
+        (user) {
+          setState(() => _loading = false);
+
+          _showSnackBar(
+            message: 'Welcome to Humboldt, ${user.name}!',
+            icon: Icons.check_circle_outline_rounded,
+            backgroundColor: JenixColorsApp.successColor,
+          );
+
+          Future.delayed(const Duration(milliseconds: 800), () {
+            if (mounted) {
+              Navigator.pushReplacementNamed(context, RoutesApp.home);
+            }
+          });
+        },
+      );
     } catch (e) {
       if (mounted) {
+        setState(() {
+          _emailError = 'An unexpected error occurred';
+          _loading = false;
+        });
+
         _showSnackBar(
           message: 'Registration failed. Please try again.',
           icon: Icons.error_outline_rounded,
           backgroundColor: JenixColorsApp.errorColor,
           duration: const Duration(seconds: 3),
         );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _loading = false);
       }
     }
   }

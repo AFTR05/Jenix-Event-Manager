@@ -1,4 +1,4 @@
 {
-    "fieldIsRequired": "El campo es requerido"
-    
+    "fieldIsRequired": "El campo es requerido",
+    "unknownError": "Error desconocido"
 }
