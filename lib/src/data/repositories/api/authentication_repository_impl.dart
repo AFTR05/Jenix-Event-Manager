@@ -1,5 +1,4 @@
-import 'dart:convert';
-import 'package:either_dart/src/either.dart';
+import 'package:either_dart/either.dart';
 import 'package:jenix_event_manager/src/core/exceptions/failure.dart';
 import 'package:jenix_event_manager/src/data/sources/api_source.dart';
 import 'package:jenix_event_manager/src/data/sources/http/consumer_api.dart';
@@ -39,6 +38,29 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     return resultRequest.fold((failure) => Left(failure), (json) {
       final Map<String, dynamic> userMap = Map<String, dynamic>.from(json);
 
+      return Right(UserEntity.fromMap(userMap));
+    });
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> getUserInformation({
+    required String accessToken,
+  }) async {
+    //final url = "$path/local/user";
+    //final resultRequest = await ConsumerAPI.requestJSON<Map<String, dynamic>>(
+    //  url: url,
+    //  method: HTTPMethod.post,
+    //  jsonObject: {"email": email, "password": password},
+    //);
+  final devUser = {
+      "phone": "+573151234567",
+      "name": "Celeste",
+      "email": "celeste@example.com",
+      "role": "user",
+    };
+    final resultRequest = Future.value(Right(devUser));
+    return resultRequest.fold((failure) => Left(failure), (json) {
+      final Map<String, dynamic> userMap = Map<String, dynamic>.from(json);
       return Right(UserEntity.fromMap(userMap));
     });
   }
