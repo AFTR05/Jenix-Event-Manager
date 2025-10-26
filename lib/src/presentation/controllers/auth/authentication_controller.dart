@@ -33,24 +33,22 @@ class AuthenticationController {
     final prefs = await SharedPreferences.getInstance();
     final userJson = prefs.getString(_keyUserData);
     if (userJson == null || userJson.isEmpty) return null;
-    
+
     try {
       return UserEntity.fromJson(userJson);
     } catch (e) {
-      // Invalid data, remove it
       await prefs.remove(_keyUserData);
       return null;
     }
   }
 
-  /// Save session with remember me flag
   Future<void> _saveSession({
     required UserEntity user,
     required bool rememberMe,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyRememberMe, rememberMe);
-    
+
     if (rememberMe) {
       await _saveUserEntity(user);
     }
@@ -69,6 +67,25 @@ class AuthenticationController {
     return prefs.getBool(_keyRememberMe) ?? false;
   }
 
+  UserEntity _mergeUserWithInfo(UserEntity base, UserEntity? info) {
+    if (info == null) return base;
+    String chooseString(String a, String b) => b.isNotEmpty ? b : a;
+
+    String? chooseToken(String? a, String? b) {
+      if (b != null && b.isNotEmpty) return b;
+      return a;
+    }
+
+    return base.copyWith(
+      email: chooseString(base.email, info.email),
+      name: chooseString(base.name, info.name),
+      phone: chooseString(base.phone, info.phone),
+      role: chooseString(base.role, info.role),
+      accessToken: chooseToken(base.accessToken, info.accessToken),
+      refreshToken: chooseToken(base.refreshToken, info.refreshToken),
+    );
+  }
+
   // ========== PUBLIC METHODS ==========
 
   /// Get current logged user from loginProvider
@@ -82,16 +99,23 @@ class AuthenticationController {
     required String password,
     bool rememberMe = true,
   }) async {
-    final either = await authenticationUsecase.logIn(email: email, password: password);
-    
-    await either.fold(
-      (failure) async => null,
-      (user) async {
-        ref.read(loginProviderProvider.notifier).setState(user);
-        await _saveSession(user: user, rememberMe: rememberMe);
-      },
+    final either = await authenticationUsecase.logIn(
+      email: email,
+      password: password,
     );
-    
+
+    await either.fold((failure) async => null, (user) async {
+      final userInfoResult = await authenticationUsecase.getUserInformation(
+        accessToken: user.accessToken ?? '',
+      );
+      UserEntity finalUser = _mergeUserWithInfo(
+        user,
+        userInfoResult.isRight ? userInfoResult.right : null,
+      );
+      ref.read(loginProviderProvider.notifier).setState(finalUser);
+      await _saveSession(user: finalUser, rememberMe: rememberMe);
+    });
+
     return either;
   }
 
@@ -112,13 +136,17 @@ class AuthenticationController {
       role: role,
     );
 
-    await either.fold(
-      (failure) async => null,
-      (user) async {
-        ref.read(loginProviderProvider.notifier).setState(user);
-        await _saveSession(user: user, rememberMe: rememberMe);
-      },
-    );
+    await either.fold((failure) async => null, (user) async {
+      final userInfoResult = await authenticationUsecase.getUserInformation(
+        accessToken: user.accessToken ?? '',
+      );
+      UserEntity finalUser = _mergeUserWithInfo(
+        user,
+        userInfoResult.isRight ? userInfoResult.right : null,
+      );
+      ref.read(loginProviderProvider.notifier).setState(finalUser);
+      await _saveSession(user: finalUser, rememberMe: rememberMe);
+    });
 
     return either;
   }
@@ -129,14 +157,14 @@ class AuthenticationController {
     final accessToken = currentUser?.accessToken;
 
     Either<Failure, bool> result;
-    
+
     if (accessToken != null) {
       result = await authenticationUsecase.logOut(accessToken: accessToken);
     } else {
       result = const Right(true);
     }
 
-    if(result.isLeft) {
+    if (result.isLeft) {
       return result;
     }
 
@@ -150,18 +178,24 @@ class AuthenticationController {
   Future<Either<Failure, UserEntity>> refreshToken({
     required String refreshToken,
   }) async {
-    final either = await authenticationUsecase.refreshToken(refreshToken: refreshToken);
-    
-    await either.fold(
-      (failure) async => null,
-      (user) async {
-        ref.read(loginProviderProvider.notifier).setState(user);
-        // Update saved session with new tokens
-        final rememberMe = await _getRememberMe();
-        await _saveSession(user: user, rememberMe: rememberMe);
-      },
+    final either = await authenticationUsecase.refreshToken(
+      refreshToken: refreshToken,
     );
-    
+
+    await either.fold((failure) async => null, (user) async {
+      final userInfoResult = await authenticationUsecase.getUserInformation(
+        accessToken: user.accessToken ?? '',
+      );
+      UserEntity finalUser = _mergeUserWithInfo(
+        user,
+        userInfoResult.isRight ? userInfoResult.right : null,
+      );
+      ref.read(loginProviderProvider.notifier).setState(finalUser);
+      // Update saved session with new tokens
+      final rememberMe = await _getRememberMe();
+      await _saveSession(user: finalUser, rememberMe: rememberMe);
+    });
+
     return either;
   }
 
@@ -182,17 +216,29 @@ class AuthenticationController {
       final result = await authenticationUsecase.refreshToken(
         refreshToken: savedUser.refreshToken!,
       );
-      
+
       return result.fold(
         (failure) async {
-          // If refresh fails, use saved user data as fallback
-          ref.read(loginProviderProvider.notifier).setState(savedUser);
+          final userInfoResult = await authenticationUsecase.getUserInformation(
+            accessToken: savedUser.accessToken ?? '',
+          );
+          final finalUser = _mergeUserWithInfo(
+            savedUser,
+            userInfoResult.isRight ? userInfoResult.right : null,
+          );
+          ref.read(loginProviderProvider.notifier).setState(finalUser);
           return true;
         },
         (refreshedUser) async {
-          // Update with new tokens and data
-          ref.read(loginProviderProvider.notifier).setState(refreshedUser);
-          await _saveUserEntity(refreshedUser);
+          final userInfoResult = await authenticationUsecase.getUserInformation(
+            accessToken: refreshedUser.accessToken ?? '',
+          );
+          final finalUser = _mergeUserWithInfo(
+            refreshedUser,
+            userInfoResult.isRight ? userInfoResult.right : null,
+          );
+          ref.read(loginProviderProvider.notifier).setState(finalUser);
+          await _saveUserEntity(finalUser);
           return true;
         },
       );

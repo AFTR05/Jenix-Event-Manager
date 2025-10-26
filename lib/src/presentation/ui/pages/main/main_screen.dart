@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:jenix_event_manager/src/domain/entities/event_entity.dart';
 import 'package:jenix_event_manager/src/domain/entities/modality_entity.dart';
 import 'package:jenix_event_manager/src/domain/entities/user_entity.dart';
@@ -8,11 +10,11 @@ import 'package:jenix_event_manager/src/presentation/ui/pages/main/event/event_d
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/profile_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/schedule/screens/schedule_screen.dart';
 
-// === Colores institucionales ===
-const Color primaryColor = Color(0xFF103e69);
-const Color accentColor = Color(0xFFbe1723);
-const Color backgroundColor = Color(0xFF0d1b2a);
-const Color surfaceColor = Color(0xFF1b263b);
+
+const Color primaryColor = JenixColorsApp.primaryColor;
+const Color accentColor = JenixColorsApp.accentColor;
+const Color backgroundColor = JenixColorsApp.backgroundColor;
+const Color surfaceColor = JenixColorsApp.surfaceColor;
 const Color textColor = Colors.white;
 
 final UserEntity user1 = UserEntity(
@@ -88,7 +90,6 @@ final List<EventEntity> dummyEvents = [
     imageUrl: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800',
   ),
 ];
-
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
 
@@ -97,6 +98,7 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
+
   @override
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(bottomNavBarStateProvider);
