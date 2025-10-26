@@ -20,6 +20,10 @@ abstract class AuthenticationRepository {
     required String accessToken
   });
 
+  Future<Either<Failure, UserEntity>> getUserInformation({
+    required String accessToken
+  });
+
     Future<Either<Failure, UserEntity>> refreshToken({
         required String refreshToken
     });
