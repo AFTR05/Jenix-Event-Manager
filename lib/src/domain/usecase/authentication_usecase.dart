@@ -35,6 +35,12 @@ class AuthenticationUsecase {
     return authenticationRepository.logOut(accessToken: accessToken);
   }
 
+  Future<Either<Failure, UserEntity>> getUserInformation({
+    required String accessToken,
+  }) {
+    return authenticationRepository.getUserInformation(accessToken: accessToken);
+  }
+
   Future<Either<Failure, UserEntity>> refreshToken({
     required String refreshToken,
   }) {
