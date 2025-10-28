@@ -9,7 +9,7 @@ import 'package:jenix_event_manager/src/presentation/providers_ui/bottom_nav_bar
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/event/event_detail_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/profile_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/schedule/screens/schedule_screen.dart';
-
+import 'package:jenix_event_manager/translations/locale_keys.g.dart';
 
 const Color primaryColor = JenixColorsApp.primaryColor;
 const Color accentColor = JenixColorsApp.accentColor;
@@ -98,7 +98,6 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
-
   @override
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(bottomNavBarStateProvider);
