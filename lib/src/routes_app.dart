@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/home/home_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/login_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/register_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/main_screen.dart';
@@ -26,7 +27,7 @@ class RoutesApp {
     switch (settings.name) {
       case index:
         // La ruta inicial ahora es el SplashScreen
-        return MaterialPageRoute(builder: (_) => const SplashScreen());
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
       
       case splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
