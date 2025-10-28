@@ -5,5 +5,6 @@
 abstract class  LocaleKeys {
   static const fieldIsRequired = 'fieldIsRequired';
   static const unknownError = 'unknownError';
+  static const selectLanguageLabel = 'selectLanguageLabel';
 
 }
