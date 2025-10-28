@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jenix_event_manager/src/core/validators/fields_validators.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/buttons/custom_button_widget.dart';
@@ -9,11 +9,6 @@ import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/form/cust
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/inputs/custom_auth_text_field_widget.dart';
 import 'package:jenix_event_manager/src/routes_app.dart';
 
-/// LoginScreen - Alexander von Humboldt Event Manager
-///
-/// **Autor:** AFTR05
-/// **Última modificación:** 2025-10-15 20:06:31 UTC
-/// **Versión:** 2.0.0
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -24,11 +19,9 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
 
   bool _rememberMe = true;
   bool _isLoading = false;
-
   String? _emailError;
   String? _passwordError;
 
@@ -44,423 +37,310 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final size = MediaQuery.of(context).size;
     final isTablet = size.width > 600;
     final isMobile = size.width < 600;
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: const Color(0xFF0C1C2C),
       body: Stack(
         children: [
+          /// ===== FONDO INSTITUCIONAL =====
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
+                colors: [
+                  Color(0xFF0A2647),
+                  Color(0xFF103E69),
+                  Color(0xFF09131E),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: isDark
-                    ? [JenixColorsApp.darkBackground, JenixColorsApp.darkGray]
-                    : [
-                        JenixColorsApp.loginBeginGradient,
-                        JenixColorsApp.loginEndGradient,
-                      ],
               ),
             ),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  // Logo
-                  SizedBox(
-                    height: isMobile ? 110 : 130,
-                    child: Center(
-                      child: Hero(
-                        tag: 'app_logo',
-                        child: SvgPicture.asset(
-                          'assets/images/humboldt_logo.svg',
-                          width: isMobile ? 90 : 110,
-                          height: isMobile ? 90 : 110,
-                          colorFilter: ColorFilter.mode(
-                            isDark
-                                ? JenixColorsApp.primaryBlueLight
-                                : JenixColorsApp.backgroundWhite,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+          ),
 
-                  // Form
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isTablet ? 60 : 24,
-                        vertical: isMobile ? 24 : 32,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.scaffoldBackgroundColor,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: JenixColorsApp.shadowColor,
-                            blurRadius: 20,
-                            offset: const Offset(0, -5),
-                          ),
-                        ],
-                      ),
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: isTablet ? 450 : double.infinity,
-                            ),
-                            child: Form(
-                              key: _formKey,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Welcome back',
-                                    style: TextStyle(
-                                      fontSize: isMobile ? 24 : 28,
-                                      fontWeight: FontWeight.w700,
-                                      color: isDark
-                                          ? JenixColorsApp.backgroundWhite
-                                          : JenixColorsApp.primaryBlue,
-                                      fontFamily: 'OpenSansHebrew',
-                                      letterSpacing: -0.5,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Please login to continue',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w400,
-                                      color: isDark
-                                          ? JenixColorsApp.lightGray
-                                          : JenixColorsApp.subtitleColor,
-                                      fontFamily: 'OpenSansHebrew',
-                                    ),
-                                  ),
-                                  SizedBox(height: isMobile ? 24 : 32),
-
-                                  // ✅ EMAIL con CustomFormElement
-                                  CustomFormElement(
-                                    labelTitle: "Email",
-                                    isRequired: true,
-                                    errorText: _emailError,
-                                    widget: CustomAuthTextFieldWidget(
-                                      controller: _emailController,
-                                      hintText:
-                                          "Enter your institutional email",
-                                      keyboardType: TextInputType.emailAddress,
-                                      textInputAction: TextInputAction.next,
-                                      prefix: Icon(
-                                        Icons.email_outlined,
-                                        color: isDark
-                                            ? JenixColorsApp.lightGray
-                                            : JenixColorsApp.greyColorIcon,
-                                        size: 20,
-                                      ),
-                                      validator:
-                                          FieldsValidators.emailValidator,
-                                      onChanged: (_) {
-                                        if (_emailError != null) {
-                                          setState(() => _emailError = null);
-                                        }
-                                      },
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 20),
-
-                                  // ✅ PASSWORD con CustomFormElement
-                                  CustomFormElement(
-                                    labelTitle: "Password",
-                                    isRequired: true,
-                                    errorText: _passwordError,
-                                    widget: CustomAuthTextFieldWidget(
-                                      controller: _passwordController,
-                                      hintText: "Enter your password",
-                                      isPasswordField: true,
-                                      textInputAction: TextInputAction.done,
-                                      validator:
-                                          FieldsValidators.fieldIsRequired,
-                                      onFieldSubmitted: (_) =>
-                                          _loginValidation(),
-                                      onChanged: (_) {
-                                        if (_passwordError != null) {
-                                          setState(() => _passwordError = null);
-                                        }
-                                      },
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 12),
-
-                                  // Remember me & Forgot
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      InkWell(
-                                        onTap: () => setState(
-                                          () => _rememberMe = !_rememberMe,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 4,
-                                            horizontal: 4,
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              SizedBox(
-                                                height: 20,
-                                                width: 20,
-                                                child: Checkbox(
-                                                  value: _rememberMe,
-                                                  onChanged: (value) {
-                                                    setState(
-                                                      () => _rememberMe =
-                                                          value ?? false,
-                                                    );
-                                                  },
-                                                  activeColor: isDark
-                                                      ? JenixColorsApp
-                                                            .primaryBlueLight
-                                                      : JenixColorsApp
-                                                            .primaryBlue,
-                                                  checkColor: JenixColorsApp
-                                                      .backgroundWhite,
-                                                  materialTapTargetSize:
-                                                      MaterialTapTargetSize
-                                                          .shrinkWrap,
-                                                  visualDensity:
-                                                      VisualDensity.compact,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          4,
-                                                        ),
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                'Remember me',
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: isDark
-                                                      ? JenixColorsApp.lightGray
-                                                      : JenixColorsApp
-                                                            .subtitleColor,
-                                                  fontWeight: FontWeight.w500,
-                                                  fontFamily: 'OpenSansHebrew',
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: _handleForgotPassword,
-                                        style: TextButton.styleFrom(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 4,
-                                          ),
-                                          minimumSize: const Size(0, 0),
-                                          tapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
-                                          foregroundColor: isDark
-                                              ? JenixColorsApp.primaryBlueLight
-                                              : JenixColorsApp.primaryBlue,
-                                        ),
-                                        child: Text(
-                                          'Forgot Password?',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: isDark
-                                                ? JenixColorsApp
-                                                      .primaryBlueLight
-                                                : JenixColorsApp.primaryBlue,
-                                            fontWeight: FontWeight.w600,
-                                            fontFamily: 'OpenSansHebrew',
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  SizedBox(height: isMobile ? 20 : 24),
-
-                                  CustomButtonWidget(
-                                    onPressed: _loginValidation,
-                                    title: "Login",
-                                    backgroundColor: isDark
-                                        ? JenixColorsApp.primaryBlueLight
-                                        : JenixColorsApp.buttonPrimary,
-                                    isLoading: _isLoading,
-                                    icon: _isLoading
-                                        ? null
-                                        : Icons.login_rounded,
-                                  ),
-
-                                  const SizedBox(height: 20),
-
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Divider(
-                                          color: isDark
-                                              ? JenixColorsApp.grayColor
-                                              : JenixColorsApp.inputBorder,
-                                          thickness: 1,
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                        ),
-                                        child: Text(
-                                          'OR',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: isDark
-                                                ? JenixColorsApp.lightGray
-                                                : JenixColorsApp.subtitleColor,
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: 'OpenSansHebrew',
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Divider(
-                                          color: isDark
-                                              ? JenixColorsApp.grayColor
-                                              : JenixColorsApp.inputBorder,
-                                          thickness: 1,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  const SizedBox(height: 20),
-
-                                  Center(
-                                    child: Wrap(
-                                      alignment: WrapAlignment.center,
-                                      crossAxisAlignment:
-                                          WrapCrossAlignment.center,
-                                      children: [
-                                        Text(
-                                          "Don't have an account? ",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: isDark
-                                                ? JenixColorsApp.lightGray
-                                                : JenixColorsApp.slateGray,
-                                            fontWeight: FontWeight.w400,
-                                            fontFamily: 'OpenSansHebrew',
-                                          ),
-                                        ),
-                                        InkWell(
-                                          onTap: _handleSignUp,
-                                          borderRadius: BorderRadius.circular(
-                                            4,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 4,
-                                              vertical: 2,
-                                            ),
-                                            child: Text(
-                                              'Sign Up',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                                fontFamily: 'OpenSansHebrew',
-                                                color: isDark
-                                                    ? JenixColorsApp
-                                                          .primaryBlueLight
-                                                    : JenixColorsApp
-                                                          .primaryBlue,
-                                                decorationColor: isDark
-                                                    ? JenixColorsApp
-                                                          .primaryBlueLight
-                                                    : JenixColorsApp
-                                                          .primaryBlue,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 16),
-
-                                  Center(
-                                    child: Text(
-                                      '© 2025 Alexander von Humboldt',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: isDark
-                                            ? JenixColorsApp.grayColor
-                                            : JenixColorsApp.lightGray,
-                                        fontWeight: FontWeight.w400,
-                                        fontFamily: 'OpenSansHebrew',
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+          /// ===== SOMBRA ROJA DECORATIVA =====
+          Positioned(
+            left: -100,
+            bottom: -80,
+            child: Container(
+              height: 220,
+              width: 220,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(0x22BE1723),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x55BE1723),
+                    blurRadius: 200,
+                    spreadRadius: 100,
+                  )
                 ],
               ),
             ),
           ),
 
-          if (_isLoading)
-            Positioned.fill(
-              child: Container(
-                color: JenixColorsApp.overlayColor,
-                child: const Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        height: 48,
-                        width: 48,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 4,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            JenixColorsApp.backgroundWhite,
+          /// ===== BOTÓN VOLVER =====
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pushReplacementNamed(context, RoutesApp.index),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white24),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 10,
+                            offset: Offset(0, 3),
                           ),
-                        ),
+                        ],
                       ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Signing in...',
-                        style: TextStyle(
-                          color: JenixColorsApp.backgroundWhite,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'OpenSansHebrew',
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.arrow_back_ios_new_rounded,
+                              color: Colors.white, size: 18),
+                          SizedBox(width: 6),
+                          Text(
+                            "Volver al inicio",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          /// ===== FORMULARIO PRINCIPAL =====
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isTablet ? 80 : 24,
+                  vertical: 40,
+                ),
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 460),
+                  padding: const EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF12263F).withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: const Color(0x33FFFFFF)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 20,
+                        offset: Offset(0, 6),
                       ),
                     ],
                   ),
+                  child: Form(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        /// ===== LOGO =====
+                        Center(
+                          child: Hero(
+                            tag: 'app_logo',
+                            child: SvgPicture.asset(
+                              'assets/images/humboldt_logo.svg',
+                              width: isMobile ? 70 : 90,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.white,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        /// ===== TITULO =====
+                        const Text(
+                          "Bienvenido a Eventum",
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            fontFamily: 'OpenSansHebrew',
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          "Inicia sesión con tu cuenta institucional",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF9DA9B9),
+                            fontFamily: 'OpenSansHebrew',
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+
+                        /// ===== CORREO =====
+                        CustomFormElement(
+                          labelTitle: "Correo institucional",
+                          isRequired: true,
+                          errorText: _emailError,
+                          widget: CustomAuthTextFieldWidget(
+                            controller: _emailController,
+                            hintText: "ejemplo@cue.edu.co",
+                            keyboardType: TextInputType.emailAddress,
+                            prefix: const Icon(Icons.email_outlined,
+                                color: Colors.white70, size: 20),
+                            validator: FieldsValidators.emailValidator,
+                            onChanged: (_) {
+                              if (_emailError != null) {
+                                setState(() => _emailError = null);
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        /// ===== CONTRASEÑA =====
+                        CustomFormElement(
+                          labelTitle: "Contraseña",
+                          isRequired: true,
+                          errorText: _passwordError,
+                          widget: CustomAuthTextFieldWidget(
+                            controller: _passwordController,
+                            hintText: "Ingresa tu contraseña",
+                            isPasswordField: true,
+                            prefix: const Icon(Icons.lock_outline_rounded,
+                                color: Colors.white70, size: 20),
+                            validator: FieldsValidators.fieldIsRequired,
+                            onChanged: (_) {
+                              if (_passwordError != null) {
+                                setState(() => _passwordError = null);
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        /// ===== RECORDARME =====
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                              onTap: () => setState(() => _rememberMe = !_rememberMe),
+                              borderRadius: BorderRadius.circular(8),
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: Checkbox(
+                                      value: _rememberMe,
+                                      onChanged: (v) =>
+                                          setState(() => _rememberMe = v ?? false),
+                                      activeColor: const Color(0xFFBE1723),
+                                      checkColor: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    'Recordarme',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white70,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: 'OpenSansHebrew',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: _handleForgotPassword,
+                              style: TextButton.styleFrom(
+                                foregroundColor: const Color(0xFFBE1723),
+                              ),
+                              child: const Text(
+                                '¿Olvidaste tu contraseña?',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+
+                        /// ===== BOTÓN LOGIN =====
+                        CustomButtonWidget(
+                          onPressed: _loginValidation,
+                          title: "Iniciar sesión",
+                          backgroundColor: const Color(0xFFBE1723),
+                          isLoading: _isLoading,
+                          icon: Icons.login_rounded,
+                        ),
+                        const SizedBox(height: 32),
+
+                        /// ===== REGISTRO =====
+                        Center(
+                          child: RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.white70,
+                              ),
+                              children: [
+                                const TextSpan(text: '¿No tienes cuenta? '),
+                                TextSpan(
+                                  text: 'Regístrate aquí',
+                                  style: const TextStyle(
+                                    color: Color(0xFFBE1723),
+                                    fontWeight: FontWeight.w600,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = _handleSignUp,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        Center(
+                          child: Text(
+                            '© 2025 Universidad Alexander von Humboldt — Eventum',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white.withOpacity(0.7),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          /// ===== LOADER =====
+          if (_isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black54,
+                child: const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
                 ),
               ),
             ),
@@ -469,6 +349,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
+  // ====================== LÓGICA ======================
+
   void _loginValidation() {
     setState(() {
       _emailError = null;
@@ -476,9 +358,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     final emailError = FieldsValidators.emailValidator(_emailController.text);
-    final passwordError = FieldsValidators.fieldIsRequired(
-      _passwordController.text,
-    );
+    final passwordError =
+        FieldsValidators.fieldIsRequired(_passwordController.text);
 
     if (emailError != null || passwordError != null) {
       setState(() {
@@ -496,10 +377,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Get authentication controller
       final authController = ref.read(authenticationControllerProvider);
-
-      // Attempt login
       final result = await authController.logIn(
         email: _emailController.text.trim(),
         password: _passwordController.text,
@@ -508,34 +386,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       if (!mounted) return;
 
-      // Handle result
       result.fold(
-        // Error case
         (failure) {
           setState(() {
             _emailError = failure.message;
             _isLoading = false;
           });
-
           _showSnackBar(
-            message: failure.message,
-            icon: Icons.error_outline_rounded,
-            backgroundColor: JenixColorsApp.errorColor,
-            duration: const Duration(seconds: 3),
-          );
+              message: failure.message,
+              icon: Icons.error_outline_rounded,
+              backgroundColor: Colors.redAccent);
         },
-        // Success case
         (user) {
           setState(() => _isLoading = false);
-
           _showSnackBar(
-            message: 'Welcome back, ${user.name}!',
-            icon: Icons.check_circle_outline_rounded,
-            backgroundColor: JenixColorsApp.successColor,
-          );
-
-          // Navigate to home after short delay
-          Future.delayed(const Duration(milliseconds: 500), () {
+              message: 'Bienvenido, ${user.name}!',
+              icon: Icons.check_circle_outline_rounded,
+              backgroundColor: Colors.green);
+          Future.delayed(const Duration(milliseconds: 600), () {
             if (mounted) {
               Navigator.pushReplacementNamed(context, RoutesApp.home);
             }
@@ -543,27 +411,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         },
       );
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _emailError = 'An unexpected error occurred';
-          _isLoading = false;
-        });
-
-        _showSnackBar(
-          message: 'An unexpected error occurred. Please try again.',
-          icon: Icons.error_outline_rounded,
-          backgroundColor: JenixColorsApp.errorColor,
-          duration: const Duration(seconds: 3),
-        );
-      }
+      setState(() => _isLoading = false);
+      _showSnackBar(
+        message: 'Ocurrió un error inesperado. Intenta nuevamente.',
+        icon: Icons.error_outline_rounded,
+        backgroundColor: Colors.redAccent,
+      );
     }
   }
 
   void _handleForgotPassword() {
     _showSnackBar(
-      message: 'Please contact IT support for password recovery',
+      message: 'Comunícate con soporte técnico para restablecer tu contraseña.',
       icon: Icons.info_outline_rounded,
-      backgroundColor: JenixColorsApp.infoColor,
+      backgroundColor: Colors.blueAccent,
     );
   }
 
@@ -575,23 +436,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     required String message,
     required IconData icon,
     required Color backgroundColor,
-    Duration duration = const Duration(seconds: 2),
+    Duration duration = const Duration(seconds: 3),
   }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            Icon(icon, color: JenixColorsApp.backgroundWhite, size: 22),
+            Icon(icon, color: Colors.white, size: 22),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  fontFamily: 'OpenSansHebrew',
-                  fontWeight: FontWeight.w500,
-                  color: JenixColorsApp.backgroundWhite,
-                ),
-              ),
+              child: Text(message, style: const TextStyle(color: Colors.white)),
             ),
           ],
         ),
