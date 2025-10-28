@@ -36,8 +36,8 @@ class JenixColorsApp {
 
   // Dynamic colors from Environment (mantén compatibilidad)
   static final jenixAppColor = HexColor.fromHex(
-    EnvironmentConfig.hexColor.isNotEmpty 
-        ? EnvironmentConfig.hexColor 
+    EnvironmentConfig.hexColor.isNotEmpty
+        ? EnvironmentConfig.hexColor
         : '003A70', // Azul Humboldt por defecto
   );
 
@@ -230,6 +230,11 @@ class JenixColorsApp {
   static const Color purpleColor = Color(0xFF8B5CF6);
   static const Color purpleLight = Color(0xFFEDE9FE);
   static const Color purpleDark = Color(0xFF7C3AED);
+
+  static const Color primaryColor = Color(0xFF103e69);
+  static const Color accentColor = Color(0xFFbe1723);
+  static const Color backgroundColor = Color(0xFF0d1b2a);
+  static const Color surfaceColor = Color(0xFF1b263b);
 
   // ============================================================================
   // UTILITY METHODS
