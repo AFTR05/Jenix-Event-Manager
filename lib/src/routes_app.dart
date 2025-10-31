@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/home/home_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/login_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/register_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/campus/campus_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/main_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/splash/splash_screen.dart';
 
@@ -14,6 +15,8 @@ class RoutesApp {
   static const String login = "/login";
   static const String register = "/register";
   static const String home = "/home";
+    static const String campus = "/campus";
+
   
   // Rutas de perfil y configuración
   static const String editProfile = "/edit-profile";
@@ -22,6 +25,7 @@ class RoutesApp {
   static const String share = "/share";
   static const String help = "/help";
   static const String appSettings = "/settings";
+
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -40,6 +44,9 @@ class RoutesApp {
       
       case home:
         return MaterialPageRoute(builder: (_) => const MainScreen());
+
+      case campus:
+        return MaterialPageRoute(builder: (_) => const CampusListScreen());
       
       // Rutas de perfil (placeholder por ahora)
       case editProfile:

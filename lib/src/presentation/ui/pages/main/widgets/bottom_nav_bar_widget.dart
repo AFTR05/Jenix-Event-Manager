@@ -1,87 +1,82 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/widgets/bottom_nav_bar_item_widget.dart';
+import 'package:jenix_event_manager/src/presentation/providers_ui/bottom_nav_bar_state.dart';
 
-/// BottomNavBarWidget - Alexander von Humboldt Event Manager
-/// Bottom navigation bar principal con diseño Jenix
-class BottomNavBarWidget extends StatelessWidget {
+class BottomNavBarWidget extends ConsumerWidget {
   final int currentIndex;
-  final void Function(int) onTap;
 
   const BottomNavBarWidget({
     super.key,
     required this.currentIndex,
-    required this.onTap,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+  Widget build(BuildContext context, WidgetRef ref) {
+    const icons = [
+      Icons.home_rounded,
+      Icons.schedule_rounded,
+      Icons.event_rounded,
+      Icons.person_rounded,
+      Icons.location_city_rounded,
+      Icons.meeting_room_rounded,
+    ];
+
+    const labels = ['Inicio', 'Agenda', 'Eventos', 'Perfil', 'Campus', 'Salones'];
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark 
-            ? JenixColorsApp.darkBackground 
-            : JenixColorsApp.backgroundWhite,
-        border: Border(
-          top: BorderSide(
-            color: isDark
-                ? JenixColorsApp.darkGray
-                : JenixColorsApp.lightGrayBorder,
-            width: 1,
-          ),
-        ),
+        color: JenixColorsApp.surfaceColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
           BoxShadow(
-            color: (isDark 
-                ? JenixColorsApp.shadowColor 
-                : JenixColorsApp.grayColor).withOpacity(0.08),
-            spreadRadius: 0,
-            blurRadius: 16,
-            offset: const Offset(0, -4),
+            color: Colors.black.withOpacity(0.4),
+            offset: const Offset(0, -3),
+            blurRadius: 8,
           ),
         ],
       ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              BottomNavItemWidget(
-                currentIndex: currentIndex,
-                onTap: onTap,
-                iconPath: 'assets/images/icons/home_icon.svg',
-                label: 'Home',
-                index: 0,
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(icons.length, (index) {
+          final isActive = index == currentIndex;
+          return GestureDetector(
+            onTap: () => ref.read(bottomNavBarStateProvider.notifier).select(index),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeInOut,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: isActive
+                    ? JenixColorsApp.accentColor.withOpacity(0.15)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
               ),
-              BottomNavItemWidget(
-                currentIndex: currentIndex,
-                onTap: onTap,
-                iconPath: 'assets/images/icons/schedule_icon.svg',
-                label: 'Schedule',
-                index: 1,
+              child: Row(
+                children: [
+                  Icon(
+                    icons[index],
+                    color: isActive
+                        ? JenixColorsApp.accentColor
+                        : Colors.white70,
+                  ),
+                  if (isActive) ...[
+                    const SizedBox(width: 6),
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 300),
+                      style: const TextStyle(
+                        color: JenixColorsApp.accentColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      child: Text(labels[index]),
+                    ),
+                  ],
+                ],
               ),
-              BottomNavItemWidget(
-                currentIndex: currentIndex,
-                onTap: onTap,
-                iconPath: 'assets/images/icons/events_icon.svg',
-                label: 'Events',
-                index: 2,
-              ),
-              BottomNavItemWidget(
-                currentIndex: currentIndex,
-                onTap: onTap,
-                iconPath: 'assets/images/icons/account_icon.svg',
-                label: 'Profile',
-                index: 3,
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        }),
       ),
     );
   }
