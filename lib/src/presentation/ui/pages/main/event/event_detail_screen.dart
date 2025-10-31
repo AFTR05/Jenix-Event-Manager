@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jenix_event_manager/src/domain/entities/event_entity.dart';
-import 'package:jenix_event_manager/src/domain/entities/modality_entity.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/modality_enum.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/widgets/bottom_nav_bar_widget.dart';
 
 class EventDetailScreen extends StatelessWidget {
@@ -19,7 +19,7 @@ class EventDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = switch (event.status) {
+    final statusColor = switch (event.state) {
       'Activo' => Colors.greenAccent,
       'En curso' => Colors.orangeAccent,
       _ => Colors.redAccent,
@@ -29,10 +29,6 @@ class EventDetailScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFF0d1b2a),
-      bottomNavigationBar: BottomNavBarWidget(
-        currentIndex: currentIndex,
-        onTap: onNavTap,
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -114,7 +110,7 @@ class EventDetailScreen extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: Image.network(
-        event.imageUrl ?? 'https://via.placeholder.com/300',
+        event.urlImage ?? 'https://via.placeholder.com/300',
         height: isSquare ? 250 : 300,
         width: double.infinity,
         fit: BoxFit.cover,
@@ -134,19 +130,17 @@ class EventDetailScreen extends StatelessWidget {
         _infoRow(Icons.calendar_today, "${event.date.toLocal()}".split(' ')[0]),
         const SizedBox(height: 8),
         _infoRow(Icons.access_time,
-            "${event.beginHour.hour.toString().padLeft(2, '0')}:${event.beginHour.minute.toString().padLeft(2, '0')} - "
-            "${event.finishHour.hour.toString().padLeft(2, '0')}:${event.finishHour.minute.toString().padLeft(2, '0')}"),
+            "${event.beginHour.toString().padLeft(2, '0')}:${event.beginHour.toString().padLeft(2, '0')} - "
+            "${event.endHour.toString().padLeft(2, '0')}:${event.endHour.toString().padLeft(2, '0')}"),
         const SizedBox(height: 8),
-        _infoRow(Icons.location_on, event.campus),
+        _infoRow(Icons.location_on, event.room.type),
         const SizedBox(height: 8),
-        _infoRow(Icons.wifi, event.modality.label),
+        _infoRow(Icons.wifi, event.modality.name),
         const SizedBox(height: 8),
         _infoRow(Icons.account_tree, event.organizationArea),
         const SizedBox(height: 8),
-        _infoRow(Icons.person, event.responsible.name),
+        _infoRow(Icons.person, event.responsablePerson.name),
         const SizedBox(height: 8),
-        _infoRow(Icons.group, "Participantes: ${event.participants.length}/${event.maxAttendees}"),
-        const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
@@ -155,7 +149,7 @@ class EventDetailScreen extends StatelessWidget {
             border: Border.all(color: statusColor),
           ),
           child: Text(
-            event.status,
+            event.state,
             style: TextStyle(color: statusColor, fontWeight: FontWeight.bold),
           ),
         ),
