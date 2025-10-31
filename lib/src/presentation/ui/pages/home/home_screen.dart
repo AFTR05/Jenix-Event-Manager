@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/main_screen.dart' as JenixColorsApp;
+import 'package:jenix_event_manager/translations/locale_keys.g.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,9 +12,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  static const Color primaryDark = Color(0xFF103E69);
-  static const Color accentRed = Color(0xFFBE1723);
-  static const Color bgDark = Color(0xFF0B1116);
+  static const Color accentRed = JenixColorsApp.accentColor;
+  static const Color bgDark = JenixColorsApp.backgroundColor;
 
   static const String _logoAsset = 'assets/images/eventum_logo.png';
   static const String _bannerAsset = 'assets/images/universidad_banner.gif';
@@ -51,11 +53,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             backgroundColor: Colors.black.withOpacity(0.75),
             toolbarHeight: 78,
             title: Row(
-              children: [
+                children: [
                 Image.asset(_logoAsset, height: 42),
                 const SizedBox(width: 12),
                 Text(
-                  'Eventum',
+                    LocaleKeys.appName.tr(),
                   style: GoogleFonts.poppins(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -65,12 +67,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ],
             ),
             actions: [
-              _HeaderButton(label: "Inicio", onTap: () {}),
-              _HeaderButton(label: "Eventos", onTap: () {}),
-              _HeaderButton(label: "Nosotros", onTap: () {}),
+                _HeaderButton(label: LocaleKeys.homeHeaderInicio.tr(), onTap: () {}),
+                _HeaderButton(label: LocaleKeys.homeHeaderEventos.tr(), onTap: () {}),
+                _HeaderButton(label: LocaleKeys.homeHeaderNosotros.tr(), onTap: () {}),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: ElevatedButton(
+                  child: ElevatedButton(
                   onPressed: () => Navigator.pushNamed(context, '/login'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: accentRed,
@@ -78,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
                   child: Text(
-                    'Ingresar',
+                    LocaleKeys.homeHeaderIngresar.tr(),
                     style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -111,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           Image.asset(_logoAsset, height: isWide ? 140 : 96),
                           const SizedBox(height: 18),
                           Text(
-                            'La excelencia en gestión de eventos académicos',
+                            LocaleKeys.homeHeroTagline.tr(),
                             textAlign: TextAlign.center,
                             style: GoogleFonts.lora(
                               fontSize: isWide ? 30 : 20,
@@ -131,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                 ),
-                                child: Text('Conoce más', style: GoogleFonts.poppins(fontSize: 15, color: Colors.white)),
+                                child: Text(LocaleKeys.homeHeroLearnMore.tr(), style: GoogleFonts.poppins(fontSize: 15, color: Colors.white)),
                               ),
                               const SizedBox(width: 12),
                               OutlinedButton(
@@ -142,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                 ),
-                                child: Text('Contacto', style: GoogleFonts.poppins(fontSize: 15)),
+                                child: Text(LocaleKeys.homeHeroContact.tr(), style: GoogleFonts.poppins(fontSize: 15)),
                               ),
                             ],
                           ),
@@ -164,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Column(
                 children: [
                   Text(
-                    'Una experiencia organizada. Diseño, control y trazabilidad en cada evento.',
+                    LocaleKeys.homeSubtitle.tr(),
                     style: GoogleFonts.poppins(
                       fontSize: isWide ? 24 : 18,
                       color: Colors.white,
@@ -174,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   const SizedBox(height: 14),
                   Text(
-                    'Eventum centraliza la planificación, las reservas y las inscripciones de eventos, garantizando visibilidad y control para organizadores y asistentes.',
+                    LocaleKeys.homeDescription.tr(),
                     style: GoogleFonts.poppins(
                       fontSize: isWide ? 16 : 14,
                       color: Colors.grey[300],
@@ -200,26 +202,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 children: [
                   _UniformFeatureCard(
                     icon: Icons.event_available_rounded,
-                    title: 'Gestión de eventos',
-                    description: 'Planificación, inscripción y seguimiento centralizado.',
+                    title: LocaleKeys.homeFeaturesEventsTitle.tr(),
+                    description: LocaleKeys.homeFeaturesEventsDescription.tr(),
                     accent: accentRed,
                   ),
                   _UniformFeatureCard(
                     icon: Icons.meeting_room_rounded,
-                    title: 'Gestión de espacios',
-                    description: 'Reservas inteligentes que evitan solapamientos.',
+                    title: LocaleKeys.homeFeaturesSpacesTitle.tr(),
+                    description: LocaleKeys.homeFeaturesSpacesDescription.tr(),
                     accent: accentRed,
                   ),
                   _UniformFeatureCard(
                     icon: Icons.how_to_reg_rounded,
-                    title: 'Control de asistencia',
-                    description: 'Check-in y reportes de participación en tiempo real.',
+                    title: LocaleKeys.homeFeaturesAttendanceTitle.tr(),
+                    description: LocaleKeys.homeFeaturesAttendanceDescription.tr(),
                     accent: accentRed,
                   ),
                   _UniformFeatureCard(
                     icon: Icons.insert_chart_rounded,
-                    title: 'Reportes & estadísticas',
-                    description: 'Exportación a Excel/PDF y dashboards claros.',
+                    title: LocaleKeys.homeFeaturesReportsTitle.tr(),
+                    description: LocaleKeys.homeFeaturesReportsDescription.tr(),
                     accent: accentRed,
                   ),
                 ],
@@ -237,10 +239,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(vertical: 26),
               child: Column(
                 children: [
-                  Text('Universidad Alexander von Humboldt • Armenia, Quindío',
-                      style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[400])),
+                  Text(LocaleKeys.homeFooterUniversity.tr(), style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[400])),
                   const SizedBox(height: 6),
-                  Text('Creado por Jenix © 2025', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[500])),
+                  Text(LocaleKeys.homeFooterCopyright.tr(), style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[500])),
                 ],
               ),
             ),

@@ -8,6 +8,8 @@ import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/buttons/c
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/form/custom_form_element.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/inputs/custom_auth_text_field_widget.dart';
 import 'package:jenix_event_manager/src/routes_app.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:jenix_event_manager/translations/locale_keys.g.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -102,15 +104,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ],
                       ),
-                      child: Row(
+                          child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Icon(Icons.arrow_back_ios_new_rounded,
-                              color: Colors.white, size: 18),
-                          SizedBox(width: 6),
+                        children: [
+                          const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                          const SizedBox(width: 6),
                           Text(
-                            "Volver al inicio",
-                            style: TextStyle(
+                            LocaleKeys.authLoginBackToHome.tr(),
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -170,9 +171,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(height: 24),
 
                         /// ===== TITULO =====
-                        const Text(
-                          "Bienvenido a Eventum",
-                          style: TextStyle(
+                        Text(LocaleKeys.authLoginTitle.tr(),
+                          style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -180,9 +180,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
-                          "Inicia sesión con tu cuenta institucional",
-                          style: TextStyle(
+                        Text(LocaleKeys.authLoginSubtitle.tr(),
+                          style: const TextStyle(
                             fontSize: 14,
                             color: Color(0xFF9DA9B9),
                             fontFamily: 'OpenSansHebrew',
@@ -192,12 +191,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                         /// ===== CORREO =====
                         CustomFormElement(
-                          labelTitle: "Correo institucional",
+                          labelTitle: LocaleKeys.authLoginEmailLabel.tr(),
                           isRequired: true,
                           errorText: _emailError,
                           widget: CustomAuthTextFieldWidget(
                             controller: _emailController,
-                            hintText: "ejemplo@cue.edu.co",
+                            hintText: LocaleKeys.authLoginEmailHint.tr(),
                             keyboardType: TextInputType.emailAddress,
                             prefix: const Icon(Icons.email_outlined,
                                 color: Colors.white70, size: 20),
@@ -213,12 +212,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                         /// ===== CONTRASEÑA =====
                         CustomFormElement(
-                          labelTitle: "Contraseña",
+                          labelTitle: LocaleKeys.authLoginButton.tr(),
                           isRequired: true,
                           errorText: _passwordError,
                           widget: CustomAuthTextFieldWidget(
                             controller: _passwordController,
-                            hintText: "Ingresa tu contraseña",
+                            hintText: LocaleKeys.authLoginForgotPassword.tr(),
                             isPasswordField: true,
                             prefix: const Icon(Icons.lock_outline_rounded,
                                 color: Colors.white70, size: 20),
@@ -253,15 +252,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  const Text(
-                                    'Recordarme',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white70,
-                                      fontWeight: FontWeight.w500,
-                                      fontFamily: 'OpenSansHebrew',
-                                    ),
-                                  ),
+                                            Text(
+                                              LocaleKeys.authLoginRememberMe.tr(),
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.white70,
+                                                fontWeight: FontWeight.w500,
+                                                fontFamily: 'OpenSansHebrew',
+                                              ),
+                                            ),
                                 ],
                               ),
                             ),
@@ -270,12 +269,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               style: TextButton.styleFrom(
                                 foregroundColor: const Color(0xFFBE1723),
                               ),
-                              child: const Text(
-                                '¿Olvidaste tu contraseña?',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600),
-                              ),
+                child: Text(
+                  LocaleKeys.authLoginForgotPassword.tr(),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600),
+                  ),
                             ),
                           ],
                         ),
@@ -284,7 +283,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         /// ===== BOTÓN LOGIN =====
                         CustomButtonWidget(
                           onPressed: _loginValidation,
-                          title: "Iniciar sesión",
+                          title: LocaleKeys.authLoginButton.tr(),
                           backgroundColor: const Color(0xFFBE1723),
                           isLoading: _isLoading,
                           icon: Icons.login_rounded,
@@ -299,10 +298,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 fontSize: 14,
                                 color: Colors.white70,
                               ),
-                              children: [
-                                const TextSpan(text: '¿No tienes cuenta? '),
+                                children: [
+                                TextSpan(text: LocaleKeys.authLoginNoAccount.tr()),
                                 TextSpan(
-                                  text: 'Regístrate aquí',
+                                  text: LocaleKeys.authLoginRegisterHere.tr(),
                                   style: const TextStyle(
                                     color: Color(0xFFBE1723),
                                     fontWeight: FontWeight.w600,
@@ -398,11 +397,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               backgroundColor: Colors.redAccent);
         },
         (user) {
-          setState(() => _isLoading = false);
-          _showSnackBar(
-              message: 'Bienvenido, ${user.name}!',
-              icon: Icons.check_circle_outline_rounded,
-              backgroundColor: Colors.green);
+      setState(() => _isLoading = false);
+      _showSnackBar(
+        message: LocaleKeys.loginWelcome.tr(namedArgs: {'name': user.name}),
+        icon: Icons.check_circle_outline_rounded,
+        backgroundColor: Colors.green);
           Future.delayed(const Duration(milliseconds: 600), () {
             if (mounted) {
               Navigator.pushReplacementNamed(context, RoutesApp.home);
@@ -413,7 +412,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       _showSnackBar(
-        message: 'Ocurrió un error inesperado. Intenta nuevamente.',
+        message: LocaleKeys.loginUnexpectedError.tr(),
         icon: Icons.error_outline_rounded,
         backgroundColor: Colors.redAccent,
       );
@@ -422,7 +421,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _handleForgotPassword() {
     _showSnackBar(
-      message: 'Comunícate con soporte técnico para restablecer tu contraseña.',
+      message: LocaleKeys.loginContactSupport.tr(),
       icon: Icons.info_outline_rounded,
       backgroundColor: Colors.blueAccent,
     );

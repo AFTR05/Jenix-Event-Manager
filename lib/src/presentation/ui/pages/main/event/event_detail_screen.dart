@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:jenix_event_manager/src/domain/entities/event_entity.dart';
 import 'package:jenix_event_manager/src/domain/entities/modality_entity.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/widgets/bottom_nav_bar_widget.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:jenix_event_manager/translations/locale_keys.g.dart';
 
 class EventDetailScreen extends StatelessWidget {
   final EventEntity event;
@@ -25,7 +27,7 @@ class EventDetailScreen extends StatelessWidget {
       _ => Colors.redAccent,
     };
 
-    final isMobile = MediaQuery.of(context).size.width < 800;
+  // responsive flag removed (unused) to keep analyzer clean
 
     return Scaffold(
       backgroundColor: const Color(0xFF0d1b2a),
@@ -64,9 +66,9 @@ class EventDetailScreen extends StatelessWidget {
                         // Lógica de inscripción
                       },
                       icon: const Icon(Icons.event_available, color: Colors.white),
-                      label: const Text(
-                        "Inscribirme",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      label: Text(
+                        LocaleKeys.eventRegisterButton.tr(),
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: statusColor,
@@ -145,7 +147,10 @@ class EventDetailScreen extends StatelessWidget {
         const SizedBox(height: 8),
         _infoRow(Icons.person, event.responsible.name),
         const SizedBox(height: 8),
-        _infoRow(Icons.group, "Participantes: ${event.participants.length}/${event.maxAttendees}"),
+        _infoRow(Icons.group, LocaleKeys.eventParticipants.tr(namedArgs: {
+          'current': '${event.participants.length}',
+          'max': '${event.maxAttendees}'
+        })),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -176,8 +181,8 @@ class EventDetailScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Descripción",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22)),
+      Text(LocaleKeys.eventDescription.tr(),
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22)),
           const SizedBox(height: 8),
           Text(
             event.description,
