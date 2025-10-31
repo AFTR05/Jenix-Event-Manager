@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:jenix_event_manager/translations/locale_keys.g.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/widgets/profile_header.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/widgets/profile_menu.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/widgets/theme_switch_button.dart';
@@ -48,7 +50,7 @@ class ProfileScreen extends StatelessWidget {
         centerTitle: true,
         // Título de la pantalla de perfil.
         title: Text(
-          'Mi Perfil',
+          LocaleKeys.profileTitle.tr(),
           style: TextStyle(
             fontFamily: 'OpenSansHebrew',
             color: titleColor,

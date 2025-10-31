@@ -344,7 +344,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       Icons.person_rounded,
     ];
 
-    const labels = ['Inicio', 'Agenda', 'Eventos', 'Perfil'];
+    final labels = [
+      LocaleKeys.navLabelInicio.tr(),
+      LocaleKeys.navLabelAgenda.tr(),
+      LocaleKeys.navLabelEventos.tr(),
+      LocaleKeys.navLabelPerfil.tr(),
+    ];
 
     return Container(
       decoration: BoxDecoration(

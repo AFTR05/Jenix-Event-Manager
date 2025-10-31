@@ -1,7 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/app_states/theme_provider.dart';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jenix_event_manager/translations/locale_keys.g.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 /// ThemeSwitchButton - Alexander von Humboldt Event Manager
@@ -75,7 +77,7 @@ class ThemeSwitchButton extends ConsumerWidget {
             ),
           ),
           title: Text(
-            isDarkmode ? "Tema Oscuro" : "Tema Claro",
+            isDarkmode ? LocaleKeys.themeDarkLabel.tr() : LocaleKeys.themeLightLabel.tr(),
             style: TextStyle(
               fontFamily: 'OpenSansHebrew',
               fontWeight: FontWeight.w500,

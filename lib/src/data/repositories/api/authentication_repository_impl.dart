@@ -77,8 +77,11 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     );
 
     return resultRequest.fold((failure) => Left(failure), (response) {
-      if (response['message'] == "Logout successful") {
-        return const Right(true);
+      //if (response['message'] == "Logout successful") {
+      //  return const Right(true);
+      //}
+      if (response is bool) {
+        return Right(response);
       }
       return const Right(true);
     });
