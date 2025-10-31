@@ -9,6 +9,8 @@ import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/buttons/c
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/form/custom_form_element.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/inputs/custom_auth_text_field_widget.dart';
 import 'package:jenix_event_manager/src/routes_app.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:jenix_event_manager/translations/locale_keys.g.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -22,8 +24,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   bool _acceptTerms = false;
   bool disableValidationInPhone = true;
@@ -55,7 +56,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       backgroundColor: const Color(0xFF0C1C2C),
       body: Stack(
         children: [
-          // Fondo con gradiente oscuro institucional
+          // Background gradient
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -70,28 +71,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
           ),
 
-          // Sombra decorativa roja institucional
-          Positioned(
-            right: -80,
-            top: -60,
-            child: Container(
-              height: 220,
-              width: 220,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0x22BE1723),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0x55BE1723),
-                    blurRadius: 200,
-                    spreadRadius: 100,
-                  )
-                ],
-              ),
-            ),
-          ),
-
-          // Contenido principal
+          // Main content
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -117,7 +97,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Logo Humboldt
+                      // Logo
                       Center(
                         child: Hero(
                           tag: 'app_logo',
@@ -134,10 +114,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                       const SizedBox(height: 24),
 
-                      // Título principal
-                      const Text(
-                        "Crea tu cuenta",
-                        style: TextStyle(
+                      // Title and subtitle
+                      Text(
+                        LocaleKeys.registerWelcome.tr(namedArgs: {'name': ''}).replaceAll('{name}', ''),
+                        style: const TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -145,9 +125,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        "Únete a la Universidad Alexander von Humboldt",
-                        style: TextStyle(
+                      Text(
+                        LocaleKeys.registerOpeningPrivacy.tr(),
+                        style: const TextStyle(
                           fontSize: 14,
                           color: Color(0xFF9DA9B9),
                           fontFamily: 'OpenSansHebrew',
@@ -156,69 +136,62 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                       const SizedBox(height: 32),
 
-                      // Campos del formulario
+                      // Form fields
                       CustomFormElement(
-                        labelTitle: "Nombre completo",
+                        labelTitle: LocaleKeys.authRegisterEmailHint.tr(),
                         isRequired: true,
                         errorText: _nameError,
                         widget: CustomAuthTextFieldWidget(
                           controller: _nameController,
                           hintText: "Ej: Camilo Correa",
-                          prefix: const Icon(Icons.person_outline,
-                              color: Colors.white70),
+                          prefix: const Icon(Icons.person_outline, color: Colors.white70),
                           keyboardType: TextInputType.name,
-                          onChanged: (_) =>
-                              setState(() => _nameError = null),
+                          onChanged: (_) => setState(() => _nameError = null),
                         ),
                       ),
+
                       const SizedBox(height: 14),
                       CustomFormElement(
-                        labelTitle: "Correo institucional",
+                        labelTitle: LocaleKeys.authRegisterEmailHint.tr(),
                         isRequired: true,
                         errorText: _emailError,
                         widget: CustomAuthTextFieldWidget(
                           controller: _emailController,
-                          hintText: "tu.correo@cue.edu.co",
-                          prefix: const Icon(Icons.email_outlined,
-                              color: Colors.white70),
+                          hintText: LocaleKeys.authRegisterEmailHint.tr(),
+                          prefix: const Icon(Icons.email_outlined, color: Colors.white70),
                           keyboardType: TextInputType.emailAddress,
-                          onChanged: (_) =>
-                              setState(() => _emailError = null),
+                          onChanged: (_) => setState(() => _emailError = null),
                         ),
                       ),
-                      const SizedBox(height: 14),
 
-                      // Teléfono
+                      const SizedBox(height: 14),
                       _buildPhoneField(),
 
                       const SizedBox(height: 14),
                       CustomFormElement(
-                        labelTitle: "Contraseña",
+                        labelTitle: LocaleKeys.authRegisterPasswordHint.tr(),
                         isRequired: true,
                         errorText: _passwordError,
                         widget: CustomAuthTextFieldWidget(
                           controller: _passwordController,
-                          hintText: "Mínimo 6 caracteres",
+                          hintText: LocaleKeys.authRegisterPasswordHint.tr(),
                           isPasswordField: true,
-                          prefix: const Icon(Icons.lock_outline,
-                              color: Colors.white70),
-                          onChanged: (_) =>
-                              setState(() => _passwordError = null),
+                          prefix: const Icon(Icons.lock_outline, color: Colors.white70),
+                          onChanged: (_) => setState(() => _passwordError = null),
                         ),
                       ),
+
                       const SizedBox(height: 14),
                       CustomFormElement(
-                        labelTitle: "Confirmar contraseña",
+                        labelTitle: LocaleKeys.authRegisterConfirmPasswordHint.tr(),
                         isRequired: true,
                         errorText: _confirmPasswordError,
                         widget: CustomAuthTextFieldWidget(
                           controller: _confirmPasswordController,
-                          hintText: "Repite tu contraseña",
+                          hintText: LocaleKeys.authRegisterConfirmPasswordHint.tr(),
                           isPasswordField: true,
-                          prefix: const Icon(Icons.lock_person_outlined,
-                              color: Colors.white70),
-                          onChanged: (_) =>
-                              setState(() => _confirmPasswordError = null),
+                          prefix: const Icon(Icons.lock_person_outlined, color: Colors.white70),
+                          onChanged: (_) => setState(() => _confirmPasswordError = null),
                         ),
                       ),
 
@@ -227,17 +200,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                       const SizedBox(height: 24),
 
-                      // Botón principal
+                      // Submit
                       CustomButtonWidget(
                         onPressed: _loading ? () {} : _registerAction,
-                        title: "Crear cuenta",
+                        title: LocaleKeys.authRegisterLoginHere.tr(),
                         backgroundColor: const Color(0xFFBE1723),
                         isLoading: _loading,
                         icon: Icons.person_add_alt_1,
                       ),
 
                       const SizedBox(height: 32),
-                      // Link de inicio de sesión
                       Center(
                         child: RichText(
                           text: TextSpan(
@@ -247,16 +219,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               color: Colors.white70,
                             ),
                             children: [
-                              const TextSpan(text: '¿Ya tienes cuenta? '),
+                              TextSpan(text: LocaleKeys.authRegisterAlreadyHaveAccount.tr()),
                               TextSpan(
-                                text: 'Inicia sesión',
+                                text: LocaleKeys.authRegisterLoginHere.tr(),
                                 style: const TextStyle(
                                   color: Color(0xFFBE1723),
                                   fontWeight: FontWeight.w600,
                                   decoration: TextDecoration.underline,
                                 ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = _handleLogin,
+                                recognizer: TapGestureRecognizer()..onTap = _handleLogin,
                               ),
                             ],
                           ),
@@ -265,7 +236,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       const SizedBox(height: 16),
                       Center(
                         child: Text(
-                          '© 2025 Universidad Alexander von Humboldt',
+                          LocaleKeys.homeFooterCopyright.tr(),
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.white.withOpacity(0.7),
@@ -279,6 +250,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
           ),
 
+          // Loader overlay
           if (_loading)
             Positioned.fill(
               child: Container(
@@ -297,9 +269,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Número de teléfono (opcional)",
-          style: TextStyle(
+        Text(
+          LocaleKeys.registerPhoneOptionalLabel.tr(),
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 14,
             fontFamily: 'OpenSansHebrew',
@@ -342,30 +314,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       children: [
         Checkbox(
           value: _acceptTerms,
-          activeColor: const Color(0xFFBE1723),
           checkColor: Colors.white,
           onChanged: (v) => setState(() => _acceptTerms = v ?? false),
         ),
         Expanded(
           child: Text.rich(
             TextSpan(
-              text: "He leído y acepto los ",
+              text: LocaleKeys.authRegisterTermsPrefix.tr(),
               style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 12,
               ),
               children: [
                 TextSpan(
-                  text: "Términos y Condiciones",
+                  text: LocaleKeys.authRegisterTerms.tr(),
                   style: const TextStyle(
                     color: Color(0xFFBE1723),
                     decoration: TextDecoration.underline,
                   ),
                   recognizer: TapGestureRecognizer()..onTap = _handleTermsTap,
                 ),
-                const TextSpan(text: " y la "),
+                TextSpan(text: LocaleKeys.authRegisterAndThe.tr()),
                 TextSpan(
-                  text: "Política de Privacidad",
+                  text: LocaleKeys.authRegisterPrivacyPolicy.tr(),
                   style: const TextStyle(
                     color: Color(0xFFBE1723),
                     decoration: TextDecoration.underline,
@@ -393,7 +364,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     });
 
     if (!_acceptTerms) {
-      _showSnackBar('Debes aceptar los Términos y la Privacidad');
+      _showSnackBar(LocaleKeys.registerAcceptTermsError.tr(), color: Colors.redAccent);
       return;
     }
 
@@ -404,7 +375,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     String? confirmPasswordError;
 
     if (_confirmPasswordController.text != _passwordController.text) {
-      confirmPasswordError = 'Las contraseñas no coinciden';
+      confirmPasswordError = LocaleKeys.registerPasswordsNoMatch.tr();
     }
 
     if (nameError != null ||
@@ -442,16 +413,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       setState(() => _loading = false);
 
       result.fold(
-        (failure) =>
-            _showSnackBar('Error: ${failure.message}', color: Colors.redAccent),
+        (failure) => _showSnackBar(LocaleKeys.registerErrorPrefix.tr(namedArgs: {'message': failure.message}), color: Colors.redAccent),
         (user) {
-          _showSnackBar('Bienvenido ${user.name}');
+          _showSnackBar(LocaleKeys.registerWelcome.tr(namedArgs: {'name': user.name}));
           Navigator.pushReplacementNamed(context, RoutesApp.home);
         },
       );
     } catch (_) {
       setState(() => _loading = false);
-      _showSnackBar('Ocurrió un error inesperado');
+      _showSnackBar(LocaleKeys.registerUnexpectedError.tr(), color: Colors.redAccent);
     }
   }
 
@@ -460,11 +430,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   void _handleTermsTap() {
-    _showSnackBar('Abriendo Términos y Condiciones...');
+    _showSnackBar(LocaleKeys.registerOpeningTerms.tr());
   }
 
   void _handlePrivacyTap() {
-    _showSnackBar('Abriendo Política de Privacidad...');
+    _showSnackBar(LocaleKeys.registerOpeningPrivacy.tr());
   }
 
   void _showSnackBar(String message, {Color color = Colors.green}) {

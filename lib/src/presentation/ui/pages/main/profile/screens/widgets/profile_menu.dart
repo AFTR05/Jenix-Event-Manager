@@ -31,7 +31,7 @@ class _ProfileMenuState extends ConsumerState<ProfileMenu> {
   /// Lista estática de ítems que componen el menú.
   List<ProfileMenuItem> get menuItems => [
     ProfileMenuItem(
-      label: 'Editar Perfil',
+      label: LocaleKeys.profileEditProfileLabel.tr(),
       iconAsset: 'assets/images/icons/user_edit_icon.svg',
       route: RoutesApp.editProfile,
     ),
@@ -43,27 +43,12 @@ class _ProfileMenuState extends ConsumerState<ProfileMenu> {
       },
     ),
     ProfileMenuItem(
-      label: 'Mis Eventos',
+      label: LocaleKeys.profileMyEventsLabel.tr(),
       iconAsset: 'assets/images/icons/calendar_icon.svg',
       route: RoutesApp.myEvents,
     ),
     ProfileMenuItem(
-      label: 'Notificaciones',
-      iconAsset: 'assets/images/icons/message_heart_icon.svg',
-      route: RoutesApp.notifications,
-    ),
-    ProfileMenuItem(
-      label: 'Compartir App',
-      iconAsset: 'assets/images/icons/share_icon.svg',
-      route: RoutesApp.share,
-    ),
-    ProfileMenuItem(
-      label: 'Ayuda y Soporte',
-      iconAsset: 'assets/images/icons/chat_icon.svg',
-      route: RoutesApp.help,
-    ),
-    const ProfileMenuItem(
-      label: 'Cerrar Sesión',
+      label: LocaleKeys.profileLogoutLabel.tr(),
       iconAsset: 'assets/images/icons/logout_icon.svg',
       isLogout: true,
     ),
