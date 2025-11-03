@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/campus_status_enum.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/room_status_enum.dart';
 import 'package:jenix_event_manager/src/domain/entities/event_entity.dart';
 import 'package:jenix_event_manager/src/domain/entities/campus_entity.dart';
 import 'package:jenix_event_manager/src/domain/entities/room_entity.dart';
@@ -22,15 +24,15 @@ final List<EventEntity> dummyEvents = [
     date: DateTime(2025, 10, 30),
     beginHour: '09:00:00',
     endHour: '17:00:00',
-    room: Room(
+    room: RoomEntity(
       id: 'R1',
       type: 'Auditorio',
       capacity: 300,
-      state: 'Disponible',
-      campus: Campus(
+      state: RoomStatusEnum.disponible,
+      campus: CampusEntity(
         id: 'C1',
         name: 'Campus Central',
-        state: 'Abierto',
+        state: CampusStatusEnum.abierto,
         isActive: true,
         createdAt: DateTime(2023, 6, 12),
       ),

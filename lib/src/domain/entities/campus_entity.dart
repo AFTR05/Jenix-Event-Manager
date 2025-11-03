@@ -1,11 +1,13 @@
-class Campus {
+import 'package:jenix_event_manager/src/domain/entities/enum/campus_status_enum.dart';
+
+class CampusEntity {
   final String id;
   final String name;
-  final String state;
+  final CampusStatusEnum state;
   final bool isActive;
   final DateTime createdAt;
 
-  Campus({
+  CampusEntity({
     required this.id,
     required this.name,
     required this.state,
@@ -13,11 +15,13 @@ class Campus {
     required this.createdAt,
   });
 
-  factory Campus.fromJson(Map<String, dynamic> json) {
-    return Campus(
+  factory CampusEntity.fromJson(Map<String, dynamic> json) {
+    return CampusEntity(
       id: json['id'],
       name: json['name'],
-      state: json['state'],
+      // Parse the incoming state string into the enum. If parsing fails,
+      // default to `abierto` to keep a sensible default.
+      state: campusStatusEnumTryParse(json['state'] as String?) ?? CampusStatusEnum.abierto,
       isActive: json['isActive'] ?? true,
       createdAt: DateTime.parse(json['createdAt']),
     );
@@ -26,8 +30,21 @@ class Campus {
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
-        'state': state,
+        // Serialize enum as its canonical text value.
+        'state': state.toText(),
         'isActive': isActive,
         'createdAt': createdAt.toIso8601String(),
       };
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is CampusEntity && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
+  String toString() => 'CampusEntity(id: $id, name: $name)';
 }
