@@ -9,7 +9,7 @@ class EventEntity {
   final DateTime date;
   final String? beginHour;
   final String? endHour;
-  final Room room;
+  final RoomEntity room;
   final String organizationArea;
   final String description;
   final String state;
@@ -47,7 +47,7 @@ class EventEntity {
       date: DateTime.parse(json['date']),
       beginHour: json['beginHour'],
       endHour: json['endHour'],
-      room: Room.fromJson(json['room']),
+      room: RoomEntity.fromJson(json['room']),
       organizationArea: json['organizationArea'],
       description: json['description'],
       state: json['state'],

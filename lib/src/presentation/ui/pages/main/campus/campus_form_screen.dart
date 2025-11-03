@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:jenix_event_manager/src/domain/entities/campus_entity.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/campus_status_enum.dart';
 
 class CampusFormDialog extends StatefulWidget {
-  final Campus? campus;
+  final CampusEntity? campus;
   const CampusFormDialog({super.key, this.campus});
 
   @override
@@ -12,10 +13,16 @@ class CampusFormDialog extends StatefulWidget {
 class _CampusFormDialogState extends State<CampusFormDialog> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
-  late String _state;
+  late CampusStatusEnum _state;
   bool _isActive = true;
+  bool _submitting = false;
 
-  final List<String> campusStates = ['Abierto', 'En mantenimiento', 'Cerrado'];
+  // Keep a specific order for the dropdown labels as used in the UI.
+  final List<CampusStatusEnum> campusStates = [
+    CampusStatusEnum.abierto,
+    CampusStatusEnum.mantenimiento,
+    CampusStatusEnum.cerrado,
+  ];
   late AnimationController _animController;
   late Animation<double> _scaleAnim;
 
@@ -23,7 +30,7 @@ class _CampusFormDialogState extends State<CampusFormDialog> with SingleTickerPr
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.campus?.name ?? '');
-    _state = widget.campus?.state ?? 'Abierto';
+  _state = widget.campus?.state ?? CampusStatusEnum.abierto;
     _isActive = widget.campus?.isActive ?? true;
 
     _animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 250));
@@ -38,9 +45,21 @@ class _CampusFormDialogState extends State<CampusFormDialog> with SingleTickerPr
     super.dispose();
   }
 
+  String _displayName(CampusStatusEnum s) {
+    switch (s) {
+      case CampusStatusEnum.abierto:
+        return 'Abierto';
+      case CampusStatusEnum.mantenimiento:
+        return 'En mantenimiento';
+      case CampusStatusEnum.cerrado:
+        return 'Cerrado';
+    }
+  }
+
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      final campus = Campus(
+      setState(() => _submitting = true);
+      final campus = CampusEntity(
         id: widget.campus?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text,
         state: _state,
@@ -74,6 +93,7 @@ class _CampusFormDialogState extends State<CampusFormDialog> with SingleTickerPr
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: _nameController,
+                  enabled: !_submitting,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: "Nombre del campus",
@@ -91,7 +111,7 @@ class _CampusFormDialogState extends State<CampusFormDialog> with SingleTickerPr
                   validator: (v) => v == null || v.isEmpty ? 'Ingrese el nombre' : null,
                 ),
                 const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
+                DropdownButtonFormField<CampusStatusEnum>(
                   value: _state,
                   dropdownColor: const Color(0xFF0A2647),
                   decoration: InputDecoration(
@@ -106,16 +126,21 @@ class _CampusFormDialogState extends State<CampusFormDialog> with SingleTickerPr
                   items: campusStates
                       .map((e) => DropdownMenuItem(
                             value: e,
-                            child: Text(e, style: const TextStyle(color: Colors.white)),
+                            child: Text(_displayName(e), style: const TextStyle(color: Colors.white)),
                           ))
                       .toList(),
-                  onChanged: (v) => setState(() => _state = v!),
+                  onChanged: _submitting ? null : (v) => setState(() => _state = v!),
                 ),
                 const SizedBox(height: 16),
                 SwitchListTile(
                   value: _isActive,
-                  onChanged: (v) => setState(() => _isActive = v),
-                  title: const Text("Activo", style: TextStyle(color: Colors.white)),
+                  onChanged: _submitting ? null : (v) => setState(() => _isActive = v),
+                  title: Text(
+                    "Activo",
+                    style: TextStyle(
+                      color: _submitting ? Colors.white30 : Colors.white,
+                    ),
+                  ),
                   activeColor: const Color(0xFFBE1723),
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -124,18 +149,35 @@ class _CampusFormDialogState extends State<CampusFormDialog> with SingleTickerPr
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("Cancelar", style: TextStyle(color: Colors.white70)),
+                      onPressed: _submitting ? null : () => Navigator.pop(context),
+                      child: Text(
+                        "Cancelar",
+                        style: TextStyle(
+                          color: _submitting ? Colors.white30 : Colors.white70,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
-                      onPressed: _submit,
+                      onPressed: _submitting ? null : _submit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFBE1723),
+                        backgroundColor: _submitting ? Colors.grey : const Color(0xFFBE1723),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
-                      child: Text(widget.campus == null ? "Crear" : "Guardar"),
+                      child: _submitting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : Text(
+                              widget.campus == null ? "Crear" : "Guardar",
+                              style: const TextStyle(color: Colors.white),
+                            ),
                     ),
                   ],
                 ),

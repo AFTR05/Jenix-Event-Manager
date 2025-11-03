@@ -1,73 +1,139 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:jenix_event_manager/src/domain/entities/campus_entity.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/room_status_enum.dart';
 import 'package:jenix_event_manager/src/domain/entities/room_entity.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/rooms/room_form_screen.dart';
+import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
+import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 
-final List<Campus> dummyCampusList = [
-  Campus(id: '1', name: 'Campus Central', state: 'Abierto', isActive: true, createdAt: DateTime(2023, 6, 12)),
-  Campus(id: '2', name: 'Campus Norte', state: 'En mantenimiento', isActive: true, createdAt: DateTime(2024, 2, 18)),
-];
-
-final List<Room> dummyRoomList = [
-  Room(
-    id: '101',
-    type: 'Sala de informática',
-    capacity: 30,
-    state: 'Abierto',
-    campus: dummyCampusList[0],
-    isActive: true,
-    createdAt: DateTime(2023, 6, 10),
-  ),
-  Room(
-    id: '102',
-    type: 'Laboratorio de física',
-    capacity: 20,
-    state: 'En mantenimiento',
-    campus: dummyCampusList[1],
-    isActive: true,
-    createdAt: DateTime(2024, 1, 12),
-  ),
-];
-
-class RoomListScreen extends StatefulWidget {
+class RoomListScreen extends ConsumerStatefulWidget {
   const RoomListScreen({super.key});
 
   @override
-  State<RoomListScreen> createState() => _RoomListScreenState();
+  ConsumerState<RoomListScreen> createState() => _RoomListScreenState();
 }
 
-class _RoomListScreenState extends State<RoomListScreen> {
+class _RoomListScreenState extends ConsumerState<RoomListScreen> {
   final dateFormat = DateFormat('dd MMM yyyy');
+  bool _isLoading = true;
+  bool _isProcessing = false;
+  List<RoomEntity> _rooms = [];
 
-  void _openForm({Room? room}) async {
-    final result = await showDialog<Room>(
-      context: context,
-      barrierDismissible: true,
-      builder: (_) => RoomFormDialog(room: room, campuses: dummyCampusList),
-    );
-
-    if (result != null) {
-      setState(() {
-        if (room == null) {
-          dummyRoomList.add(result);
-        } else {
-          final index = dummyRoomList.indexWhere((r) => r.id == room.id);
-          if (index != -1) dummyRoomList[index] = result;
-        }
-      });
+  String _displayState(RoomStatusEnum state) {
+    switch (state) {
+      case RoomStatusEnum.disponible:
+        return 'Abierto';
+      case RoomStatusEnum.mantenimiento:
+        return 'En mantenimiento';
+      case RoomStatusEnum.cerrado:
+        return 'Cerrado';
     }
   }
 
-  void _deleteRoom(Room room) {
-    setState(() => dummyRoomList.removeWhere((r) => r.id == room.id));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Salón "${room.type}" eliminado'),
-        backgroundColor: const Color(0xFFBE1723),
-        behavior: SnackBarBehavior.floating,
-      ),
+  @override
+  void initState() {
+    super.initState();
+    _loadRooms(showLoading: true);
+    _loadCampuses(); // Cargar campus para el formulario
+  }
+
+  Future<void> _loadRooms({bool showLoading = false}) async {
+    if (showLoading && mounted) {
+      setState(() => _isLoading = true);
+    }
+    
+    final controller = ref.read(roomControllerProvider);
+    final user = ref.read(loginProviderProvider);
+    final token = user?.accessToken ?? '';
+    
+    print('🔄 Llamando al endpoint de rooms...');
+    final res = await controller.getAllRooms(token);
+    
+    if (mounted) {
+      if (res.isRight) {
+        print('✅ Recibidos ${res.right.length} salones del backend');
+        // Forzar rebuild limpiando primero la lista
+        setState(() {
+          if (showLoading) _isLoading = false;
+          _rooms = [];
+        });
+        setState(() {
+          _rooms = List<RoomEntity>.from(res.right);
+        });
+        print('✅ UI actualizada con ${_rooms.length} salones');
+      } else {
+        print('❌ Error al cargar salones: ${res.left}');
+        setState(() {
+          if (showLoading) _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadCampuses() async {
+    final campusController = ref.read(campusControllerProvider);
+    final user = ref.read(loginProviderProvider);
+    final token = user?.accessToken ?? '';
+    await campusController.fetchAllAndCache(token);
+  }
+
+  void _setProcessing(bool processing) {
+    if (mounted) {
+      setState(() => _isProcessing = processing);
+    }
+  }
+
+  void _openForm({RoomEntity? room}) async {
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => RoomFormDialog(room: room),
     );
+
+    if (result == true) {
+      // Si el formulario retornó true, recargar la lista
+      _setProcessing(true);
+      await Future.delayed(const Duration(milliseconds: 300));
+      await _loadRooms();
+      _setProcessing(false);
+    }
+  }
+
+  void _deleteRoom(RoomEntity room) async {
+    _setProcessing(true);
+    final roomController = ref.read(roomControllerProvider);
+    final user = ref.read(loginProviderProvider);
+    final token = user?.accessToken ?? '';
+
+    try {
+      print('🗑️ Eliminando salón: ${room.id}');
+      final res = await roomController.deleteRoom(room.id, token);
+      
+      if (res.isRight && res.right == true) {
+        print('✅ Salón eliminado: ${room.id}');
+        await Future.delayed(const Duration(milliseconds: 300));
+        await _loadRooms();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Salón "${room.type}" eliminado exitosamente'),
+            backgroundColor: const Color(0xFFBE1723),
+            behavior: SnackBarBehavior.floating,
+          ));
+        }
+      } else {
+        print('❌ Error al eliminar salón: ${res.left}');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Error al eliminar salón'),
+            backgroundColor: Color(0xFFBE1723),
+            behavior: SnackBarBehavior.floating,
+          ));
+        }
+      }
+    } finally {
+      _setProcessing(false);
+    }
   }
 
   @override
@@ -76,8 +142,8 @@ class _RoomListScreenState extends State<RoomListScreen> {
       backgroundColor: const Color(0xFF0C1C2C),
 
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openForm(),
-        backgroundColor: const Color(0xFFBE1723),
+        onPressed: _isProcessing ? null : () => _openForm(),
+        backgroundColor: _isProcessing ? Colors.grey : const Color(0xFFBE1723),
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text("Nuevo", style: TextStyle(color: Colors.white)),
       ),
@@ -98,96 +164,130 @@ class _RoomListScreenState extends State<RoomListScreen> {
           // Lista de salones
           Padding(
             padding: const EdgeInsets.all(16),
-            child: ListView.builder(
-              itemCount: dummyRoomList.length,
-              itemBuilder: (context, index) {
-                final room = dummyRoomList[index];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF12263F).withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: room.state == 'Abierto'
-                          ? Colors.greenAccent.withOpacity(0.4)
-                          : room.state == 'Cerrado'
-                              ? Colors.redAccent.withOpacity(0.4)
-                              : Colors.amberAccent.withOpacity(0.4),
-                    ),
-                    boxShadow: const [
-                      BoxShadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 4)),
-                    ],
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 26,
-                      backgroundColor: Colors.white.withOpacity(0.1),
-                      child: Icon(Icons.meeting_room, color: Colors.white.withOpacity(0.8), size: 28),
-                    ),
-                    title: Text(
-                      room.type,
-                      style: const TextStyle(
-                        color: Color(0xFFE6EEF5),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Capacidad: ${room.capacity}",
-                              style: const TextStyle(color: Color(0xFF9DA9B9))),
-                          Text("Campus: ${room.campus.name}",
-                              style: const TextStyle(color: Color(0xFF9DA9B9))),
-                          Text("Estado: ${room.state}",
-                              style: const TextStyle(color: Color(0xFF9DA9B9))),
-                          Text("Creado: ${dateFormat.format(room.createdAt)}",
-                              style: const TextStyle(color: Color(0xFF9DA9B9))),
-                        ],
-                      ),
-                    ),
-                    trailing: PopupMenuButton<String>(
-                      color: const Color(0xFF12263F),
-                      icon: const Icon(Icons.more_vert, color: Colors.white70),
-                      onSelected: (value) {
-                        if (value == 'edit') {
-                          _openForm(room: room);
-                        } else if (value == 'delete') {
-                          _deleteRoom(room);
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit, color: Colors.white70, size: 18),
-                              SizedBox(width: 8),
-                              Text("Editar", style: TextStyle(color: Colors.white)),
-                            ],
-                          ),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _rooms.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No hay salones disponibles',
+                          style: TextStyle(color: Colors.white70),
                         ),
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete, color: Color(0xFFBE1723), size: 18),
-                              SizedBox(width: 8),
-                              Text("Eliminar", style: TextStyle(color: Color(0xFFBE1723))),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                      )
+                    : _buildListView(_rooms),
           ),
+
+          /// Overlay de carga durante operaciones (crear/actualizar/eliminar)
+          if (_isProcessing)
+            Container(
+              color: Colors.black54,
+              child: const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFBE1723)),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'Procesando...',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
+    );
+  }
+
+  Widget _buildListView(List<RoomEntity> list) {
+    return ListView.builder(
+      itemCount: list.length,
+      itemBuilder: (context, index) {
+        final room = list[index];
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF12263F).withOpacity(0.9),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: room.state == RoomStatusEnum.disponible
+                  ? Colors.greenAccent.withOpacity(0.4)
+                  : room.state == RoomStatusEnum.cerrado
+                      ? Colors.redAccent.withOpacity(0.4)
+                      : Colors.amberAccent.withOpacity(0.4),
+            ),
+            boxShadow: const [
+              BoxShadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 4)),
+            ],
+          ),
+          child: ListTile(
+            leading: CircleAvatar(
+              radius: 26,
+              backgroundColor: Colors.white.withOpacity(0.1),
+              child: Icon(Icons.meeting_room, color: Colors.white.withOpacity(0.8), size: 28),
+            ),
+            title: Text(
+              room.type,
+              style: const TextStyle(
+                color: Color(0xFFE6EEF5),
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Capacidad: ${room.capacity}", style: const TextStyle(color: Color(0xFF9DA9B9))),
+                  Text("Campus: ${room.campus.name}", style: const TextStyle(color: Color(0xFF9DA9B9))),
+                  Text("Estado: ${_displayState(room.state)}", style: const TextStyle(color: Color(0xFF9DA9B9))),
+                  Text("Creado: ${dateFormat.format(room.createdAt)}", style: const TextStyle(color: Color(0xFF9DA9B9))),
+                ],
+              ),
+            ),
+            trailing: PopupMenuButton<String>(
+              color: const Color(0xFF12263F),
+              icon: const Icon(Icons.more_vert, color: Colors.white70),
+              onSelected: (value) {
+                if (value == 'edit') {
+                  _openForm(room: room);
+                } else if (value == 'delete') {
+                  _deleteRoom(room);
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, color: Colors.white70, size: 18),
+                      SizedBox(width: 8),
+                      Text("Editar", style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete, color: Color(0xFFBE1723), size: 18),
+                      SizedBox(width: 8),
+                      Text("Eliminar", style: TextStyle(color: Color(0xFFBE1723))),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

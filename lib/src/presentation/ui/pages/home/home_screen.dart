@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/main_screen.dart' as JenixColorsApp;
-import 'package:jenix_event_manager/translations/locale_keys.g.dart';
+import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,7 +26,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 900),
     )..forward();
-    _fadeAnim = CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut);
+    _fadeAnim = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -53,11 +54,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             backgroundColor: Colors.black.withOpacity(0.75),
             toolbarHeight: 78,
             title: Row(
-                children: [
+              children: [
                 Image.asset(_logoAsset, height: 42),
                 const SizedBox(width: 12),
                 Text(
-                    LocaleKeys.appName.tr(),
+                  'Eventum',
                   style: GoogleFonts.poppins(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -67,21 +68,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ],
             ),
             actions: [
-                _HeaderButton(label: LocaleKeys.homeHeaderInicio.tr(), onTap: () {}),
-                _HeaderButton(label: LocaleKeys.homeHeaderEventos.tr(), onTap: () {}),
-                _HeaderButton(label: LocaleKeys.homeHeaderNosotros.tr(), onTap: () {}),
+              _HeaderButton(label: "Inicio", onTap: () {}),
+              _HeaderButton(label: "Eventos", onTap: () {}),
+              _HeaderButton(label: "Nosotros", onTap: () {}),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: ElevatedButton(
+                child: ElevatedButton(
                   onPressed: () => Navigator.pushNamed(context, '/login'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: accentRed,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                   ),
                   child: Text(
-                    LocaleKeys.homeHeaderIngresar.tr(),
-                    style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+                    'Ingresar',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
@@ -101,9 +110,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Image.asset(_bannerAsset, fit: BoxFit.cover),
 
                     // Overlay oscuro más fuerte para mejor contraste del texto
-                    Container(
-                      color: Colors.black.withOpacity(0.68),
-                    ),
+                    Container(color: Colors.black.withOpacity(0.68)),
 
                     // contenido central sobre banner
                     Center(
@@ -113,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           Image.asset(_logoAsset, height: isWide ? 140 : 96),
                           const SizedBox(height: 18),
                           Text(
-                            LocaleKeys.homeHeroTagline.tr(),
+                            'La excelencia en gestión de eventos académicos',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.lora(
                               fontSize: isWide ? 30 : 20,
@@ -127,13 +134,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               ElevatedButton(
-                                onPressed: () => Navigator.pushNamed(context, '/about'),
+                                onPressed: () =>
+                                    Navigator.pushNamed(context, '/about'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: accentRed,
-                                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 22,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                                child: Text(LocaleKeys.homeHeroLearnMore.tr(), style: GoogleFonts.poppins(fontSize: 15, color: Colors.white)),
+                                child: Text(
+                                  'Conoce más',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 15,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                               const SizedBox(width: 12),
                               OutlinedButton(
@@ -141,10 +160,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 style: OutlinedButton.styleFrom(
                                   side: BorderSide(color: Colors.white24),
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 18,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                                child: Text(LocaleKeys.homeHeroContact.tr(), style: GoogleFonts.poppins(fontSize: 15)),
+                                child: Text(
+                                  'Contacto',
+                                  style: GoogleFonts.poppins(fontSize: 15),
+                                ),
                               ),
                             ],
                           ),
@@ -166,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Column(
                 children: [
                   Text(
-                    LocaleKeys.homeSubtitle.tr(),
+                    'Una experiencia organizada. Diseño, control y trazabilidad en cada evento.',
                     style: GoogleFonts.poppins(
                       fontSize: isWide ? 24 : 18,
                       color: Colors.white,
@@ -176,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   const SizedBox(height: 14),
                   Text(
-                    LocaleKeys.homeDescription.tr(),
+                    'Eventum centraliza la planificación, las reservas y las inscripciones de eventos, garantizando visibilidad y control para organizadores y asistentes.',
                     style: GoogleFonts.poppins(
                       fontSize: isWide ? 16 : 14,
                       color: Colors.grey[300],
@@ -202,26 +229,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 children: [
                   _UniformFeatureCard(
                     icon: Icons.event_available_rounded,
-                    title: LocaleKeys.homeFeaturesEventsTitle.tr(),
-                    description: LocaleKeys.homeFeaturesEventsDescription.tr(),
+                    title: 'Gestión de eventos',
+                    description:
+                        'Planificación, inscripción y seguimiento centralizado.',
                     accent: accentRed,
                   ),
                   _UniformFeatureCard(
                     icon: Icons.meeting_room_rounded,
-                    title: LocaleKeys.homeFeaturesSpacesTitle.tr(),
-                    description: LocaleKeys.homeFeaturesSpacesDescription.tr(),
+                    title: 'Gestión de espacios',
+                    description:
+                        'Reservas inteligentes que evitan solapamientos.',
                     accent: accentRed,
                   ),
                   _UniformFeatureCard(
                     icon: Icons.how_to_reg_rounded,
-                    title: LocaleKeys.homeFeaturesAttendanceTitle.tr(),
-                    description: LocaleKeys.homeFeaturesAttendanceDescription.tr(),
+                    title: 'Control de asistencia',
+                    description:
+                        'Check-in y reportes de participación en tiempo real.',
                     accent: accentRed,
                   ),
                   _UniformFeatureCard(
                     icon: Icons.insert_chart_rounded,
-                    title: LocaleKeys.homeFeaturesReportsTitle.tr(),
-                    description: LocaleKeys.homeFeaturesReportsDescription.tr(),
+                    title: 'Reportes & estadísticas',
+                    description: 'Exportación a Excel/PDF y dashboards claros.',
                     accent: accentRed,
                   ),
                 ],
@@ -239,9 +269,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(vertical: 26),
               child: Column(
                 children: [
-                  Text(LocaleKeys.homeFooterUniversity.tr(), style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[400])),
+                  Text(
+                    'Universidad Alexander von Humboldt • Armenia, Quindío',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: Colors.grey[400],
+                    ),
+                  ),
                   const SizedBox(height: 6),
-                  Text(LocaleKeys.homeFooterCopyright.tr(), style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[500])),
+                  Text(
+                    'Creado por Jenix © 2025',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[500],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -348,7 +390,11 @@ class _UniformFeatureCardState extends State<_UniformFeatureCard> {
                     Expanded(
                       child: Text(
                         widget.title,
-                        style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
@@ -357,10 +403,14 @@ class _UniformFeatureCardState extends State<_UniformFeatureCard> {
                 Expanded(
                   child: Text(
                     widget.description,
-                    style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[300], height: 1.45),
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: Colors.grey[300],
+                      height: 1.45,
+                    ),
                     textAlign: TextAlign.left,
                   ),
-                )
+                ),
               ],
             ),
           ),

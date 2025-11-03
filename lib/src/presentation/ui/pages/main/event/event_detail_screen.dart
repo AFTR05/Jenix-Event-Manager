@@ -143,11 +143,6 @@ class EventDetailScreen extends StatelessWidget {
         const SizedBox(height: 8),
         _infoRow(Icons.person, event.responsablePerson.name),
         const SizedBox(height: 8),
-        _infoRow(Icons.group, LocaleKeys.eventParticipants.tr(namedArgs: {
-          'current': '${event.participants.length}',
-          'max': '${event.maxAttendees}'
-        })),
-        const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
