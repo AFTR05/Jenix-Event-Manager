@@ -42,7 +42,7 @@ class AuthenticationController {
     }
   }
 
-  Future<void> _saveSession({
+  Future<void> saveSession({
     required UserEntity user,
     required bool rememberMe,
   }) async {
@@ -113,7 +113,7 @@ class AuthenticationController {
         userInfoResult.isRight ? userInfoResult.right : null,
       );
       ref.read(loginProviderProvider.notifier).setState(finalUser);
-      await _saveSession(user: finalUser, rememberMe: rememberMe);
+      await saveSession(user: finalUser, rememberMe: rememberMe);
     });
 
     return either;
@@ -145,7 +145,7 @@ class AuthenticationController {
         userInfoResult.isRight ? userInfoResult.right : null,
       );
       ref.read(loginProviderProvider.notifier).setState(finalUser);
-      await _saveSession(user: finalUser, rememberMe: rememberMe);
+      await saveSession(user: finalUser, rememberMe: rememberMe);
     });
 
     return either;
@@ -193,7 +193,7 @@ class AuthenticationController {
       ref.read(loginProviderProvider.notifier).setState(finalUser);
       // Update saved session with new tokens
       final rememberMe = await _getRememberMe();
-      await _saveSession(user: finalUser, rememberMe: rememberMe);
+      await saveSession(user: finalUser, rememberMe: rememberMe);
     });
 
     return either;

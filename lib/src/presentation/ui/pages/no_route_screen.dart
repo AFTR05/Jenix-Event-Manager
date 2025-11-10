@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:jenix_event_manager/translations/locale_keys.g.dart';
 
 class NoRouteScreen extends StatelessWidget {
   const NoRouteScreen({super.key});
@@ -9,7 +11,7 @@ class NoRouteScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Página no encontrada"),
+  title: Text(LocaleKeys.noRouteTitle.tr()),
         centerTitle: true,
         iconTheme: IconThemeData(color: Colors.white),
         actionsIconTheme: IconThemeData(color: Colors.white),
@@ -26,9 +28,9 @@ class NoRouteScreen extends StatelessWidget {
                 color: Colors.redAccent,
               ),
               const SizedBox(height: 20),
-              const Text(
-                "Oops! No encontramos esta ruta",
-                style: TextStyle(
+              Text(
+                LocaleKeys.noRouteOops.tr(),
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   fontFamily: "OpenSansHebrew",
@@ -36,9 +38,9 @@ class NoRouteScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              const Text(
-                "La página a la que intentas acceder no existe o fue movida.",
-                style: TextStyle(
+              Text(
+                LocaleKeys.noRouteDescription.tr(),
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.grey,
                   fontFamily: "OpenSansHebrew",
@@ -53,7 +55,7 @@ class NoRouteScreen extends StatelessWidget {
                 },
                 icon: Icon(Icons.arrow_back, color: JenixColorsApp.jenixAppColor),
                 label: Text(
-                  "Volver",
+                  LocaleKeys.noRouteBack.tr(),
                   style: const TextStyle(
                     fontFamily: "OpenSansHebrew",
                   ).copyWith(color: JenixColorsApp.jenixAppColor),

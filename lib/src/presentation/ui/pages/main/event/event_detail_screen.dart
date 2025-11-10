@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:jenix_event_manager/src/domain/entities/event_entity.dart';
-import 'package:jenix_event_manager/src/domain/entities/modality_entity.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/modality_enum.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/widgets/bottom_nav_bar_widget.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:jenix_event_manager/translations/locale_keys.g.dart';
 
 class EventDetailScreen extends StatelessWidget {
   final EventEntity event;
@@ -19,20 +21,16 @@ class EventDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = switch (event.status) {
+    final statusColor = switch (event.state) {
       'Activo' => Colors.greenAccent,
       'En curso' => Colors.orangeAccent,
       _ => Colors.redAccent,
     };
 
-    final isMobile = MediaQuery.of(context).size.width < 800;
+  // responsive flag removed (unused) to keep analyzer clean
 
     return Scaffold(
       backgroundColor: const Color(0xFF0d1b2a),
-      bottomNavigationBar: BottomNavBarWidget(
-        currentIndex: currentIndex,
-        onTap: onNavTap,
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -64,9 +62,9 @@ class EventDetailScreen extends StatelessWidget {
                         // Lógica de inscripción
                       },
                       icon: const Icon(Icons.event_available, color: Colors.white),
-                      label: const Text(
-                        "Inscribirme",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      label: Text(
+                        LocaleKeys.eventRegisterButton.tr(),
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: statusColor,
@@ -114,7 +112,7 @@ class EventDetailScreen extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: Image.network(
-        event.imageUrl ?? 'https://via.placeholder.com/300',
+        event.urlImage ?? 'https://via.placeholder.com/300',
         height: isSquare ? 250 : 300,
         width: double.infinity,
         fit: BoxFit.cover,
@@ -134,19 +132,17 @@ class EventDetailScreen extends StatelessWidget {
         _infoRow(Icons.calendar_today, "${event.date.toLocal()}".split(' ')[0]),
         const SizedBox(height: 8),
         _infoRow(Icons.access_time,
-            "${event.beginHour.hour.toString().padLeft(2, '0')}:${event.beginHour.minute.toString().padLeft(2, '0')} - "
-            "${event.finishHour.hour.toString().padLeft(2, '0')}:${event.finishHour.minute.toString().padLeft(2, '0')}"),
+            "${event.beginHour.toString().padLeft(2, '0')}:${event.beginHour.toString().padLeft(2, '0')} - "
+            "${event.endHour.toString().padLeft(2, '0')}:${event.endHour.toString().padLeft(2, '0')}"),
         const SizedBox(height: 8),
-        _infoRow(Icons.location_on, event.campus),
+        _infoRow(Icons.location_on, event.room.type),
         const SizedBox(height: 8),
-        _infoRow(Icons.wifi, event.modality.label),
+        _infoRow(Icons.wifi, event.modality.name),
         const SizedBox(height: 8),
         _infoRow(Icons.account_tree, event.organizationArea),
         const SizedBox(height: 8),
-        _infoRow(Icons.person, event.responsible.name),
+        _infoRow(Icons.person, event.responsablePerson.name),
         const SizedBox(height: 8),
-        _infoRow(Icons.group, "Participantes: ${event.participants.length}/${event.maxAttendees}"),
-        const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
@@ -155,7 +151,7 @@ class EventDetailScreen extends StatelessWidget {
             border: Border.all(color: statusColor),
           ),
           child: Text(
-            event.status,
+            event.state,
             style: TextStyle(color: statusColor, fontWeight: FontWeight.bold),
           ),
         ),
@@ -176,8 +172,8 @@ class EventDetailScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Descripción",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22)),
+      Text(LocaleKeys.eventDescription.tr(),
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22)),
           const SizedBox(height: 8),
           Text(
             event.description,
