@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:jenix_event_manager/translations/locale_keys.g.dart';
 
 class NoRouteScreen extends StatelessWidget {
   const NoRouteScreen({super.key});
@@ -10,7 +11,7 @@ class NoRouteScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('no_route.title'.tr()),
+  title: Text(LocaleKeys.noRouteTitle.tr()),
         centerTitle: true,
         iconTheme: IconThemeData(color: Colors.white),
         actionsIconTheme: IconThemeData(color: Colors.white),
@@ -28,7 +29,7 @@ class NoRouteScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'no_route.oops'.tr(),
+                LocaleKeys.noRouteOops.tr(),
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -38,7 +39,7 @@ class NoRouteScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'no_route.description'.tr(),
+                LocaleKeys.noRouteDescription.tr(),
                 style: const TextStyle(
                   fontSize: 16,
                   color: Colors.grey,
@@ -54,7 +55,7 @@ class NoRouteScreen extends StatelessWidget {
                 },
                 icon: Icon(Icons.arrow_back, color: JenixColorsApp.jenixAppColor),
                 label: Text(
-                  'no_route.back'.tr(),
+                  LocaleKeys.noRouteBack.tr(),
                   style: const TextStyle(
                     fontFamily: "OpenSansHebrew",
                   ).copyWith(color: JenixColorsApp.jenixAppColor),

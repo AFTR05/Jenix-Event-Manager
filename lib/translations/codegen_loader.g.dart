@@ -94,7 +94,11 @@ class CodegenLoader extends AssetLoader{
   "authLoginNoAccount": "Don't have an account? ",
   "authLoginRegisterHere": "Register here",
   "themeDarkLabel": "Dark theme",
-  "themeLightLabel": "Light theme"
+  "themeLightLabel": "Light theme",
+  "noRouteTitle": "No route",
+  "noRouteOops": "Oops!",
+  "noRouteDescription": "The page you are looking for does not exist.",
+  "noRouteBack": "Go back"
 };
 static const Map<String,dynamic> _es = {
   "fieldIsRequired": "El campo es requerido",
@@ -176,7 +180,11 @@ static const Map<String,dynamic> _es = {
   "authLoginNoAccount": "¿No tienes cuenta? ",
   "authLoginRegisterHere": "Regístrate aquí",
   "themeDarkLabel": "Tema Oscuro",
-  "themeLightLabel": "Tema Claro"
+  "themeLightLabel": "Tema Claro",
+  "noRouteTitle": "Ruta no encontrada",
+  "noRouteOops": "¡Ups!",
+  "noRouteDescription": "La página que buscas no existe.",
+  "noRouteBack": "Volver"
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": _en, "es": _es};
 }

@@ -83,5 +83,9 @@ abstract class  LocaleKeys {
   static const authLoginRegisterHere = 'authLoginRegisterHere';
   static const themeDarkLabel = 'themeDarkLabel';
   static const themeLightLabel = 'themeLightLabel';
+  static const noRouteTitle = 'noRouteTitle';
+  static const noRouteOops = 'noRouteOops';
+  static const noRouteDescription = 'noRouteDescription';
+  static const noRouteBack = 'noRouteBack';
 
 }
