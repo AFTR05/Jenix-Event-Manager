@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:jenix_event_manager/translations/locale_keys.g.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -120,7 +122,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Schedule',
+                            LocaleKeys.scheduleTitle.tr(),
                             style: TextStyle(
                               color: JenixColorsApp.backgroundWhite,
                               fontSize: 22,
@@ -243,7 +245,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               iconBgColor: isDark 
                   ? JenixColorsApp.primaryBlue.withOpacity(0.2)
                   : JenixColorsApp.infoLight,
-              label: 'Events this week',
+              label: LocaleKeys.eventsThisWeek.tr(),
               value: '3',
               valueColor: JenixColorsApp.primaryBlue,
               isDark: isDark,
@@ -272,7 +274,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               iconBgColor: isDark
                   ? JenixColorsApp.primaryBlueLight.withOpacity(0.12)
                   : JenixColorsApp.infoLight,
-              label: 'Upcoming events',
+              label: LocaleKeys.upcomingEvents.tr(),
               value: '5',
               valueColor: JenixColorsApp.primaryBlueLight,
               isDark: isDark,
@@ -457,7 +459,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                'TODAY',
+                                LocaleKeys.todayLabel.tr(),
                                 style: TextStyle(
                                   color: JenixColorsApp.primaryBlue,
                                   fontSize: 10,
@@ -468,7 +470,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             ),
                           Expanded(
                             child: Text(
-                              isToday ? 'Your events today' : 'No events scheduled',
+                              isToday ? LocaleKeys.yourEventsToday.tr() : LocaleKeys.noEventsScheduled.tr(),
                               style: TextStyle(
                                 color: mainTextColor,
                                 fontWeight: FontWeight.w600,
@@ -481,7 +483,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Tap to see details',
+                        LocaleKeys.tapToSeeDetails.tr(),
                         style: TextStyle(
                           color: isDark 
                               ? JenixColorsApp.lightGray
@@ -509,14 +511,21 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   String _weekdayShort(int weekday) {
     switch (weekday) {
-      case 1: return 'Mon';
-      case 2: return 'Tue';
-      case 3: return 'Wed';
-      case 4: return 'Thu';
-      case 5: return 'Fri';
-      case 6: return 'Sat';
+      case 1:
+        return LocaleKeys.weekdayMon.tr();
+      case 2:
+        return LocaleKeys.weekdayTue.tr();
+      case 3:
+        return LocaleKeys.weekdayWed.tr();
+      case 4:
+        return LocaleKeys.weekdayThu.tr();
+      case 5:
+        return LocaleKeys.weekdayFri.tr();
+      case 6:
+        return LocaleKeys.weekdaySat.tr();
       case 7:
-      default: return 'Sun';
+      default:
+        return LocaleKeys.weekdaySun.tr();
     }
   }
 

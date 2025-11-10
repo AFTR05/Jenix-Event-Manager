@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,9 +10,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  static const Color primaryDark = Color(0xFF103E69);
-  static const Color accentRed = Color(0xFFBE1723);
-  static const Color bgDark = Color(0xFF0B1116);
+  static const Color accentRed = JenixColorsApp.accentColor;
+  static const Color bgDark = JenixColorsApp.backgroundColor;
 
   static const String _logoAsset = 'assets/images/eventum_logo.png';
   static const String _bannerAsset = 'assets/images/universidad_banner.gif';
@@ -26,7 +26,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 900),
     )..forward();
-    _fadeAnim = CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut);
+    _fadeAnim = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -74,12 +77,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   onPressed: () => Navigator.pushNamed(context, '/login'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: accentRed,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                   ),
                   child: Text(
                     'Ingresar',
-                    style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
@@ -99,9 +110,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Image.asset(_bannerAsset, fit: BoxFit.cover),
 
                     // Overlay oscuro más fuerte para mejor contraste del texto
-                    Container(
-                      color: Colors.black.withOpacity(0.68),
-                    ),
+                    Container(color: Colors.black.withOpacity(0.68)),
 
                     // contenido central sobre banner
                     Center(
@@ -125,13 +134,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               ElevatedButton(
-                                onPressed: () => Navigator.pushNamed(context, '/about'),
+                                onPressed: () =>
+                                    Navigator.pushNamed(context, '/about'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: accentRed,
-                                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 22,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                                child: Text('Conoce más', style: GoogleFonts.poppins(fontSize: 15, color: Colors.white)),
+                                child: Text(
+                                  'Conoce más',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 15,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                               const SizedBox(width: 12),
                               OutlinedButton(
@@ -139,10 +160,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 style: OutlinedButton.styleFrom(
                                   side: BorderSide(color: Colors.white24),
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 18,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                                child: Text('Contacto', style: GoogleFonts.poppins(fontSize: 15)),
+                                child: Text(
+                                  'Contacto',
+                                  style: GoogleFonts.poppins(fontSize: 15),
+                                ),
                               ),
                             ],
                           ),
@@ -201,19 +230,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   _UniformFeatureCard(
                     icon: Icons.event_available_rounded,
                     title: 'Gestión de eventos',
-                    description: 'Planificación, inscripción y seguimiento centralizado.',
+                    description:
+                        'Planificación, inscripción y seguimiento centralizado.',
                     accent: accentRed,
                   ),
                   _UniformFeatureCard(
                     icon: Icons.meeting_room_rounded,
                     title: 'Gestión de espacios',
-                    description: 'Reservas inteligentes que evitan solapamientos.',
+                    description:
+                        'Reservas inteligentes que evitan solapamientos.',
                     accent: accentRed,
                   ),
                   _UniformFeatureCard(
                     icon: Icons.how_to_reg_rounded,
                     title: 'Control de asistencia',
-                    description: 'Check-in y reportes de participación en tiempo real.',
+                    description:
+                        'Check-in y reportes de participación en tiempo real.',
                     accent: accentRed,
                   ),
                   _UniformFeatureCard(
@@ -237,10 +269,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(vertical: 26),
               child: Column(
                 children: [
-                  Text('Universidad Alexander von Humboldt • Armenia, Quindío',
-                      style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[400])),
+                  Text(
+                    'Universidad Alexander von Humboldt • Armenia, Quindío',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: Colors.grey[400],
+                    ),
+                  ),
                   const SizedBox(height: 6),
-                  Text('Creado por Jenix © 2025', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[500])),
+                  Text(
+                    'Creado por Jenix © 2025',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[500],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -347,7 +390,11 @@ class _UniformFeatureCardState extends State<_UniformFeatureCard> {
                     Expanded(
                       child: Text(
                         widget.title,
-                        style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
@@ -356,10 +403,14 @@ class _UniformFeatureCardState extends State<_UniformFeatureCard> {
                 Expanded(
                   child: Text(
                     widget.description,
-                    style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[300], height: 1.45),
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: Colors.grey[300],
+                      height: 1.45,
+                    ),
                     textAlign: TextAlign.left,
                   ),
-                )
+                ),
               ],
             ),
           ),

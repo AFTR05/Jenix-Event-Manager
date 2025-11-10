@@ -35,7 +35,23 @@ import 'package:jenix_event_manager/src/inject/states_providers/general_states/i
 }
 
 class ConsumerAPI {
+  // Default timeout restored to the original value used in the project.
   static const timeoutDurationDefault = Duration(minutes: 2);
+
+  static Map<String, String>? _sanitizeHeaders(Map<String, String>? headers) {
+    if (headers == null) return null;
+    final out = <String, String>{};
+    for (final entry in headers.entries) {
+      final k = entry.key.trim();
+      if (k.isEmpty) continue;
+      var v = entry.value.toString();
+      v = v.replaceAll(RegExp(r'[\x00-\x1F\x7F]'), '');
+      v = v.trim();
+      if (v.isEmpty) continue;
+      out[k] = v;
+    }
+    return out.isEmpty ? null : out;
+  }
 
   static bool isValidStatus({required http.Response response}) {
     return response.statusCode >= 200 && response.statusCode < 300;
@@ -57,12 +73,9 @@ class ConsumerAPI {
           return Left(NoDataException());
         }
       }
-      final response = await http
-          .get(
-            Uri.parse(url),
-            headers: headers,
-          )
-          .timeout(timeout);
+  final safeHeaders = _sanitizeHeaders(headers);
+  final futureResponse = http.get(Uri.parse(url), headers: safeHeaders);
+  final response = await futureResponse.timeout(timeout);
 
       if (isValidStatus(response: response)) {
         return Right(
@@ -102,35 +115,32 @@ class ConsumerAPI {
       http.Response response;
 
       switch (method) {
-        case HTTPMethod.get:
-          return getData(
-            url: url,
-            headers: headers,
-            validateNetwork: validateNetwork,
-          );
-        case HTTPMethod.post:
-          response = await http
-              .post(Uri.parse(url),
-                  headers: headers, body: params, encoding: encoding)
-              .timeout(timeout);
+            case HTTPMethod.get:
+              return getData(
+                url: url,
+                headers: headers,
+                validateNetwork: validateNetwork,
+                timeout: timeout,
+              );
+            case HTTPMethod.post:
+          final safeHeaders = _sanitizeHeaders(headers);
+      final futurePost = http.post(Uri.parse(url), headers: safeHeaders, body: params, encoding: encoding);
+      response = await futurePost.timeout(timeout);
           break;
-        case HTTPMethod.put:
-          response = await http
-              .put(Uri.parse(url),
-                  headers: headers, body: params, encoding: encoding)
-              .timeout(timeout);
+            case HTTPMethod.put:
+        final safeHeaders = _sanitizeHeaders(headers);
+    final futurePut = http.put(Uri.parse(url), headers: safeHeaders, body: params, encoding: encoding);
+  response = await futurePut.timeout(timeout);
           break;
-        case HTTPMethod.patch:
-          response = await http
-              .patch(Uri.parse(url),
-                  headers: headers, body: params, encoding: encoding)
-              .timeout(timeout);
+            case HTTPMethod.patch:
+        final safeHeaders = _sanitizeHeaders(headers);
+    final futurePatch = http.patch(Uri.parse(url), headers: safeHeaders, body: params, encoding: encoding);
+  response = await futurePatch.timeout(timeout);
           break;
-        case HTTPMethod.delete:
-          response = await http
-              .delete(Uri.parse(url),
-                  headers: headers, body: params, encoding: encoding)
-              .timeout(timeout);
+            case HTTPMethod.delete:
+        final safeHeaders = _sanitizeHeaders(headers);
+    final futureDelete = http.delete(Uri.parse(url), headers: safeHeaders, body: params, encoding: encoding);
+  response = await futureDelete.timeout(timeout);
           break;
       }
 
@@ -166,12 +176,12 @@ class ConsumerAPI {
     HTTPMethod method = HTTPMethod.post,
     Map<String, String>? headers,
     bool validateNetwork = true,
-    Duration timeout = timeoutDurationDefault,
+    Duration? timeout,
   }) async {
     try {
-      headers ??= {};
-      if (!headers.containsKey("Content-Type")) {
-        headers["Content-Type"] = "application/x-www-form-urlencoded";
+      final sanitized = _sanitizeHeaders(headers) ?? <String, String>{};
+      if (!sanitized.containsKey("Content-Type")) {
+        sanitized["Content-Type"] = "application/x-www-form-urlencoded";
       }
 
       final String encodedParams = convertToURLEncoded(formData);
@@ -180,8 +190,9 @@ class ConsumerAPI {
         url: url,
         method: method,
         params: encodedParams,
-        headers: headers,
+        headers: sanitized,
         validateNetwork: validateNetwork,
+        timeout: timeout ?? timeoutDurationDefault,
       );
 
       if (response.isRight) {
@@ -215,15 +226,20 @@ class ConsumerAPI {
     Map<String, String>? headers,
     bool isJSONRequestBody = true,
     bool validateNetwork = true,
-    Duration timeout = timeoutDurationDefault,
+    Duration? timeout,
   }) async {
     try {
-      dynamic params = jsonObject;
-      if (isJSONRequestBody) {
+      dynamic params;
+      Map<String, String>? safeHeaders = _sanitizeHeaders(headers);
+
+      // Only send a JSON body when the caller provided a non-null jsonObject.
+      // If jsonObject is null we avoid sending the literal string "null" as body
+      // and we also avoid forcing Content-Type: application/json.
+      if (isJSONRequestBody && jsonObject != null) {
         params = JSONUtils.getJSONFromObject(jsonObject: jsonObject);
-        headers ??= {};
-        if (!headers.containsKey("Content-Type")) {
-          headers["Content-Type"] = "application/json";
+        safeHeaders = safeHeaders ?? <String, String>{};
+        if (!safeHeaders.containsKey("Content-Type")) {
+          safeHeaders["Content-Type"] = "application/json";
         }
       }
 
@@ -231,8 +247,9 @@ class ConsumerAPI {
         url: url,
         method: method,
         params: params,
-        headers: headers,
+        headers: safeHeaders,
         validateNetwork: validateNetwork,
+        timeout: timeout ?? timeoutDurationDefault,
       );
       if (response.isRight) {
         final jsonResponse =
@@ -264,7 +281,7 @@ class ConsumerAPI {
     required Map<String, String> params,
     Map<String, String>? headers,
     bool validateNetwork = true,
-    Duration timeout = timeoutDurationDefault,
+    Duration? timeout,
   }) async {
     if (validateNetwork) {
       if (!(await _validateInternet())) {
@@ -273,11 +290,14 @@ class ConsumerAPI {
     }
     var request = http.MultipartRequest(method.getName(), Uri.parse(url));
     request.fields.addAll(params);
-    if (headers != null) {
-      request.headers.addAll(headers);
+    final safe = _sanitizeHeaders(headers);
+    if (safe != null) {
+      request.headers.addAll(safe);
     }
     try {
-      http.StreamedResponse response = await request.send().timeout(timeout);
+    final sendFuture = request.send();
+  final effectiveTimeout = timeout ?? timeoutDurationDefault;
+  http.StreamedResponse response = await sendFuture.timeout(effectiveTimeout);
 
       if (response.statusCode == 200) {
         final responseString = await response.stream.bytesToString();

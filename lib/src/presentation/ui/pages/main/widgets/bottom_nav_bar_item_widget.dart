@@ -74,7 +74,7 @@ class BottomNavItemWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 5),
                 // Label con colores Jenix
                 Text(
                   label,

@@ -26,5 +26,39 @@ final authenticationControllerProvider =
 // ignore: unused_element
 typedef AuthenticationControllerRef =
     AutoDisposeProviderRef<AuthenticationController>;
+String _$campusControllerHash() => r'c4c3ee42f4afa5b1bffca8db62923cd348a4ee57';
+
+/// See also [campusController].
+@ProviderFor(campusController)
+final campusControllerProvider = AutoDisposeProvider<CampusController>.internal(
+  campusController,
+  name: r'campusControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$campusControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CampusControllerRef = AutoDisposeProviderRef<CampusController>;
+String _$roomControllerHash() => r'3c5a9d97a23022ff6ecbedfd59d84a78712ffc82';
+
+/// See also [roomController].
+@ProviderFor(roomController)
+final roomControllerProvider = AutoDisposeProvider<RoomController>.internal(
+  roomController,
+  name: r'roomControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$roomControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef RoomControllerRef = AutoDisposeProviderRef<RoomController>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
