@@ -131,19 +131,19 @@ class _CampusFormDialogState extends State<CampusFormDialog> with SingleTickerPr
                       .toList(),
                   onChanged: _submitting ? null : (v) => setState(() => _state = v!),
                 ),
-                const SizedBox(height: 16),
-                SwitchListTile(
-                  value: _isActive,
-                  onChanged: _submitting ? null : (v) => setState(() => _isActive = v),
-                  title: Text(
-                    "Activo",
-                    style: TextStyle(
-                      color: _submitting ? Colors.white30 : Colors.white,
-                    ),
-                  ),
-                  activeColor: const Color(0xFFBE1723),
-                  contentPadding: EdgeInsets.zero,
-                ),
+                //const SizedBox(height: 16),
+                //SwitchListTile(
+                //  value: _isActive,
+                //  onChanged: _submitting ? null : (v) => setState(() => _isActive = v),
+                //  title: Text(
+                //    "Activo",
+                //    style: TextStyle(
+                //      color: _submitting ? Colors.white30 : Colors.white,
+                //    ),
+                //  ),
+                //  activeColor: const Color(0xFFBE1723),
+                //  contentPadding: EdgeInsets.zero,
+                //),
                 const SizedBox(height: 18),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,

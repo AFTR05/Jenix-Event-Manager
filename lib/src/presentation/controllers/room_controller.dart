@@ -54,6 +54,29 @@ class RoomController {
     }
   }
 
+  /// Helper that tries the provided [action] with the current token. If the
+  /// request fails with a ServerHttpException and statusCode == 401, it will
+  /// refresh the token once and retry the [action] with the new token.
+  Future<Either<Failure, T>> _callWithAuthRetry<T>(
+    Future<Either<Failure, T>> Function(String token) action,
+    String token,
+  ) async {
+    final effectiveToken = ref.read(loginProviderProvider)?.accessToken ?? token;
+    final res = await action(effectiveToken);
+
+    if (res.isLeft && res.left is ServerHttpException) {
+      final serverEx = res.left as ServerHttpException;
+      if (serverEx.response.statusCode == 401) {
+        // Try refresh once
+        await refreshToken();
+        final newToken = ref.read(loginProviderProvider)?.accessToken ?? effectiveToken;
+        return await action(newToken);
+      }
+    }
+
+    return res;
+  }
+
   Future<Either<Failure, List<RoomEntity>>> fetchAllAndCache(String token) async {
     final res = await getAllRooms(token);
     if (res.isRight) {
@@ -89,15 +112,16 @@ class RoomController {
     required String campusId,
     required String token,
   }) async {
-    await refreshToken();
-    final effectiveToken = ref.read(loginProviderProvider)?.accessToken ?? token;
-    return await roomUsecase.createRoom(
-      type: type,
-      capacity: capacity,
-      state: state,
-      equipment: equipment,
-      campusId: campusId,
-      token: effectiveToken,
+    return await _callWithAuthRetry<RoomEntity>(
+      (t) => roomUsecase.createRoom(
+        type: type,
+        capacity: capacity,
+        state: state,
+        equipment: equipment,
+        campusId: campusId,
+        token: t,
+      ),
+      token,
     );
   }
 
@@ -125,9 +149,10 @@ class RoomController {
   }
 
   Future<Either<Failure, bool>> deleteRoom(String id, String token) async {
-    await refreshToken();
-    final effectiveToken = ref.read(loginProviderProvider)?.accessToken ?? token;
-    return await roomUsecase.deleteRoom(id: id, token: effectiveToken);
+    return await _callWithAuthRetry<bool>(
+      (t) => roomUsecase.deleteRoom(id: id, token: t),
+      token,
+    );
   }
 
   Future<Either<Failure, bool>> deleteAndCache(String id, String token) async {
@@ -140,9 +165,10 @@ class RoomController {
   }
 
   Future<Either<Failure, RoomEntity>> getRoomById(String id, String token) async {
-    await refreshToken();
-    final effectiveToken = ref.read(loginProviderProvider)?.accessToken ?? token;
-    return await roomUsecase.getRoomById(id: id, token: effectiveToken);
+    return await _callWithAuthRetry<RoomEntity>(
+      (t) => roomUsecase.getRoomById(id: id, token: t),
+      token,
+    );
   }
 
   Future<Either<Failure, bool>> updateRoom({
@@ -154,16 +180,17 @@ class RoomController {
     required String campusId,
     required String token,
   }) async {
-    await refreshToken();
-    final effectiveToken = ref.read(loginProviderProvider)?.accessToken ?? token;
-    return await roomUsecase.updateRoom(
-      id: id,
-      type: type,
-      capacity: capacity,
-      state: state,
-      equipment: equipment,
-      campusId: campusId,
-      token: effectiveToken,
+    return await _callWithAuthRetry<bool>(
+      (t) => roomUsecase.updateRoom(
+        id: id,
+        type: type,
+        capacity: capacity,
+        state: state,
+        equipment: equipment,
+        campusId: campusId,
+        token: t,
+      ),
+      token,
     );
   }
 

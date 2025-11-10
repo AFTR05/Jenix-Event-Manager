@@ -59,6 +59,29 @@ class CampusController {
       await ref.read(authenticationControllerProvider).saveSession(user: updatedUser, rememberMe: true);
     }
   }
+  
+  /// Helper that tries the provided [action] with the current token. If the
+  /// request fails with a ServerHttpException and statusCode == 401, it will
+  /// refresh the token once and retry the [action] with the new token.
+  Future<Either<Failure, T>> _callWithAuthRetry<T>(
+    Future<Either<Failure, T>> Function(String token) action,
+    String token,
+  ) async {
+    final effectiveToken = ref.read(loginProviderProvider)?.accessToken ?? token;
+    final res = await action(effectiveToken);
+
+    if (res.isLeft && res.left is ServerHttpException) {
+      final serverEx = res.left as ServerHttpException;
+      if (serverEx.response.statusCode == 401) {
+        // Try refresh once
+        await refreshToken();
+        final newToken = ref.read(loginProviderProvider)?.accessToken ?? effectiveToken;
+        return await action(newToken);
+      }
+    }
+
+    return res;
+  }
   /// Fetches all campuses from the backend and updates the cache + stream.
   Future<Either<Failure, List<CampusEntity>>> fetchAllAndCache(String token) async {
     final res = await getAllCampuses(token);
@@ -73,13 +96,9 @@ class CampusController {
 
   Future<Either<Failure, CampusEntity>> createCampus(
       String name, CampusStatusEnum state, String token) async {
-    // Ensure access token is refreshed before performing the request.
-    await refreshToken();
-    final effectiveToken = ref.read(loginProviderProvider)?.accessToken ?? token;
-    return await campusUsecase.createCampus(
-      name: name,
-      state: state.toText(),
-      token: effectiveToken,
+    return await _callWithAuthRetry<CampusEntity>(
+      (t) => campusUsecase.createCampus(name: name, state: state.toText(), token: t),
+      token,
     );
   }
 
@@ -95,9 +114,10 @@ class CampusController {
   }
 
   Future<Either<Failure, bool>> deleteCampus(String id, String token) async {
-    await refreshToken();
-    final effectiveToken = ref.read(loginProviderProvider)?.accessToken ?? token;
-    return await campusUsecase.deleteCampus(id: id, token: effectiveToken);
+    return await _callWithAuthRetry<bool>(
+      (t) => campusUsecase.deleteCampus(id: id, token: t),
+      token,
+    );
   }
 
   /// Delete a campus and remove it from the cache + notify stream on success.
@@ -111,40 +131,30 @@ class CampusController {
   }
 
   Future<Either<Failure, List<CampusEntity>>> getAllCampuses(String token) async {
-    // For listing campuses we prefer speed: use the current token from state
-    // and avoid forcing a token refresh here which can add significant delay.
-    final effectiveToken = ref.read(loginProviderProvider)?.accessToken ?? token;
-    final res = await campusUsecase.getAllCampuses(token: effectiveToken);
-
-    // If the request failed with 401 (token expired) try one refresh-and-retry
-    if (res.isLeft && res.left is ServerHttpException) {
-      final serverEx = res.left as ServerHttpException;
-      if (serverEx.response.statusCode == 401) {
-        await refreshToken();
-        final newToken = ref.read(loginProviderProvider)?.accessToken ?? effectiveToken;
-        return await campusUsecase.getAllCampuses(token: newToken);
-      }
-    }
-
-    return res;
+    return await _callWithAuthRetry<List<CampusEntity>>(
+      (t) => campusUsecase.getAllCampuses(token: t),
+      token,
+    );
   }
 
   Future<Either<Failure, CampusEntity>> getCampusById(String id, String token) async {
-    await refreshToken();
-    final effectiveToken = ref.read(loginProviderProvider)?.accessToken ?? token;
-    return await campusUsecase.getCampusById(id: id, token: effectiveToken);
+    return await _callWithAuthRetry<CampusEntity>(
+      (t) => campusUsecase.getCampusById(id: id, token: t),
+      token,
+    );
   }
 
   Future<Either<Failure, bool>> updateCampus(String id, String name,
       CampusStatusEnum state, bool isActive, String token) async {
-    await refreshToken();
-    final effectiveToken = ref.read(loginProviderProvider)?.accessToken ?? token;
-    return await campusUsecase.updateCampus(
-      id: id,
-      name: name,
-      state: state.toText(),
-      isActive: isActive,
-      token: effectiveToken,
+    return await _callWithAuthRetry<bool>(
+      (t) => campusUsecase.updateCampus(
+        id: id,
+        name: name,
+        state: state.toText(),
+        isActive: isActive,
+        token: t,
+      ),
+      token,
     );
   }
 

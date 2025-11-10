@@ -78,5 +78,9 @@
     "authLoginNoAccount": "Don't have an account? ",
     "authLoginRegisterHere": "Register here",
     "themeDarkLabel": "Dark theme",
-    "themeLightLabel": "Light theme"
+    "themeLightLabel": "Light theme",
+    "noRouteTitle": "No route",
+    "noRouteOops": "Oops!",
+    "noRouteDescription": "The page you are looking for does not exist.",
+    "noRouteBack": "Go back"
 }
