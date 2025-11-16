@@ -107,7 +107,8 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : _events.isEmpty
                     ? const Center(
-                        child: Text('No hay eventos', style: TextStyle(color: Colors.white70)),
+                        child: Text('No hay eventos',
+                            style: TextStyle(color: Colors.white70)),
                       )
                     : _buildListView(_events),
           ),
@@ -136,11 +137,46 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
             color: const Color(0xFF12263F).withOpacity(0.9),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: Colors.white24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.5),
+                blurRadius: 6,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: ListTile(
+            contentPadding: const EdgeInsets.all(12),
+            leading: event.urlImage != null && event.urlImage!.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      event.urlImage!,
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.event,
+                        color: Colors.white70,
+                        size: 40,
+                      ),
+                    ),
+                  )
+                : Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A2B44),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.event, color: Colors.white70, size: 40),
+                  ),
             title: Text(
               event.name,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,33 +184,36 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                 Text('Sala: ${event.room.type}', style: const TextStyle(color: Colors.white70)),
                 Text('Área: ${event.organizationArea}', style: const TextStyle(color: Colors.white70)),
                 Text('Modalidad: ${event.modality.name}', style: const TextStyle(color: Colors.white70)),
-                Text('Fecha inicio: ${dateFormat.format(event.createdAt)}',
-                    style: const TextStyle(color: Colors.white70)),
-                Text('Fecha fin: ${dateFormat.format(event.initialDate)}',
-                    style: const TextStyle(color: Colors.white70)),
+                Text('Inicio: ${dateFormat.format(event.createdAt)}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                Text('Fin: ${dateFormat.format(event.initialDate)}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
               ],
             ),
             trailing: PopupMenuButton<String>(
               color: const Color(0xFF12263F),
               icon: const Icon(Icons.more_vert, color: Colors.white70),
               onSelected: (value) {
-                if (value == 'edit') {
-                  _openForm(event: event);
-                } else if (value == 'delete') {
-                  _deleteEvent(event);
-                }
+                if (value == 'edit') _openForm(event: event);
+                if (value == 'delete') _deleteEvent(event);
               },
               itemBuilder: (context) => [
                 const PopupMenuItem(
                   value: 'edit',
                   child: Row(
-                    children: [Icon(Icons.edit, color: Colors.white70), SizedBox(width: 8), Text('Editar', style: TextStyle(color: Colors.white))],
+                    children: [
+                      Icon(Icons.edit, color: Colors.white70),
+                      SizedBox(width: 8),
+                      Text('Editar', style: TextStyle(color: Colors.white)),
+                    ],
                   ),
                 ),
                 const PopupMenuItem(
                   value: 'delete',
                   child: Row(
-                    children: [Icon(Icons.delete, color: Color(0xFFBE1723)), SizedBox(width: 8), Text('Eliminar', style: TextStyle(color: Color(0xFFBE1723)))],
+                    children: [
+                      Icon(Icons.delete, color: Color(0xFFBE1723)),
+                      SizedBox(width: 8),
+                      Text('Eliminar', style: TextStyle(color: Color(0xFFBE1723))),
+                    ],
                   ),
                 ),
               ],
