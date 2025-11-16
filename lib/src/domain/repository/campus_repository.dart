@@ -1,7 +1,6 @@
 import 'package:either_dart/either.dart';
 import 'package:jenix_event_manager/src/core/exceptions/failure.dart';
 import 'package:jenix_event_manager/src/domain/entities/campus_entity.dart';
-import 'package:jenix_event_manager/src/domain/entities/user_entity.dart';
 
 abstract class CampusRepository {
   Future<Either<Failure, CampusEntity>> createCampus({
