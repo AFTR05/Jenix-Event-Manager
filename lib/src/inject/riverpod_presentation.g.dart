@@ -60,5 +60,22 @@ final roomControllerProvider = AutoDisposeProvider<RoomController>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef RoomControllerRef = AutoDisposeProviderRef<RoomController>;
+String _$eventControllerHash() => r'bbd9d352bbe5ca2f83f837de6724bbd3f64cf65c';
+
+/// See also [eventController].
+@ProviderFor(eventController)
+final eventControllerProvider = AutoDisposeProvider<EventController>.internal(
+  eventController,
+  name: r'eventControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$eventControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef EventControllerRef = AutoDisposeProviderRef<EventController>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

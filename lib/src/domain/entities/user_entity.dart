@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 class UserEntity {
+  final String id;
   final String email;
   final String name;
   final String phone;
@@ -9,6 +10,7 @@ class UserEntity {
   final String? refreshToken;
 
   const UserEntity({
+    required this.id,
     required this.email,
     required this.name,
     required this.phone,
@@ -26,6 +28,7 @@ class UserEntity {
     String? refreshToken,
   }) {
     return UserEntity(
+      id: id,
       email: email ?? this.email,
       name: name ?? this.name,
       phone: phone ?? this.phone,
@@ -37,6 +40,7 @@ class UserEntity {
 
   factory UserEntity.fromMap(Map<String, dynamic> map) {
     return UserEntity(
+      id: (map['id'] ?? '') as String,
       email: (map['email'] ?? '') as String,
       name: (map['name'] ?? '') as String,
       phone: (map['phone'] ?? '') as String,
