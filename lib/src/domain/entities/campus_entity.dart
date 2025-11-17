@@ -16,16 +16,17 @@ class CampusEntity {
   });
 
   factory CampusEntity.fromJson(Map<String, dynamic> json) {
-    return CampusEntity(
-      id: json['id'],
-      name: json['name'],
-      // Parse the incoming state string into the enum. If parsing fails,
-      // default to `abierto` to keep a sensible default.
-      state: campusStatusEnumTryParse(json['state'] as String?) ?? CampusStatusEnum.abierto,
-      isActive: json['isActive'] ?? true,
-      createdAt: DateTime.parse(json['createdAt']),
-    );
-  }
+  return CampusEntity(
+    id: (json['id']?.toString() ?? ''),
+    name: (json['name']?.toString() ?? ''),
+    state: campusStatusEnumTryParse(json['state'] as String?) ?? CampusStatusEnum.abierto,
+    isActive: json['isActive'] ?? true,
+    createdAt: json['createdAt'] != null
+        ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
+        : DateTime.now(),
+  );
+}
+
 
   Map<String, dynamic> toJson() => {
         'id': id,
