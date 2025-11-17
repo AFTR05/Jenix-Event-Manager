@@ -7,7 +7,7 @@ part of 'internet_connection_provider.dart';
 // **************************************************************************
 
 String _$internetConnectionProviderHash() =>
-    r'b1a72da687dad25ed1702f9dba99bd221357ff9c';
+    r'e8dc642ff9a428967682389a7729c058492d4924';
 
 /// See also [InternetConnectionProvider].
 @ProviderFor(InternetConnectionProvider)
