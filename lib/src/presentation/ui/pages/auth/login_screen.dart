@@ -404,7 +404,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         backgroundColor: Colors.green);
           Future.delayed(const Duration(milliseconds: 600), () {
             if (mounted) {
-              Navigator.pushReplacementNamed(context, RoutesApp.home);
+              Navigator.pushReplacementNamed(context, RoutesApp.main);
             }
           });
         },

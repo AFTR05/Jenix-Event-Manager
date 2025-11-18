@@ -3,7 +3,7 @@ import 'package:jenix_event_manager/src/presentation/ui/pages/home/home_screen.d
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/login_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/register_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/campus/campus_list_screen.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/main_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/home/main_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/splash/splash_screen.dart';
 
 /// RoutesApp - Alexander von Humboldt Event Manager
@@ -11,13 +11,12 @@ import 'package:jenix_event_manager/src/presentation/ui/pages/splash/splash_scre
 class RoutesApp {
   // Rutas principales
   static const String index = "/";
-  static const String splash = "/splash";
   static const String login = "/login";
   static const String register = "/register";
+  static const String main = "/main";
   static const String home = "/home";
-    static const String campus = "/campus";
+  static const String campus = "/campus";
 
-  
   // Rutas de perfil y configuración
   static const String editProfile = "/edit-profile";
   static const String myEvents = "/my-events";
@@ -26,28 +25,27 @@ class RoutesApp {
   static const String help = "/help";
   static const String appSettings = "/settings";
 
-
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case index:
+      case home:
         // La ruta inicial ahora es el SplashScreen
         return MaterialPageRoute(builder: (_) => const HomeScreen());
-      
-      case splash:
+
+      case index:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
-      
+
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
-      
+
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
-      
-      case home:
+
+      case main:
         return MaterialPageRoute(builder: (_) => const MainScreen());
 
       case campus:
         return MaterialPageRoute(builder: (_) => const CampusListScreen());
-      
+
       // Rutas de perfil (placeholder por ahora)
       case editProfile:
       case myEvents:
@@ -57,9 +55,7 @@ class RoutesApp {
       case appSettings:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
-            appBar: AppBar(
-              title: Text(_getRouteTitle(settings.name ?? '')),
-            ),
+            appBar: AppBar(title: Text(_getRouteTitle(settings.name ?? ''))),
             body: Center(
               child: Text(
                 'Pantalla en desarrollo:\n${_getRouteTitle(settings.name ?? '')}',
@@ -72,7 +68,7 @@ class RoutesApp {
             ),
           ),
         );
-      
+
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
