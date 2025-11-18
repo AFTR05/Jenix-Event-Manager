@@ -22,11 +22,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     final currentIndex = ref.watch(bottomNavBarStateProvider);
 
     final screens = [
-      const EventListScreen(), // ✅ ahora la lista de eventos está separada
+      const EventListScreen(),
       const ScheduleScreen(),
       const EventListScreen(),
       const ProfileScreen(),
-
       const CampusListScreen(),
       const RoomListScreen(),
     ];

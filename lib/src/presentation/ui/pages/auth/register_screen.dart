@@ -416,7 +416,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         (failure) => _showSnackBar(LocaleKeys.registerErrorPrefix.tr(namedArgs: {'message': failure.message}), color: Colors.redAccent),
         (user) {
           _showSnackBar(LocaleKeys.registerWelcome.tr(namedArgs: {'name': user.name}));
-          Navigator.pushReplacementNamed(context, RoutesApp.home);
+          Navigator.pushReplacementNamed(context, RoutesApp.main);
         },
       );
     } catch (_) {
