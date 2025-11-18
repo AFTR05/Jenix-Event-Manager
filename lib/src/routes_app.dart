@@ -28,25 +28,17 @@ class RoutesApp {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case home:
-        // La ruta inicial ahora es el SplashScreen
         return MaterialPageRoute(builder: (_) => const HomeScreen());
-
       case index:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
-
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
-
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
-
       case main:
         return MaterialPageRoute(builder: (_) => const MainScreen());
-
       case campus:
         return MaterialPageRoute(builder: (_) => const CampusListScreen());
-
-      // Rutas de perfil (placeholder por ahora)
       case editProfile:
       case myEvents:
       case notifications:

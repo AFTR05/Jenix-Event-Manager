@@ -16,7 +16,7 @@ class EventEntity {
   final UserEntity? responsablePerson; // <- puede ser nulo
   final ModalityType modality;
   final int maxAttendees;
-  final String urlImage;
+  final String? urlImage;
   final bool isActive;
   final DateTime createdAt;
   final DateTime? deletedAt;
