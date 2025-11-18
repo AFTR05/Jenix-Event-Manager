@@ -147,7 +147,7 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
           ),
           child: ListTile(
             contentPadding: const EdgeInsets.all(12),
-            leading: event.urlImage != null && event.urlImage!.isNotEmpty
+            leading: (event.urlImage != null && event.urlImage!.isNotEmpty && event.urlImage != 'Por defecto')
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
@@ -155,7 +155,7 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                       width: 60,
                       height: 60,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(
+                      errorBuilder: (_, _, _) => const Icon(
                         Icons.event,
                         color: Colors.white70,
                         size: 40,

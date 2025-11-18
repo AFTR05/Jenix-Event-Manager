@@ -25,9 +25,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       const EventListScreen(),
       const ScheduleScreen(),
       const EventListScreen(),
-      const ProfileScreen(),
       const CampusListScreen(),
       const RoomListScreen(),
+      const ProfileScreen(),
     ];
 
     return Scaffold(

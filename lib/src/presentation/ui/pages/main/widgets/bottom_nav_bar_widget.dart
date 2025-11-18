@@ -17,12 +17,13 @@ class BottomNavBarWidget extends ConsumerWidget {
       Icons.home_rounded,
       Icons.schedule_rounded,
       Icons.event_rounded,
-      Icons.person_rounded,
       Icons.location_city_rounded,
       Icons.meeting_room_rounded,
+      
+      Icons.person_rounded,
     ];
 
-    const labels = ['Inicio', 'Agenda', 'Eventos', 'Perfil', 'Campus', 'Salones'];
+    const labels = ['Inicio', 'Agenda', 'Eventos',  'Campus', 'Salones','Perfil'];
 
     return Container(
       decoration: BoxDecoration(
