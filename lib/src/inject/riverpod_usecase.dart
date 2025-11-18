@@ -3,6 +3,7 @@ import 'package:jenix_event_manager/src/domain/usecase/authentication_usecase.da
 import 'package:jenix_event_manager/src/domain/usecase/campus_usecase.dart';
 import 'package:jenix_event_manager/src/domain/usecase/room_usecase.dart';
 import 'package:jenix_event_manager/src/domain/usecase/event_usecase.dart';
+import 'package:jenix_event_manager/src/domain/usecase/users_usecase.dart';
 
 import 'package:jenix_event_manager/src/inject/riverpod_repositories.dart';
 
@@ -35,5 +36,12 @@ RoomUsecase roomUsecase(Ref ref) {
 EventUsecase eventUsecase(Ref ref) {
   return EventUsecase(
     repository: ref.watch(eventRepositoryProvider),
+  );
+}
+
+@riverpod
+UsersUsecase usersUsecase(Ref ref) {
+  return UsersUsecase(
+    usersRepository: ref.watch(usersRepositoryProvider),
   );
 }

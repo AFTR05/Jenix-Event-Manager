@@ -4,6 +4,7 @@ import 'package:jenix_event_manager/src/presentation/controllers/auth/authentica
 import 'package:jenix_event_manager/src/presentation/controllers/campus_controller.dart';
 import 'package:jenix_event_manager/src/presentation/controllers/event_controller.dart';
 import 'package:jenix_event_manager/src/presentation/controllers/room_controller.dart';
+import 'package:jenix_event_manager/src/presentation/controllers/users_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'riverpod_presentation.g.dart';
@@ -37,5 +38,14 @@ EventController eventController(Ref ref) {
   return EventController(
     ref: ref,
     usecase: ref.watch(eventUsecaseProvider),
+  );
+}
+
+
+@riverpod
+UsersController usersController(Ref ref) {
+  return UsersController(
+    ref: ref,
+    usersUsecase: ref.watch(usersUsecaseProvider),
   );
 }
