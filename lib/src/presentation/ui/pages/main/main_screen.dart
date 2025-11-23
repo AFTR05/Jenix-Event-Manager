@@ -4,13 +4,11 @@ import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:jenix_event_manager/src/domain/entities/enum/role_enum.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 import 'package:jenix_event_manager/src/presentation/providers_ui/bottom_nav_bar_state.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/event/event_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/events/events_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/my_events/event_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/management_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/schedule/screens/schedule_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/profile_screen.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/campus/campus_list_screen.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/rooms/room_list_screen.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/users/users_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/widgets/bottom_nav_bar_widget.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
@@ -27,7 +25,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     final isAdmin = ref.read(loginProviderProvider)?.role == RoleEnum.admin;
 
     final screens = [
-      const EventListScreen(),
+      const EventsScreen(),
       const ScheduleScreen(),
       if (isAdmin) const ManagementScreen(),
       const ProfileScreen(),

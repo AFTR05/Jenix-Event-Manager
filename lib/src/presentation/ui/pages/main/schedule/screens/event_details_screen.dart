@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:io';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:jenix_event_manager/src/domain/entities/event_entity.dart';
 
@@ -90,17 +91,8 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              if (widget.event.urlImage != null && widget.event.urlImage!.isNotEmpty)
-                Image.network(
-                  widget.event.urlImage!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: JenixColorsApp.primaryBlue,
-                      child: const Icon(Icons.image_not_supported, color: Colors.white),
-                    );
-                  },
-                )
+              if (widget.event.urlImage != null && widget.event.urlImage!.isNotEmpty && !widget.event.urlImage!.toLowerCase().contains('por defecto'))
+                _buildImageWidget(widget.event.urlImage!)
               else
                 Container(
                   color: JenixColorsApp.primaryBlue,
@@ -506,5 +498,44 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
         setState(() => isLoading = false);
       }
     }
+  }
+
+  Widget _buildImageWidget(String imageUrl) {
+    // Detectar si es una URL de red o ruta local
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      // Es una URL de red
+      return Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildPlaceholderImage();
+        },
+      );
+    } else if (imageUrl.startsWith('file://')) {
+      // Es una ruta local con prefijo file://
+      return Image.file(
+        File(imageUrl.replaceFirst('file://', '')),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildPlaceholderImage();
+        },
+      );
+    } else {
+      // Ruta local sin prefijo
+      return Image.file(
+        File(imageUrl),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildPlaceholderImage();
+        },
+      );
+    }
+  }
+
+  Widget _buildPlaceholderImage() {
+    return Container(
+      color: JenixColorsApp.primaryBlue,
+      child: const Icon(Icons.image_not_supported, color: Colors.white),
+    );
   }
 }
