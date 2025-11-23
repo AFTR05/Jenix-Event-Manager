@@ -94,5 +94,23 @@ final usersUsecaseProvider = AutoDisposeProvider<UsersUsecase>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef UsersUsecaseRef = AutoDisposeProviderRef<UsersUsecase>;
+String _$enrollmentUsecaseHash() => r'3f40b3dbc442684eb10b744aab63d611734d09e6';
+
+/// See also [enrollmentUsecase].
+@ProviderFor(enrollmentUsecase)
+final enrollmentUsecaseProvider =
+    AutoDisposeProvider<EnrollmentUsecase>.internal(
+      enrollmentUsecase,
+      name: r'enrollmentUsecaseProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$enrollmentUsecaseHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef EnrollmentUsecaseRef = AutoDisposeProviderRef<EnrollmentUsecase>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

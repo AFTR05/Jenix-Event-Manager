@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jenix_event_manager/src/domain/usecase/authentication_usecase.dart';
 import 'package:jenix_event_manager/src/domain/usecase/campus_usecase.dart';
+import 'package:jenix_event_manager/src/domain/usecase/enrollment_usecase.dart';
 import 'package:jenix_event_manager/src/domain/usecase/room_usecase.dart';
 import 'package:jenix_event_manager/src/domain/usecase/event_usecase.dart';
 import 'package:jenix_event_manager/src/domain/usecase/users_usecase.dart';
@@ -43,5 +44,12 @@ EventUsecase eventUsecase(Ref ref) {
 UsersUsecase usersUsecase(Ref ref) {
   return UsersUsecase(
     usersRepository: ref.watch(usersRepositoryProvider),
+  );
+}
+
+@riverpod
+EnrollmentUsecase enrollmentUsecase(Ref ref) {
+  return EnrollmentUsecase(
+    ref.watch(enrollmentRepositoryProvider),
   );
 }

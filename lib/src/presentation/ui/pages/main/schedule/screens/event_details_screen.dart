@@ -3,14 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:jenix_event_manager/src/domain/entities/event_entity.dart';
+import 'package:jenix_event_manager/src/domain/entities/enrollment_entity.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/enrollment_status_enum.dart';
+import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
+import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 
 class EventDetailsScreen extends ConsumerStatefulWidget {
   final EventEntity event;
 
-  const EventDetailsScreen({
-    required this.event,
-    super.key,
-  });
+  const EventDetailsScreen({required this.event, super.key});
 
   @override
   ConsumerState<EventDetailsScreen> createState() => _EventDetailsScreenState();
@@ -19,12 +20,106 @@ class EventDetailsScreen extends ConsumerStatefulWidget {
 class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
   bool isRegistered = false;
   bool isLoading = false;
+  bool isEventFull = false;
+  bool isEventPassed = false;
+  int currentEnrollments = 0;
+  String? userEnrollmentId; // ID de la inscripción del usuario
+
+  @override
+  void initState() {
+    super.initState();
+    _checkEventStatus();
+    _checkUserEnrollment();
+  }
+
+  Future<void> _checkEventStatus() {
+    // Verificar si el evento ya pasó
+    final now = DateTime.now();
+    final eventEndDateTime = _combineDateTime(
+      widget.event.finalDate,
+      widget.event.endHour,
+    );
+
+    final isPassed = now.isAfter(eventEndDateTime);
+    setState(() => isEventPassed = isPassed);
+    
+    return Future.value();
+  }
+
+  DateTime _combineDateTime(DateTime date, String? timeString) {
+    if (timeString == null || timeString.isEmpty) {
+      return date;
+    }
+
+    try {
+      final parts = timeString.split(':');
+      final hour = int.parse(parts[0]);
+      final minute = parts.length > 1 ? int.parse(parts[1]) : 0;
+      return DateTime(date.year, date.month, date.day, hour, minute);
+    } catch (e) {
+      return date;
+    }
+  }
+
+  Future<void> _checkUserEnrollment() async {
+    final user = ref.read(loginProviderProvider);
+    if (user == null || user.accessToken == null) {
+      return;
+    }
+
+    final enrollmentController = ref.read(enrollmentControllerProvider);
+    final result = await enrollmentController.getEnrollmentsByEvent(
+      widget.event.id,
+      user.accessToken!,
+    );
+
+    result.fold(
+      (failure) {
+        // Error al obtener inscripciones, no hacer nada silenciosamente
+      },
+      (enrollments) {
+        // Contar inscripciones válidas (excluir canceladas, rechazadas, no_show)
+        final validEnrollments = enrollments
+            .where(
+              (e) =>
+                  e.status != EnrollmentStatus.cancelled &&
+                  e.status != EnrollmentStatus.rejected &&
+                  e.status != EnrollmentStatus.noShow,
+            )
+            .toList();
+
+        final currentCount = validEnrollments.length;
+        final isFull = currentCount >= widget.event.maxAttendees;
+
+        // Buscar la inscripción del usuario actual
+        EnrollmentEntity? userEnrollment;
+        try {
+          userEnrollment = validEnrollments.firstWhere(
+            (enrollment) => enrollment.userId == user.id,
+          );
+        } catch (e) {
+          userEnrollment = null;
+        }
+
+        final userEnrolled = userEnrollment != null;
+
+        setState(() {
+          isRegistered = userEnrolled;
+          currentEnrollments = currentCount;
+          isEventFull =
+              isFull && !userEnrolled; // Solo bloquear si NO está inscrito
+          // Guardar el ID de la inscripción del usuario
+          userEnrollmentId = userEnrollment?.id;
+        });
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? JenixColorsApp.darkBackground 
+    final backgroundColor = isDark
+        ? JenixColorsApp.darkBackground
         : JenixColorsApp.backgroundLightGray;
 
     return Scaffold(
@@ -91,7 +186,9 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              if (widget.event.urlImage != null && widget.event.urlImage!.isNotEmpty && !widget.event.urlImage!.toLowerCase().contains('por defecto'))
+              if (widget.event.urlImage != null &&
+                  widget.event.urlImage!.isNotEmpty &&
+                  !widget.event.urlImage!.toLowerCase().contains('por defecto'))
                 _buildImageWidget(widget.event.urlImage!)
               else
                 Container(
@@ -107,10 +204,7 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.6),
-                    ],
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),
@@ -148,7 +242,9 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
-            color: isDark ? JenixColorsApp.backgroundWhite : JenixColorsApp.darkColorText,
+            color: isDark
+                ? JenixColorsApp.backgroundWhite
+                : JenixColorsApp.darkColorText,
           ),
         ),
         const SizedBox(height: 8),
@@ -156,7 +252,9 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
           widget.event.organizationArea,
           style: TextStyle(
             fontSize: 14,
-            color: isDark ? JenixColorsApp.lightGray : JenixColorsApp.subtitleColor,
+            color: isDark
+                ? JenixColorsApp.lightGray
+                : JenixColorsApp.subtitleColor,
           ),
         ),
       ],
@@ -170,7 +268,8 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
           child: _buildInfoCard(
             icon: Icons.access_time_rounded,
             label: 'Hora',
-            value: '${widget.event.beginHour ?? '--:--'} - ${widget.event.endHour ?? '--:--'}',
+            value:
+                '${widget.event.beginHour ?? '--:--'} - ${widget.event.endHour ?? '--:--'}',
             isDark: isDark,
           ),
         ),
@@ -196,7 +295,7 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark 
+        color: isDark
             ? JenixColorsApp.darkGray.withOpacity(0.3)
             : JenixColorsApp.infoLight,
         borderRadius: BorderRadius.circular(14),
@@ -210,18 +309,14 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
         children: [
           Row(
             children: [
-              Icon(
-                icon,
-                size: 16,
-                color: JenixColorsApp.primaryBlue,
-              ),
+              Icon(icon, size: 16, color: JenixColorsApp.primaryBlue),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 11,
-                  color: isDark 
-                      ? JenixColorsApp.lightGray 
+                  color: isDark
+                      ? JenixColorsApp.lightGray
                       : JenixColorsApp.subtitleColor,
                   fontWeight: FontWeight.w600,
                 ),
@@ -234,8 +329,8 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: isDark 
-                  ? JenixColorsApp.backgroundWhite 
+              color: isDark
+                  ? JenixColorsApp.backgroundWhite
                   : JenixColorsApp.darkColorText,
             ),
             overflow: TextOverflow.ellipsis,
@@ -254,7 +349,9 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: isDark ? JenixColorsApp.backgroundWhite : JenixColorsApp.darkColorText,
+            color: isDark
+                ? JenixColorsApp.backgroundWhite
+                : JenixColorsApp.darkColorText,
           ),
         ),
         const SizedBox(height: 8),
@@ -262,8 +359,8 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
           widget.event.description,
           style: TextStyle(
             fontSize: 14,
-            color: isDark 
-                ? JenixColorsApp.lightGray 
+            color: isDark
+                ? JenixColorsApp.lightGray
                 : JenixColorsApp.secondaryTextColor,
             height: 1.6,
           ),
@@ -276,12 +373,12 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark 
+        color: isDark
             ? JenixColorsApp.darkGray.withOpacity(0.3)
             : JenixColorsApp.backgroundWhite,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark 
+          color: isDark
               ? JenixColorsApp.darkGray.withOpacity(0.5)
               : JenixColorsApp.lightGrayBorder,
           width: 1,
@@ -293,14 +390,16 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
           _buildDetailRow(
             icon: Icons.calendar_today_rounded,
             label: 'Inicio',
-            value: '${widget.event.initialDate.day}/${widget.event.initialDate.month}/${widget.event.initialDate.year}',
+            value:
+                '${widget.event.initialDate.day}/${widget.event.initialDate.month}/${widget.event.initialDate.year}',
             isDark: isDark,
           ),
           const SizedBox(height: 12),
           _buildDetailRow(
             icon: Icons.calendar_today_rounded,
             label: 'Fin',
-            value: '${widget.event.finalDate.day}/${widget.event.finalDate.month}/${widget.event.finalDate.year}',
+            value:
+                '${widget.event.finalDate.day}/${widget.event.finalDate.month}/${widget.event.finalDate.year}',
             isDark: isDark,
           ),
           if (widget.event.responsablePerson != null) ...[
@@ -325,11 +424,7 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
   }) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: JenixColorsApp.primaryBlue,
-        ),
+        Icon(icon, size: 18, color: JenixColorsApp.primaryBlue),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -339,8 +434,8 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark 
-                      ? JenixColorsApp.lightGray 
+                  color: isDark
+                      ? JenixColorsApp.lightGray
                       : JenixColorsApp.subtitleColor,
                 ),
               ),
@@ -350,8 +445,8 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: isDark 
-                      ? JenixColorsApp.backgroundWhite 
+                  color: isDark
+                      ? JenixColorsApp.backgroundWhite
                       : JenixColorsApp.darkColorText,
                 ),
               ),
@@ -363,13 +458,20 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
   }
 
   Widget _buildCapacity(bool isDark) {
+    final spotsAvailable = widget.event.maxAttendees - currentEnrollments;
+    final isFull = spotsAvailable <= 0;
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: JenixColorsApp.primaryBlue.withOpacity(0.12),
+        color: isFull
+            ? Colors.red.withOpacity(0.12)
+            : JenixColorsApp.primaryBlue.withOpacity(0.12),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: JenixColorsApp.primaryBlue.withOpacity(0.2),
+          color: isFull
+              ? Colors.red.withOpacity(0.2)
+              : JenixColorsApp.primaryBlue.withOpacity(0.2),
           width: 1,
         ),
       ),
@@ -378,7 +480,7 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
           Icon(
             Icons.group_rounded,
             size: 24,
-            color: JenixColorsApp.primaryBlue,
+            color: isFull ? Colors.red : JenixColorsApp.primaryBlue,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -389,18 +491,20 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
                   'Capacidad',
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark 
-                        ? JenixColorsApp.lightGray 
+                    color: isDark
+                        ? JenixColorsApp.lightGray
                         : JenixColorsApp.subtitleColor,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Máximo ${widget.event.maxAttendees} participantes',
+                  isFull
+                      ? 'Evento lleno'
+                      : 'Máximo ${widget.event.maxAttendees} participantes',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: JenixColorsApp.primaryBlue,
+                    color: isFull ? Colors.red : JenixColorsApp.primaryBlue,
                   ),
                 ),
               ],
@@ -409,15 +513,17 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: JenixColorsApp.primaryBlue.withOpacity(0.2),
+              color: isFull
+                  ? Colors.red.withOpacity(0.2)
+                  : JenixColorsApp.primaryBlue.withOpacity(0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              '0/${widget.event.maxAttendees}',
+              '$currentEnrollments/${widget.event.maxAttendees}',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: JenixColorsApp.primaryBlue,
+                color: isFull ? Colors.red : JenixColorsApp.primaryBlue,
               ),
             ),
           ),
@@ -427,16 +533,44 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
   }
 
   Widget _buildActionButton() {
+    final isButtonDisabled = isLoading || 
+        (isEventFull && !isRegistered) || 
+        (isEventPassed && !isRegistered);
+
+    String buttonText;
+    Color buttonColor;
+    Color textColor;
+
+    if (isEventPassed && !isRegistered) {
+      buttonText = 'Evento finalizado';
+      buttonColor = Colors.grey.withOpacity(0.3);
+      textColor = Colors.grey;
+    } else if (isEventPassed && isRegistered) {
+      buttonText = 'Evento finalizado';
+      buttonColor = Colors.grey.withOpacity(0.3);
+      textColor = Colors.grey;
+    } else if (isRegistered) {
+      buttonText = 'Cancelar inscripción';
+      buttonColor = Colors.red.withOpacity(0.3);
+      textColor = Colors.red;
+    } else if (isEventFull) {
+      buttonText = 'Evento lleno';
+      buttonColor = Colors.red.withOpacity(0.3);
+      textColor = Colors.red;
+    } else {
+      buttonText = 'Inscribirse al evento';
+      buttonColor = JenixColorsApp.primaryBlue;
+      textColor = JenixColorsApp.backgroundWhite;
+    }
+
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: isLoading ? null : _handleRegistration,
+        onPressed: (isButtonDisabled || (isEventPassed && isRegistered)) ? null : _handleRegistration,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isRegistered 
-              ? JenixColorsApp.primaryBlue.withOpacity(0.3)
-              : JenixColorsApp.primaryBlue,
-          disabledBackgroundColor: JenixColorsApp.primaryBlue.withOpacity(0.5),
+          backgroundColor: buttonColor,
+          disabledBackgroundColor: Colors.grey.withOpacity(0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
@@ -452,13 +586,11 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
                 ),
               )
             : Text(
-                isRegistered ? 'Ya estás inscrito' : 'Inscribirse al evento',
+                buttonText,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: isRegistered 
-                      ? JenixColorsApp.primaryBlue
-                      : JenixColorsApp.backgroundWhite,
+                  color: textColor,
                 ),
               ),
       ),
@@ -466,33 +598,97 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
   }
 
   Future<void> _handleRegistration() async {
+    final user = ref.read(loginProviderProvider);
+    if (user == null || user.accessToken == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Debes iniciar sesión primero'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     setState(() => isLoading = true);
 
     try {
-      // TODO: Integrar con EventController para inscribirse
-      await Future.delayed(const Duration(seconds: 1));
-      
-      setState(() => isRegistered = true);
-      
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('¡Te inscribiste al evento exitosamente!'),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-          ),
+      final enrollmentController = ref.read(enrollmentControllerProvider);
+      final token = user.accessToken!;
+
+      if (isRegistered && userEnrollmentId != null) {
+        // Cancelar inscripción usando el ID guardado
+        final result = await enrollmentController.cancelEnrollmentAndCache(
+          userEnrollmentId!,
+          token,
+        );
+
+        result.fold(
+          (failure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error al cancelar: ${failure.toString()}'),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          },
+          (success) {
+            setState(() {
+              isRegistered = false;
+              userEnrollmentId = null;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Inscripción cancelada'),
+                backgroundColor: Colors.orange,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          },
+        );
+      } else {
+        // Inscribirse al evento
+        final result = await enrollmentController.enrollInEventAndCache(
+          widget.event.id,
+          token,
+        );
+
+        result.fold(
+          (failure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error al inscribirse: ${failure.toString()}'),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          },
+          (enrollment) {
+            setState(() {
+              isRegistered = true;
+              userEnrollmentId = enrollment.id;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '¡Inscripción exitosa! Estado: ${enrollment.status.name}',
+                ),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          },
         );
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
