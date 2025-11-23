@@ -94,5 +94,24 @@ final usersControllerProvider = AutoDisposeProvider<UsersController>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef UsersControllerRef = AutoDisposeProviderRef<UsersController>;
+String _$enrollmentControllerHash() =>
+    r'01ab902bbc3cc43fcbe3554f8ab686e8496e9b03';
+
+/// See also [enrollmentController].
+@ProviderFor(enrollmentController)
+final enrollmentControllerProvider =
+    AutoDisposeProvider<EnrollmentController>.internal(
+      enrollmentController,
+      name: r'enrollmentControllerProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$enrollmentControllerHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef EnrollmentControllerRef = AutoDisposeProviderRef<EnrollmentController>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
