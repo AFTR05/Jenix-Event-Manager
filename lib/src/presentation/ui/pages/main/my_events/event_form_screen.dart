@@ -194,66 +194,6 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
     super.dispose();
   }
 
-  Future<void> _pickInitialDate() async {
-    final date = await showDatePicker(
-      context: context,
-      initialDate: _initialDate ?? DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.dark(
-            primary: Color(0xFFD32F2F),
-            onPrimary: Colors.white,
-            surface: Color(0xFF2C2C2C),
-            onSurface: Colors.white,
-          ),
-          dialogBackgroundColor: const Color(0xFF1A1A1A),
-        ),
-        child: child!,
-      ),
-    );
-    if (date != null) setState(() => _initialDate = date);
-  }
-
-  Future<void> _pickFinalDate() async {
-    final date = await showDatePicker(
-      context: context,
-      initialDate: _finalDate ?? DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.dark(
-            primary: Color(0xFFD32F2F),
-            onPrimary: Colors.white,
-            surface: Color(0xFF2C2C2C),
-            onSurface: Colors.white,
-          ),
-          dialogBackgroundColor: const Color(0xFF1A1A1A),
-        ),
-        child: child!,
-      ),
-    );
-    if (date != null) setState(() => _finalDate = date);
-  }
-
-  Future<void> _pickBeginTime() async {
-    final time = await showTimePicker(
-      context: context,
-      initialTime: _beginTime ?? TimeOfDay.now(),
-    );
-    if (time != null) setState(() => _beginTime = time);
-  }
-
-  Future<void> _pickEndTime() async {
-    final time = await showTimePicker(
-      context: context,
-      initialTime: _endTime ?? TimeOfDay.now(),
-    );
-    if (time != null) setState(() => _endTime = time);
-  }
-
   void _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_initialDate == null ||
@@ -262,6 +202,25 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
         _endTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Seleccione fecha y hora de inicio y fin')),
+      );
+      return;
+    }
+
+    // Validar que máx asistentes sea mayor a 0
+    try {
+      final maxAttendees = int.parse(_maxAttendeesController.text);
+      if (maxAttendees <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('El número máximo de asistentes debe ser mayor a 0'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        return;
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ingrese un número válido de asistentes')),
       );
       return;
     }
@@ -283,18 +242,13 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
       _endTime!.minute,
     );
 
-    // Validar que la fecha de inicio sea menor o igual a la fecha final
-    if (startDateTime.isAfter(endDateTime)) {
+    // Validar que la fecha/hora de inicio sea anterior a la de fin
+    if (!startDateTime.isBefore(endDateTime)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('La fecha/hora de inicio debe ser anterior a la de fin')),
-      );
-      return;
-    }
-
-    // Validar que si es el mismo día, la hora de inicio sea menor a la de fin
-    if (_initialDate!.compareTo(_finalDate!) == 0 && _beginTime!.hour == _endTime!.hour && _beginTime!.minute >= _endTime!.minute) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('La hora de inicio debe ser anterior a la hora de fin')),
+        const SnackBar(
+          content: Text('La fecha y hora de inicio debe ser anterior a la de fin'),
+          duration: Duration(seconds: 3),
+        ),
       );
       return;
     }
@@ -515,38 +469,150 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
                   _buildInfoCard(
                     child: Column(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildDateButton(
-                                  label: "Fecha Inicio",
-                                  date: _initialDate,
-                                  onTap: _submitting ? null : _pickInitialDate),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: _buildTimeButton(
-                                  label: "Hora Inicio",
-                                  time: _beginTime,
-                                  onTap: _submitting ? null : _pickBeginTime),
-                            ),
-                          ],
+                        Text(
+                          'Seleccionar Fechas',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        // Calendario para fecha inicial
+                        _buildDatePickerButton(
+                          label: 'Fecha Inicio',
+                          date: _initialDate,
+                          onTap: _submitting
+                              ? null
+                              : () async {
+                                  final date = await showDatePicker(
+                                    context: context,
+                                    initialDate: _initialDate ?? DateTime.now(),
+                                    firstDate: DateTime(2020),
+                                    lastDate: DateTime(2100),
+                                    builder: (context, child) => Theme(
+                                      data: Theme.of(context).copyWith(
+                                        colorScheme: const ColorScheme.dark(
+                                          primary: Color(0xFFBE1723),
+                                          onPrimary: Colors.white,
+                                          surface: Color(0xFF2C2C2C),
+                                          onSurface: Colors.white,
+                                        ),
+                                        dialogBackgroundColor: const Color(0xFF1A1A1A),
+                                      ),
+                                      child: child!,
+                                    ),
+                                  );
+                                  if (date != null) {
+                                    setState(() {
+                                      _initialDate = date;
+                                      if (_finalDate != null && date.isAfter(_finalDate!)) {
+                                        _finalDate = date.add(const Duration(hours: 1));
+                                      }
+                                    });
+                                  }
+                                },
+                        ),
+                        const SizedBox(height: 12),
+                        // Calendario para fecha final
+                        _buildDatePickerButton(
+                          label: 'Fecha Fin',
+                          date: _finalDate,
+                          onTap: _submitting
+                              ? null
+                              : () async {
+                                  final date = await showDatePicker(
+                                    context: context,
+                                    initialDate: _finalDate ?? (_initialDate?.add(const Duration(hours: 1)) ?? DateTime.now()),
+                                    firstDate: _initialDate ?? DateTime(2020),
+                                    lastDate: DateTime(2100),
+                                    builder: (context, child) => Theme(
+                                      data: Theme.of(context).copyWith(
+                                        colorScheme: const ColorScheme.dark(
+                                          primary: Color(0xFFBE1723),
+                                          onPrimary: Colors.white,
+                                          surface: Color(0xFF2C2C2C),
+                                          onSurface: Colors.white,
+                                        ),
+                                        dialogBackgroundColor: const Color(0xFF1A1A1A),
+                                      ),
+                                      child: child!,
+                                    ),
+                                  );
+                                  if (date != null) {
+                                    setState(() => _finalDate = date);
+                                  }
+                                },
+                        ),
+                        const SizedBox(height: 16),
+                        // Horas
+                        Text(
+                          'Seleccionar Horas',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         Row(
                           children: [
                             Expanded(
-                              child: _buildDateButton(
-                                  label: "Fecha Fin",
-                                  date: _finalDate,
-                                  onTap: _submitting ? null : _pickFinalDate),
+                              child: _buildTimePickerButton(
+                                label: 'Hora Inicio',
+                                time: _beginTime,
+                                onTap: _submitting
+                                    ? null
+                                    : () async {
+                                        final time = await showTimePicker(
+                                          context: context,
+                                          initialTime: _beginTime ?? TimeOfDay.now(),
+                                          builder: (context, child) => Theme(
+                                            data: Theme.of(context).copyWith(
+                                              colorScheme: const ColorScheme.dark(
+                                                primary: Color(0xFFBE1723),
+                                                onPrimary: Colors.white,
+                                                surface: Color(0xFF2C2C2C),
+                                                onSurface: Colors.white,
+                                              ),
+                                            ),
+                                            child: child!,
+                                          ),
+                                        );
+                                        if (time != null) {
+                                          setState(() => _beginTime = time);
+                                        }
+                                      },
+                              ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 12),
                             Expanded(
-                              child: _buildTimeButton(
-                                  label: "Hora Fin",
-                                  time: _endTime,
-                                  onTap: _submitting ? null : _pickEndTime),
+                              child: _buildTimePickerButton(
+                                label: 'Hora Fin',
+                                time: _endTime,
+                                onTap: _submitting
+                                    ? null
+                                    : () async {
+                                        final time = await showTimePicker(
+                                          context: context,
+                                          initialTime: _endTime ?? TimeOfDay.now(),
+                                          builder: (context, child) => Theme(
+                                            data: Theme.of(context).copyWith(
+                                              colorScheme: const ColorScheme.dark(
+                                                primary: Color(0xFFBE1723),
+                                                onPrimary: Colors.white,
+                                                surface: Color(0xFF2C2C2C),
+                                                onSurface: Colors.white,
+                                              ),
+                                            ),
+                                            child: child!,
+                                          ),
+                                        );
+                                        if (time != null) {
+                                          setState(() => _endTime = time);
+                                        }
+                                      },
+                              ),
                             ),
                           ],
                         ),
@@ -564,10 +630,24 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
                             controller: _maxAttendeesController,
                             label: "Máx. asistentes",
                             icon: Icons.people,
-                            validatorMsg: "Ingrese número de asistentes",
+                            validatorMsg: "Ingrese un número válido mayor a 0",
                             keyboard: TextInputType.number,
                             enabled: !_submitting,
                             onChanged: (_) => setState(() {}),
+                            validator: (v) {
+                              if (v == null || v.isEmpty) {
+                                return "Ingrese el número máximo de asistentes";
+                              }
+                              try {
+                                final num = int.parse(v);
+                                if (num <= 0) {
+                                  return "El número debe ser mayor a 0";
+                                }
+                              } catch (e) {
+                                return "Ingrese un número válido";
+                              }
+                              return null;
+                            },
                           ),
                         const SizedBox(height: 16),
                         _buildDropdown<String>(
@@ -885,6 +965,107 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
     );
   }
 
+  Widget _buildDatePickerButton({
+    required String label,
+    required DateTime? date,
+    required VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0A2647),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: onTap == null ? Colors.white10 : const Color(0xFFBE1723).withOpacity(0.4),
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.calendar_today, color: onTap == null ? Colors.white30 : const Color(0xFFBE1723), size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    date != null ? DateFormat('dd/MM/yyyy').format(date) : 'Seleccionar',
+                    style: TextStyle(
+                      color: onTap == null ? Colors.white30 : Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimePickerButton({
+    required String label,
+    required TimeOfDay? time,
+    required VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0A2647),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: onTap == null ? Colors.white10 : const Color(0xFFBE1723).withOpacity(0.4),
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.access_time, color: onTap == null ? Colors.white30 : const Color(0xFFBE1723), size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  time != null ? time.format(context) : '--:--',
+                  style: TextStyle(
+                    color: onTap == null ? Colors.white30 : Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -893,6 +1074,7 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
     TextInputType? keyboard,
     bool enabled = true,
     void Function(String)? onChanged,
+    String? Function(String?)? validator,
   }) {
     return TextFormField(
       controller: controller,
@@ -900,9 +1082,9 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
       keyboardType: keyboard ?? TextInputType.text,
       onChanged: onChanged,
       style: const TextStyle(color: Colors.white),
-      validator: validatorMsg != null
+      validator: validator ?? (validatorMsg != null
           ? (v) => v == null || v.isEmpty ? validatorMsg : null
-          : null,
+          : null),
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(color: Colors.white70),
@@ -963,59 +1145,6 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
                 ),
               ))
           .toList(),
-    );
-  }
-
-  Widget _buildDateButton({
-    required String label,
-    required DateTime? date,
-    required VoidCallback? onTap,
-  }) {
-    final dateFormat = DateFormat('dd MMM yyyy');
-    return ElevatedButton.icon(
-      onPressed: onTap,
-      icon: Icon(
-        Icons.calendar_today,
-        color: onTap == null ? Colors.white30 : Colors.white70,
-      ),
-      label: Text(
-        date != null ? dateFormat.format(date) : label,
-        style: TextStyle(
-          color: onTap == null ? Colors.white30 : Colors.white,
-        ),
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: onTap == null ? const Color(0xFF1A1A1A) : const Color(0xFF0A2647),
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      ),
-    );
-  }
-
-  Widget _buildTimeButton({
-    required String label,
-    required TimeOfDay? time,
-    required VoidCallback? onTap,
-  }) {
-    return ElevatedButton.icon(
-      onPressed: onTap,
-      icon: Icon(
-        Icons.access_time,
-        color: onTap == null ? Colors.white30 : Colors.white70,
-      ),
-      label: Text(
-        time != null
-            ? "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}"
-            : label,
-        style: TextStyle(
-          color: onTap == null ? Colors.white30 : Colors.white,
-        ),
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: onTap == null ? const Color(0xFF1A1A1A) : const Color(0xFF0A2647),
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      ),
     );
   }
 }
