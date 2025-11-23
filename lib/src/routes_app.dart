@@ -3,7 +3,11 @@ import 'package:jenix_event_manager/src/presentation/ui/pages/home/home_screen.d
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/login_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/register_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/campus/campus_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/event/event_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/home/main_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/edit_profile_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/rooms/room_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/users/users_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/splash/splash_screen.dart';
 
 /// RoutesApp - Alexander von Humboldt Event Manager
@@ -16,6 +20,8 @@ class RoutesApp {
   static const String main = "/main";
   static const String home = "/home";
   static const String campus = "/campus";
+  static const String rooms = "/rooms";
+  static const String users = "/users";
 
   // Rutas de perfil y configuración
   static const String editProfile = "/edit-profile";
@@ -39,8 +45,14 @@ class RoutesApp {
         return MaterialPageRoute(builder: (_) => const MainScreen());
       case campus:
         return MaterialPageRoute(builder: (_) => const CampusListScreen());
-      case editProfile:
+      case rooms:
+        return MaterialPageRoute(builder: (_) => const RoomListScreen());
+      case users:
+        return MaterialPageRoute(builder: (_) => const UsersListScreen());
       case myEvents:
+        return MaterialPageRoute(builder: (_) => const EventListScreen());
+      case editProfile:
+        return MaterialPageRoute(builder: (_) => const EditProfileScreen());
       case notifications:
       case share:
       case help:

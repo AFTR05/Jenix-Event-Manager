@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:jenix_event_manager/src/domain/entities/campus_entity.dart';
 import 'package:jenix_event_manager/src/domain/entities/enum/campus_status_enum.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
+import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/appbar/secondary_appbar_widget.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/campus/campus_form_screen.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 
@@ -33,27 +34,29 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
     if (showLoading && mounted) {
       setState(() => _isLoading = true);
     }
-    
+
     final controller = ref.read(campusControllerProvider);
     final user = ref.read(loginProviderProvider);
     final token = user?.accessToken ?? '';
-    
+
     print('🔄 Llamando al endpoint de campus...');
     // Llamar directamente al endpoint, sin cache
     final res = await controller.getAllCampuses(token);
-    
+
     if (mounted) {
       if (res.isRight) {
         print('✅ Recibidos ${res.right.length} campus del backend');
         print('📋 ANTES de actualizar UI: ${_campuses.length} campus');
         for (var i = 0; i < _campuses.length; i++) {
-          print('   [ANTES] ${_campuses[i].name} -> ${_campuses[i].state.toText()}');
+          print(
+            '   [ANTES] ${_campuses[i].name} -> ${_campuses[i].state.toText()}',
+          );
         }
-        
+
         for (var campus in res.right) {
           print('   [NUEVO] ${campus.name} -> ${campus.state.toText()}');
         }
-        
+
         // Forzar rebuild limpiando primero la lista
         setState(() {
           if (showLoading) _isLoading = false;
@@ -63,10 +66,12 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
         setState(() {
           _campuses = List<CampusEntity>.from(res.right); // Crear nueva lista
         });
-        
+
         print('✅ DESPUÉS de setState: ${_campuses.length} campus en UI');
         for (var i = 0; i < _campuses.length; i++) {
-          print('   [UI] ${_campuses[i].name} -> ${_campuses[i].state.toText()}');
+          print(
+            '   [UI] ${_campuses[i].name} -> ${_campuses[i].state.toText()}',
+          );
         }
       } else {
         print('❌ Error al cargar campuses: ${res.left}');
@@ -102,7 +107,7 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
       builder: (_) => CampusFormDialog(campus: campus),
     );
     if (result == null) return;
-    
+
     _setProcessing(true);
     final controller = ref.read(campusControllerProvider);
     final user = ref.read(loginProviderProvider);
@@ -191,7 +196,7 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
     try {
       print('🗑️ Eliminando campus: ${campus.id}');
       final res = await controller.deleteCampus(campus.id, token);
-      
+
       if (res.isRight && res.right == true) {
         print('✅ Campus eliminado: ${campus.id}');
         // Pequeño delay para asegurar que el backend se actualice
@@ -227,7 +232,7 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0C1C2C),
-
+      appBar: SecondaryAppbarWidget(title: 'Gestion de Sedes'),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isProcessing ? null : () => _openForm(),
         backgroundColor: _isProcessing ? Colors.grey : const Color(0xFFBE1723),
@@ -253,13 +258,13 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _campuses.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'No hay campus disponibles',
-                          style: TextStyle(color: Colors.white70),
-                        ),
-                      )
-                    : _buildListView(_campuses),
+                ? const Center(
+                    child: Text(
+                      'No hay campus disponibles',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  )
+                : _buildListView(_campuses),
           ),
 
           /// Overlay de carga durante operaciones (crear/actualizar/eliminar)
@@ -271,7 +276,9 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFBE1723)),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFFBE1723),
+                      ),
                     ),
                     SizedBox(height: 16),
                     Text(
@@ -293,12 +300,16 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
 
   Widget _buildListView(List<CampusEntity> list) {
     return ListView.builder(
-      key: ValueKey('campus_list_${list.length}_${DateTime.now().millisecondsSinceEpoch}'),
+      key: ValueKey(
+        'campus_list_${list.length}_${DateTime.now().millisecondsSinceEpoch}',
+      ),
       itemCount: list.length,
       itemBuilder: (context, index) {
         final campus = list[index];
         return Container(
-          key: ValueKey('campus_${campus.id}_${campus.state.toText()}_${campus.name}'),
+          key: ValueKey(
+            'campus_${campus.id}_${campus.state.toText()}_${campus.name}',
+          ),
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
             color: const Color(0xFF12263F).withOpacity(0.9),

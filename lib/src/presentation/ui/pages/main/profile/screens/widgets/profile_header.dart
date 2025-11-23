@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/role_enum.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 
 /// ProfileHeader - Alexander von Humboldt Event Manager
@@ -110,7 +111,7 @@ class ProfileHeader extends ConsumerWidget {
           const SizedBox(height: 8),
           
           // Role badge (si existe)
-          if (user?.role != null && user!.role.isNotEmpty)
+          if (user?.role != null)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
@@ -126,7 +127,7 @@ class ProfileHeader extends ConsumerWidget {
                 ),
               ),
               child: Text(
-                user.role.toUpperCase(),
+                user!.role.displayName,
                 style: TextStyle(
                   fontFamily: 'OpenSansHebrew',
                   fontWeight: FontWeight.w600,

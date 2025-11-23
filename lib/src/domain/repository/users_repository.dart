@@ -29,4 +29,10 @@ abstract class UsersRepository {
     required String userId,
     required String token,
   });
+
+  Future<Either<Failure, List<UserEntity>>> getAllUsers({
+    required int page,
+    required int limit,
+    required String token,
+  });
 }
