@@ -8,9 +8,9 @@ import 'package:jenix_event_manager/src/presentation/ui/pages/main/event/event_l
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/management_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/schedule/screens/schedule_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/profile_screen.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/campus/campus_list_screen.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/rooms/room_list_screen.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/users/users_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/campus/campus_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/rooms/room_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/users/users_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/widgets/bottom_nav_bar_widget.dart';
 
 class MainScreen extends ConsumerStatefulWidget {

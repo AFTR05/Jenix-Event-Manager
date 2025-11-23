@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/home/home_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/login_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/register_screen.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/campus/campus_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/campus/campus_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/event/event_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/home/main_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/edit_profile_screen.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/rooms/room_list_screen.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/users/users_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/rooms/room_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/users/users_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/splash/splash_screen.dart';
 
 /// RoutesApp - Alexander von Humboldt Event Manager
