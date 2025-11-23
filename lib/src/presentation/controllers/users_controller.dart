@@ -132,4 +132,20 @@ class UsersController {
       token,
     );
   }
+
+  /// Obtener lista de todos los usuarios con paginación
+  Future<Either<Failure, List<UserEntity>>> getAllUsers({
+    required int page,
+    required int limit,
+    required String token,
+  }) async {
+    return await _callWithAuthRetry<List<UserEntity>>(
+      (t) => usersUsecase.getAllUsers(
+        page: page,
+        limit: limit,
+        token: t,
+      ),
+      token,
+    );
+  }
 }

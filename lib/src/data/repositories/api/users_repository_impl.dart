@@ -37,10 +37,6 @@ class UsersRepositoryImpl implements UsersRepository {
       'phone': phone,
       'documentNumber': documentNumber,
     };
-
-    print('📤 CREATE Organizer Request: $path/create/organizer');
-    print('   Body: $body');
-
     final resultRequest = await ConsumerAPI.requestJSON<Map<String, dynamic>>(
       url: '$path/create/organizer',
       method: HTTPMethod.post,
@@ -50,10 +46,8 @@ class UsersRepositoryImpl implements UsersRepository {
 
     if (resultRequest.isRight) {
       final userData = resultRequest.right;
-      print('✅ CREATE Organizer Success: ${userData['email']}');
       return Right(UserEntity.fromMap(userData));
     } else {
-      print('❌ CREATE Organizer Failed: ${resultRequest.left}');
       return Left(UsersException());
     }
   }
@@ -70,11 +64,6 @@ class UsersRepositoryImpl implements UsersRepository {
     if (name != null) body['name'] = name;
     if (phone != null) body['phone'] = phone;
     if (documentNumber != null) body['documentNumber'] = documentNumber;
-
-    print('📤 UPDATE User Request: $path');
-    print('   Headers: ${_getHeaders(token: token, includeContentType: true)}');
-    print('   Body: $body');
-
     final resultRequest = await ConsumerAPI.requestJSON<Map<String, dynamic>>(
       url: path,
       method: HTTPMethod.patch,
@@ -84,10 +73,8 @@ class UsersRepositoryImpl implements UsersRepository {
 
     if (resultRequest.isRight) {
       final userData = resultRequest.right;
-      print('✅ UPDATE User Success: ${userData['email']}');
       return Right(UserEntity.fromMap(userData));
     } else {
-      print('❌ UPDATE User Failed: ${resultRequest.left}');
       return Left(UsersException());
     }
   }
@@ -97,10 +84,6 @@ class UsersRepositoryImpl implements UsersRepository {
     required String email,
     required String token,
   }) async {
-    print(
-      '📤 PROMOTE User to Organizer Request: $path/promote/organizer?email=$email',
-    );
-
     final url = Uri.encodeFull('$path/promote/organizer?email=$email');
 
     final resultRequest = await ConsumerAPI.requestJSON<Map<String, dynamic>>(
@@ -111,10 +94,8 @@ class UsersRepositoryImpl implements UsersRepository {
 
     if (resultRequest.isRight) {
       final userData = resultRequest.right;
-      print('✅ PROMOTE User to Organizer Success: ${userData['email']}');
       return Right(UserEntity.fromMap(userData));
     } else {
-      print('❌ PROMOTE User to Organizer Failed: ${resultRequest.left}');
       return Left(UsersException());
     }
   }
@@ -124,8 +105,6 @@ class UsersRepositoryImpl implements UsersRepository {
     required String userId,
     required String token,
   }) async {
-    print('📤 DELETE User Request: $path/$userId');
-
     final resultRequest = await ConsumerAPI.requestJSON<Map<String, dynamic>>(
       url: '$path/$userId',
       method: HTTPMethod.delete,
@@ -133,10 +112,43 @@ class UsersRepositoryImpl implements UsersRepository {
     );
 
     if (resultRequest.isRight) {
-      print('✅ DELETE User Success');
       return Right(resultRequest.isRight);
     } else {
-      print('❌ DELETE User Failed: ${resultRequest.left}');
+      return Left(UsersException());
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<UserEntity>>> getAllUsers({
+    required int page,
+    required int limit,
+    required String token,
+  }) async {
+    final url = '$path?page=$page&limit=$limit';
+    final resultRequest = await ConsumerAPI.requestJSON<dynamic>(
+      url: url,
+      method: HTTPMethod.get,
+      headers: _getHeaders(token: token),
+    );
+
+    if (resultRequest.isRight) {
+      final responseData = resultRequest.right;
+      List<dynamic> usersList = [];
+      if (responseData is Map<String, dynamic>) {
+        if (responseData.containsKey('data')) {
+          usersList = responseData['data'] as List<dynamic>? ?? [];
+        } else if (responseData.containsKey('users')) {
+          usersList = responseData['users'] as List<dynamic>? ?? [];
+        }
+      } else if (responseData is List<dynamic>) {
+        usersList = responseData;
+      }
+
+      final users = usersList
+          .map((u) => UserEntity.fromMap(u as Map<String, dynamic>))
+          .toList();
+      return Right(users);
+    } else {
       return Left(UsersException());
     }
   }

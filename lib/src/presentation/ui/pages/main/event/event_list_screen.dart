@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:jenix_event_manager/src/domain/entities/event_entity.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
+import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/appbar/secondary_appbar_widget.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/event/event_form_screen.dart';
 
 class EventListScreen extends ConsumerStatefulWidget {
@@ -84,6 +85,7 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0C1C2C),
+      appBar: SecondaryAppbarWidget(title: 'Gestion de Eventos'),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isProcessing ? null : () => _openForm(),
         icon: const Icon(Icons.add, color: Colors.white),

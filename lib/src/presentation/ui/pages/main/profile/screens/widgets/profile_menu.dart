@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jenix_event_manager/src/core/helpers/language_app.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/role_enum.dart';
+import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/general_widgets/selection_bottom_sheet_widget.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/widgets/profile_menu_tile.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -42,11 +44,13 @@ class _ProfileMenuState extends ConsumerState<ProfileMenu> {
         _showLanguageSelectionBottomSheet(context);
       },
     ),
-    ProfileMenuItem(
-      label: LocaleKeys.profileMyEventsLabel.tr(),
-      iconAsset: 'assets/images/icons/calendar_icon.svg',
-      route: RoutesApp.myEvents,
-    ),
+    if (ref.read(loginProviderProvider)?.role == RoleEnum.admin) ...[
+      ProfileMenuItem(
+        label: LocaleKeys.profileMyEventsLabel.tr(),
+        iconAsset: 'assets/images/icons/calendar_icon.svg',
+        route: RoutesApp.myEvents,
+      ),
+    ],
     ProfileMenuItem(
       label: LocaleKeys.profileLogoutLabel.tr(),
       iconAsset: 'assets/images/icons/logout_icon.svg',

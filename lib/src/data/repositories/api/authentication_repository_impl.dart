@@ -46,19 +46,12 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   Future<Either<Failure, UserEntity>> getUserInformation({
     required String accessToken,
   }) async {
-    //final url = "$path/local/user";
-    //final resultRequest = await ConsumerAPI.requestJSON<Map<String, dynamic>>(
-    //  url: url,
-    //  method: HTTPMethod.post,
-    //  jsonObject: {"email": email, "password": password},
-    //);
-  final devUser = {
-      "phone": "+573151234567",
-      "name": "Celeste",
-      "email": "celeste@example.com",
-      "role": "user",
-    };
-    final resultRequest = Future.value(Right(devUser));
+    final url = "$path/me";
+    final resultRequest = await ConsumerAPI.requestJSON<Map<String, dynamic>>(
+      url: url,
+      method: HTTPMethod.get,
+      headers: _getHeaders(token: accessToken),
+    );
     return resultRequest.fold((failure) => Left(failure), (json) {
       final Map<String, dynamic> userMap = Map<String, dynamic>.from(json);
       return Right(UserEntity.fromMap(userMap));
