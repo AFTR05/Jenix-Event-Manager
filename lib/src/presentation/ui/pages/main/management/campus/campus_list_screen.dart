@@ -5,7 +5,7 @@ import 'package:jenix_event_manager/src/domain/entities/campus_entity.dart';
 import 'package:jenix_event_manager/src/domain/entities/enum/campus_status_enum.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/appbar/secondary_appbar_widget.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/campus/campus_form_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/campus/campus_form_screen.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 
 // No hard-coded dummy campus list anymore. When offline or on error

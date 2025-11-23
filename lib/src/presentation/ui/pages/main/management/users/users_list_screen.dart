@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:jenix_event_manager/src/domain/entities/user_entity.dart';
 import 'package:jenix_event_manager/src/domain/entities/enum/role_enum.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/appbar/secondary_appbar_widget.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/users/users_form_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/users/users_form_screen.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 

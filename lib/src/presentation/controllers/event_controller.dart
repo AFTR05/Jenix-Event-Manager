@@ -16,7 +16,7 @@ class EventController {
   final _eventsController = StreamController<List<EventEntity>>.broadcast();
   Stream<List<EventEntity>> get eventsStream => _eventsController.stream;
 
-  final List<EventEntity> _cache = [];
+  final List<EventEntity> cache = [];
 
   EventController({required this.usecase, required this.ref}) {
     _eventsController.add([]);
@@ -27,7 +27,7 @@ class EventController {
   }
 
   void _notify() {
-    _eventsController.add(List.unmodifiable(_cache));
+    _eventsController.add(List.unmodifiable(cache));
   }
 
   Future<void> refreshToken() async {
@@ -80,7 +80,7 @@ class EventController {
   Future<Either<Failure, List<EventEntity>>> fetchAll(String token) async {
     final res = await getAllEvents(token);
     if (res.isRight) {
-      _cache
+      cache
         ..clear()
         ..addAll(res.right);
       _notify();
@@ -162,7 +162,7 @@ class EventController {
     );
 
     if (res.isRight) {
-      _cache.add(res.right);
+      cache.add(res.right);
       _notify();
     }
 
@@ -180,7 +180,7 @@ class EventController {
     final res = await deleteEvent(id, token);
 
     if (res.isRight && res.right) {
-      _cache.removeWhere((e) => e.id == id);
+      cache.removeWhere((e) => e.id == id);
       _notify();
     }
 
@@ -269,12 +269,12 @@ class EventController {
 
       if (getRes.isRight) {
         final updated = getRes.right;
-        final index = _cache.indexWhere((c) => c.id == id);
+        final index = cache.indexWhere((c) => c.id == id);
 
         if (index != -1) {
-          _cache[index] = updated;
+          cache[index] = updated;
         } else {
-          _cache.add(updated);
+          cache.add(updated);
         }
 
         _notify();
