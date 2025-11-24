@@ -173,8 +173,6 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
               ],
             );
           }
-
-          // Usar los datos del stream si están disponibles
           final streamData = snapshot.data ?? eventController.cache;
           final events = EventsUtils.getActiveEvents(streamData);
 
