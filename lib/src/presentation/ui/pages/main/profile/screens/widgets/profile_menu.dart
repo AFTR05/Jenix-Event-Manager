@@ -52,6 +52,11 @@ class _ProfileMenuState extends ConsumerState<ProfileMenu> {
       ),
     ],
     ProfileMenuItem(
+      label: "Mis Inscripciones",
+      icon: Icons.event_note_outlined,
+      route: RoutesApp.myEnrollments,
+    ),
+    ProfileMenuItem(
       label: LocaleKeys.profileLogoutLabel.tr(),
       iconAsset: 'assets/images/icons/logout_icon.svg',
       isLogout: true,

@@ -7,6 +7,7 @@ class EnrollmentEntity {
   final EnrollmentStatus status;
   final DateTime enrollmentDate;
   final DateTime? cancelledAt;
+  final EventInfo? event;
 
   EnrollmentEntity({
     required this.id,
@@ -15,6 +16,7 @@ class EnrollmentEntity {
     required this.status,
     required this.enrollmentDate,
     this.cancelledAt,
+    this.event,
   });
 
   factory EnrollmentEntity.fromJson(Map<String, dynamic> json) {
@@ -27,6 +29,9 @@ class EnrollmentEntity {
       cancelledAt: json['cancelledAt'] != null
           ? DateTime.parse(json['cancelledAt'] as String)
           : null,
+      event: json['event'] != null
+          ? EventInfo.fromJson(json['event'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -38,6 +43,47 @@ class EnrollmentEntity {
       'status': status.value,
       'enrollmentDate': enrollmentDate.toIso8601String(),
       'cancelledAt': cancelledAt?.toIso8601String(),
+      'event': event?.toJson(),
+    };
+  }
+}
+
+class EventInfo {
+  final String id;
+  final String name;
+  final DateTime initialDate;
+  final DateTime finalDate;
+  final String? beginHour;
+  final String? endHour;
+
+  EventInfo({
+    required this.id,
+    required this.name,
+    required this.initialDate,
+    required this.finalDate,
+    this.beginHour,
+    this.endHour,
+  });
+
+  factory EventInfo.fromJson(Map<String, dynamic> json) {
+    return EventInfo(
+      id: json['id'] as String,
+      name: json['name'] as String? ?? 'Sin nombre',
+      initialDate: DateTime.parse(json['initialDate'] as String),
+      finalDate: DateTime.parse(json['finalDate'] as String),
+      beginHour: json['beginHour'] as String?,
+      endHour: json['endHour'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'initialDate': initialDate.toIso8601String(),
+      'finalDate': finalDate.toIso8601String(),
+      'beginHour': beginHour,
+      'endHour': endHour,
     };
   }
 }

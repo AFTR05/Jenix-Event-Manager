@@ -6,7 +6,8 @@ import 'package:jenix_event_manager/src/domain/entities/event_entity.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/appbar/secondary_appbar_widget.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/my_events/event_form_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/my_events/event_form_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/my_events/event_enrollments_dialog.dart';
 
 class EventListScreen extends ConsumerStatefulWidget {
   const EventListScreen({super.key});
@@ -90,6 +91,11 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
       );
     }
     _setProcessing(false);
+  }
+
+  bool _isEventPassed(EventEntity event) {
+    final now = DateTime.now();
+    return now.isAfter(event.finalDate);
   }
 
   @override
@@ -225,31 +231,56 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
               color: const Color(0xFF12263F),
               icon: const Icon(Icons.more_vert, color: Colors.white70),
               onSelected: (value) {
-                if (value == 'edit') _openForm(event: event);
+                if (value == 'edit' && !_isEventPassed(event)) {
+                  _openForm(event: event);
+                }
                 if (value == 'delete') _deleteEvent(event);
+                if (value == 'enrollments') {
+                  showDialog(
+                    context: context,
+                    builder: (_) => EventEnrollmentsDialog(event: event),
+                  );
+                }
               },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'edit',
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit, color: Colors.white70),
-                      SizedBox(width: 8),
-                      Text('Editar', style: TextStyle(color: Colors.white)),
-                    ],
+              itemBuilder: (context) {
+                final isPassed = _isEventPassed(event);
+                return [
+                  PopupMenuItem(
+                    enabled: !isPassed,
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit, color: isPassed ? Colors.white30 : Colors.white70),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Editar',
+                          style: TextStyle(color: isPassed ? Colors.white30 : Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete, color: Color(0xFFBE1723)),
-                      SizedBox(width: 8),
-                      Text('Eliminar', style: TextStyle(color: Color(0xFFBE1723))),
-                    ],
+                  PopupMenuItem(
+                    value: 'enrollments',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.people, color: Color(0xFF4CAF50)),
+                        const SizedBox(width: 8),
+                        const Text('Ver inscripciones', style: TextStyle(color: Color(0xFF4CAF50))),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, color: Color(0xFFBE1723)),
+                        SizedBox(width: 8),
+                        Text('Eliminar', style: TextStyle(color: Color(0xFFBE1723))),
+                      ],
+                    ),
+                  ),
+                ];
+              },
             ),
           ),
         );
