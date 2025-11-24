@@ -2,8 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_usecase.dart';
 import 'package:jenix_event_manager/src/presentation/controllers/auth/authentication_controller.dart';
 import 'package:jenix_event_manager/src/presentation/controllers/campus_controller.dart';
+import 'package:jenix_event_manager/src/presentation/controllers/enrollment_controller.dart';
 import 'package:jenix_event_manager/src/presentation/controllers/event_controller.dart';
 import 'package:jenix_event_manager/src/presentation/controllers/room_controller.dart';
+import 'package:jenix_event_manager/src/presentation/controllers/users_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'riverpod_presentation.g.dart';
@@ -39,3 +41,21 @@ EventController eventController(Ref ref) {
     usecase: ref.watch(eventUsecaseProvider),
   );
 }
+
+
+@riverpod
+UsersController usersController(Ref ref) {
+  return UsersController(
+    ref: ref,
+    usersUsecase: ref.watch(usersUsecaseProvider),
+  );
+}
+
+@riverpod
+EnrollmentController enrollmentController(Ref ref) {
+  return EnrollmentController(
+    ref: ref,
+    enrollmentUsecase: ref.watch(enrollmentUsecaseProvider),
+  );
+}
+

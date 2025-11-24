@@ -68,15 +68,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       // Navegar según el resultado
       if (isLogged) {
         // Usuario tiene sesión activa, ir a Home
-        Navigator.pushReplacementNamed(context, RoutesApp.home);
+        Navigator.pushReplacementNamed(context, RoutesApp.main);
       } else {
         // No hay sesión, ir a Login
-        Navigator.pushReplacementNamed(context, RoutesApp.login);
+        Navigator.pushReplacementNamed(context, RoutesApp.main);
       }
     } catch (e) {
       // En caso de error, ir a Login por seguridad
       if (mounted) {
-        Navigator.pushReplacementNamed(context, RoutesApp.login);
+        Navigator.pushReplacementNamed(context, RoutesApp.main);
       }
     }
   }

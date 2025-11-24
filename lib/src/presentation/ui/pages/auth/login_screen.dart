@@ -89,7 +89,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: MouseRegion(
                   cursor: SystemMouseCursors.click,
                   child: GestureDetector(
-                    onTap: () => Navigator.pushReplacementNamed(context, RoutesApp.index),
+                    onTap: () => Navigator.pushReplacementNamed(context, RoutesApp.home),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
@@ -404,7 +404,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         backgroundColor: Colors.green);
           Future.delayed(const Duration(milliseconds: 600), () {
             if (mounted) {
-              Navigator.pushReplacementNamed(context, RoutesApp.home);
+              Navigator.pushReplacementNamed(context, RoutesApp.main);
             }
           });
         },

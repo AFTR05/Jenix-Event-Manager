@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/home/home_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/login_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/register_screen.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/campus/campus_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/campus/campus_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/enrollments/own_enrollments_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/my_events/event_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/main_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/edit_profile_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/rooms/room_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/users/users_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/splash/splash_screen.dart';
 
 /// RoutesApp - Alexander von Humboldt Event Manager
@@ -11,55 +16,54 @@ import 'package:jenix_event_manager/src/presentation/ui/pages/splash/splash_scre
 class RoutesApp {
   // Rutas principales
   static const String index = "/";
-  static const String splash = "/splash";
   static const String login = "/login";
   static const String register = "/register";
+  static const String main = "/main";
   static const String home = "/home";
-    static const String campus = "/campus";
+  static const String campus = "/campus";
+  static const String rooms = "/rooms";
+  static const String users = "/users";
 
-  
   // Rutas de perfil y configuración
   static const String editProfile = "/edit-profile";
   static const String myEvents = "/my-events";
+  static const String myEnrollments = "/my-enrollments";
   static const String notifications = "/notifications";
   static const String share = "/share";
   static const String help = "/help";
   static const String appSettings = "/settings";
 
-
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case index:
-        // La ruta inicial ahora es el SplashScreen
+      case home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
-      
-      case splash:
+      case index:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
-      
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
-      
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
-      
-      case home:
+      case main:
         return MaterialPageRoute(builder: (_) => const MainScreen());
-
       case campus:
         return MaterialPageRoute(builder: (_) => const CampusListScreen());
-      
-      // Rutas de perfil (placeholder por ahora)
-      case editProfile:
+      case rooms:
+        return MaterialPageRoute(builder: (_) => const RoomListScreen());
+      case users:
+        return MaterialPageRoute(builder: (_) => const UsersListScreen());
       case myEvents:
+        return MaterialPageRoute(builder: (_) => const EventListScreen());
+      case myEnrollments:
+        return MaterialPageRoute(builder: (_) => const OwnEnrollmentsScreen());
+      case editProfile:
+        return MaterialPageRoute(builder: (_) => const EditProfileScreen());
       case notifications:
       case share:
       case help:
       case appSettings:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
-            appBar: AppBar(
-              title: Text(_getRouteTitle(settings.name ?? '')),
-            ),
+            appBar: AppBar(title: Text(_getRouteTitle(settings.name ?? ''))),
             body: Center(
               child: Text(
                 'Pantalla en desarrollo:\n${_getRouteTitle(settings.name ?? '')}',
@@ -72,7 +76,7 @@ class RoutesApp {
             ),
           ),
         );
-      
+
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
@@ -103,6 +107,8 @@ class RoutesApp {
         return 'Compartir App';
       case help:
         return 'Ayuda y Soporte';
+      case myEnrollments:
+        return 'Mis Inscripciones';
       case appSettings:
         return 'Configuración';
       default:

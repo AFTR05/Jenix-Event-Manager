@@ -1,28 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/role_enum.dart';
+import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 import 'package:jenix_event_manager/src/presentation/providers_ui/bottom_nav_bar_state.dart';
 
 class BottomNavBarWidget extends ConsumerWidget {
   final int currentIndex;
 
-  const BottomNavBarWidget({
-    super.key,
-    required this.currentIndex,
-  });
+  const BottomNavBarWidget({super.key, required this.currentIndex});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const icons = [
+    final isAdmin = ref.read(loginProviderProvider)?.role == RoleEnum.admin;
+    
+    final icons = [
       Icons.home_rounded,
       Icons.schedule_rounded,
-      Icons.event_rounded,
+      if (isAdmin) Icons.event_rounded,
       Icons.person_rounded,
-      Icons.location_city_rounded,
-      Icons.meeting_room_rounded,
     ];
 
-    const labels = ['Inicio', 'Agenda', 'Eventos', 'Perfil', 'Campus', 'Salones'];
+    final labels = [
+      'Inicio',
+      'Agenda',
+      if (isAdmin) 'Administrar',
+      'Perfil',
+    ];
 
     return Container(
       decoration: BoxDecoration(
@@ -42,7 +46,8 @@ class BottomNavBarWidget extends ConsumerWidget {
         children: List.generate(icons.length, (index) {
           final isActive = index == currentIndex;
           return GestureDetector(
-            onTap: () => ref.read(bottomNavBarStateProvider.notifier).select(index),
+            onTap: () =>
+                ref.read(bottomNavBarStateProvider.notifier).select(index),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 350),
               curve: Curves.easeInOut,

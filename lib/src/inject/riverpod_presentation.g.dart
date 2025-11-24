@@ -60,7 +60,7 @@ final roomControllerProvider = AutoDisposeProvider<RoomController>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef RoomControllerRef = AutoDisposeProviderRef<RoomController>;
-String _$eventControllerHash() => r'bbd9d352bbe5ca2f83f837de6724bbd3f64cf65c';
+String _$eventControllerHash() => r'598c3908f301b3e1cec4f2c37084b88d74b1818b';
 
 /// See also [eventController].
 @ProviderFor(eventController)
@@ -77,5 +77,41 @@ final eventControllerProvider = AutoDisposeProvider<EventController>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef EventControllerRef = AutoDisposeProviderRef<EventController>;
+String _$usersControllerHash() => r'c7c61b57263cb0907224e5f5b2cdff6be8c58e56';
+
+/// See also [usersController].
+@ProviderFor(usersController)
+final usersControllerProvider = AutoDisposeProvider<UsersController>.internal(
+  usersController,
+  name: r'usersControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$usersControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef UsersControllerRef = AutoDisposeProviderRef<UsersController>;
+String _$enrollmentControllerHash() =>
+    r'01ab902bbc3cc43fcbe3554f8ab686e8496e9b03';
+
+/// See also [enrollmentController].
+@ProviderFor(enrollmentController)
+final enrollmentControllerProvider =
+    AutoDisposeProvider<EnrollmentController>.internal(
+      enrollmentController,
+      name: r'enrollmentControllerProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$enrollmentControllerHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef EnrollmentControllerRef = AutoDisposeProviderRef<EnrollmentController>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
