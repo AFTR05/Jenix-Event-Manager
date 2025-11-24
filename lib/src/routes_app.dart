@@ -3,6 +3,7 @@ import 'package:jenix_event_manager/src/presentation/ui/pages/home/home_screen.d
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/login_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/register_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/campus/campus_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/reports/reports_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/enrollments/own_enrollments_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/my_events/event_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/main_screen.dart';
@@ -23,6 +24,7 @@ class RoutesApp {
   static const String campus = "/campus";
   static const String rooms = "/rooms";
   static const String users = "/users";
+  static const String reports = "/reports";
 
   // Rutas de perfil y configuración
   static const String editProfile = "/edit-profile";
@@ -45,6 +47,8 @@ class RoutesApp {
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case main:
         return MaterialPageRoute(builder: (_) => const MainScreen());
+      case reports:
+        return MaterialPageRoute(builder: (_) => const ReportsScreen());
       case campus:
         return MaterialPageRoute(builder: (_) => const CampusListScreen());
       case rooms:
