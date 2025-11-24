@@ -62,19 +62,52 @@ class EnrollmentRepositoryImpl implements EnrollmentRepository {
   }) async {
     print('📤 GET My Enrollments Request: $path/my-enrollments');
 
-    final resultRequest = await ConsumerAPI.requestJSON<List<dynamic>>(
+    final resultRequest = await ConsumerAPI.requestJSON<dynamic>(
       url: '$path/my-enrollments',
       method: HTTPMethod.get,
       headers: _getHeaders(token: token),
     );
 
     if (resultRequest.isRight) {
-      final enrollmentsData = resultRequest.right;
-      print('✅ GET My Enrollments Success: ${enrollmentsData.length} items');
-      return Right(enrollmentsData.map((e) => EnrollmentEntity.fromJson(e as Map<String, dynamic>)).toList());
+      try {
+        final responseData = resultRequest.right;
+        
+        // Si es un objeto con estructura wrapper, extraer enrollments
+        if (responseData is Map<String, dynamic>) {
+          final enrollmentsListRaw = responseData['enrollments'] as List<dynamic>? ?? [];
+          final userId = responseData['userId'] as String?;
+          
+          final enrollmentsList = enrollmentsListRaw.map((e) {
+            final enrollmentMap = e as Map<String, dynamic>;
+            final eventMap = enrollmentMap['event'] as Map<String, dynamic>?;
+            
+            return EnrollmentEntity(
+              id: enrollmentMap['enrollmentId'] as String,
+              userId: userId,
+              eventId: eventMap?['id'] as String?,
+              status: EnrollmentStatus.fromString(enrollmentMap['status'] as String),
+              enrollmentDate: DateTime.parse(enrollmentMap['enrollmentDate'] as String),
+              cancelledAt: enrollmentMap['cancelledAt'] != null 
+                ? DateTime.parse(enrollmentMap['cancelledAt'] as String)
+                : null,
+              event: eventMap != null ? EventInfo.fromJson(eventMap) : null,
+            );
+          }).toList();
+          
+          print('✅ GET My Enrollments Success: ${enrollmentsList.length} items');
+          return Right(enrollmentsList);
+        } else {
+          print('❌ GET My Enrollments Unexpected format');
+          return Right([]);
+        }
+      } catch (e) {
+        print('❌ GET My Enrollments Parsing Error: $e');
+        return Right([]); // Retornar lista vacía en caso de error
+      }
     } else {
       print('❌ GET My Enrollments Failed: ${resultRequest.left}');
-      return Left(EnrollmentException());
+      print('⚠️ Returning empty list instead of error');
+      return Right([]);
     }
   }
 

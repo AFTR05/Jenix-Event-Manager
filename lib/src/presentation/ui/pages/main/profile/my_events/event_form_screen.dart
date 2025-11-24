@@ -200,9 +200,7 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
         _finalDate == null ||
         _beginTime == null ||
         _endTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Seleccione fecha y hora de inicio y fin')),
-      );
+      _showErrorDialog('Seleccione fecha y hora de inicio y fin');
       return;
     }
 
@@ -210,18 +208,11 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
     try {
       final maxAttendees = int.parse(_maxAttendeesController.text);
       if (maxAttendees <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('El número máximo de asistentes debe ser mayor a 0'),
-            duration: Duration(seconds: 3),
-          ),
-        );
+        _showErrorDialog('El número máximo de asistentes debe ser mayor a 0');
         return;
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingrese un número válido de asistentes')),
-      );
+      _showErrorDialog('Ingrese un número válido de asistentes');
       return;
     }
 
@@ -244,20 +235,13 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
 
     // Validar que la fecha/hora de inicio sea anterior a la de fin
     if (!startDateTime.isBefore(endDateTime)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('La fecha y hora de inicio debe ser anterior a la de fin'),
-          duration: Duration(seconds: 3),
-        ),
-      );
+      _showErrorDialog('La fecha y hora de inicio debe ser anterior a la de fin');
       return;
     }
 
     // Validar que si es presencial o híbrido, tenga un salón seleccionado
     if ((_selectedModality == ModalityType.presential || _selectedModality == ModalityType.hybrid) && _selectedRoom == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Seleccione una sala para eventos ${_selectedModality == ModalityType.presential ? 'presenciales' : 'híbridos'}')),
-      );
+      _showErrorDialog('Seleccione una sala para eventos ${_selectedModality == ModalityType.presential ? 'presenciales' : 'híbridos'}');
       return;
     }
 
@@ -265,9 +249,7 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
     if ((_selectedModality == ModalityType.presential || _selectedModality == ModalityType.hybrid) && _selectedRoom != null) {
       if (!_isRoomAvailable(_selectedRoom!, startDateTime, endDateTime)) {
         final reason = _getRoomUnavailableReason(_selectedRoom!, startDateTime, endDateTime);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Salón no disponible: ${reason ?? "conflicto de horario"}')),
-        );
+        _showErrorDialog('Salón no disponible: ${reason ?? "conflicto de horario"}');
         return;
       }
     }
@@ -277,19 +259,13 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
       try {
         final maxAttendees = int.parse(_maxAttendeesController.text);
         if (maxAttendees > _selectedRoom!.capacity) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Capacidad insuficiente: ${maxAttendees} personas exceden la capacidad del salón (${_selectedRoom!.capacity})',
-              ),
-            ),
+          _showErrorDialog(
+            'Capacidad insuficiente: ${maxAttendees} personas exceden la capacidad del salón (${_selectedRoom!.capacity})',
           );
           return;
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ingrese un número válido de asistentes')),
-        );
+        _showErrorDialog('Ingrese un número válido de asistentes');
         return;
       }
     }
@@ -382,6 +358,23 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
         ),
       );
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        title: const Text('Error', style: TextStyle(color: Colors.white)),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar', style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

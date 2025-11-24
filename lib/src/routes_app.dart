@@ -3,7 +3,8 @@ import 'package:jenix_event_manager/src/presentation/ui/pages/home/home_screen.d
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/login_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/auth/register_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/campus/campus_list_screen.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/my_events/event_list_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/enrollments/own_enrollments_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/my_events/event_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/main_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/edit_profile_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/rooms/room_list_screen.dart';
@@ -26,6 +27,7 @@ class RoutesApp {
   // Rutas de perfil y configuración
   static const String editProfile = "/edit-profile";
   static const String myEvents = "/my-events";
+  static const String myEnrollments = "/my-enrollments";
   static const String notifications = "/notifications";
   static const String share = "/share";
   static const String help = "/help";
@@ -51,6 +53,8 @@ class RoutesApp {
         return MaterialPageRoute(builder: (_) => const UsersListScreen());
       case myEvents:
         return MaterialPageRoute(builder: (_) => const EventListScreen());
+      case myEnrollments:
+        return MaterialPageRoute(builder: (_) => const OwnEnrollmentsScreen());
       case editProfile:
         return MaterialPageRoute(builder: (_) => const EditProfileScreen());
       case notifications:
@@ -103,6 +107,8 @@ class RoutesApp {
         return 'Compartir App';
       case help:
         return 'Ayuda y Soporte';
+      case myEnrollments:
+        return 'Mis Inscripciones';
       case appSettings:
         return 'Configuración';
       default:
