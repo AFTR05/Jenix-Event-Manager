@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/modality_enum.dart';
 import 'package:jenix_event_manager/src/domain/entities/event_entity.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/event/event_form_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/appbar/secondary_appbar_widget.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/my_events/event_form_screen.dart';
+import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/my_events/event_enrollments_dialog.dart';
 
 class EventListScreen extends ConsumerStatefulWidget {
   const EventListScreen({super.key});
@@ -33,11 +36,21 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
   Future<void> _loadEvents() async {
     setState(() => _isLoading = true);
     final controller = ref.read(eventControllerProvider);
-    final token = ref.read(loginProviderProvider)?.accessToken ?? '';
+    final currentUser = ref.read(loginProviderProvider);
+    final token = currentUser?.accessToken ?? '';
     final res = await controller.getAllEvents(token);
     if (mounted) {
       if (res.isRight) {
-        setState(() => _events = List<EventEntity>.from(res.right));
+        // Filtrar solo eventos creados por el usuario autenticado
+        final allEvents = List<EventEntity>.from(res.right);
+        final userEvents = allEvents
+            //.where((event) => event.responsablePerson?.id == currentUser?.id)
+            .toList();
+        
+        // Ordenar por fecha inicial (más próximos primero)
+        userEvents.sort((a, b) => a.initialDate.compareTo(b.initialDate));
+        
+        setState(() => _events = userEvents);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error cargando eventos: ${res.left}')),
@@ -80,10 +93,16 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
     _setProcessing(false);
   }
 
+  bool _isEventPassed(EventEntity event) {
+    final now = DateTime.now();
+    return now.isAfter(event.finalDate);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0C1C2C),
+      appBar: SecondaryAppbarWidget(title: 'Gestion de Eventos'),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isProcessing ? null : () => _openForm(),
         icon: const Icon(Icons.add, color: Colors.white),
@@ -147,7 +166,7 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
           ),
           child: ListTile(
             contentPadding: const EdgeInsets.all(12),
-            leading: event.urlImage != null && event.urlImage!.isNotEmpty
+            leading: (event.urlImage != null && event.urlImage!.isNotEmpty && event.urlImage != 'Por defecto')
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
@@ -155,7 +174,7 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                       width: 60,
                       height: 60,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(
+                      errorBuilder: (_, _, _) => const Icon(
                         Icons.event,
                         color: Colors.white70,
                         size: 40,
@@ -181,42 +200,87 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Sala: ${event.room.type}', style: const TextStyle(color: Colors.white70)),
-                Text('Área: ${event.organizationArea}', style: const TextStyle(color: Colors.white70)),
-                Text('Modalidad: ${event.modality.name}', style: const TextStyle(color: Colors.white70)),
-                Text('Inicio: ${dateFormat.format(event.createdAt)}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                Text('Fin: ${dateFormat.format(event.initialDate)}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                const SizedBox(height: 4),
+                Text('Sala: ${event.room.type}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                Text('Área: ${event.organizationArea}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                Text('Modalidad: ${event.modality.label}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Inicio: ${dateFormat.format(event.initialDate)}',
+                        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Fin: ${dateFormat.format(event.finalDate)}',
+                        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
             trailing: PopupMenuButton<String>(
               color: const Color(0xFF12263F),
               icon: const Icon(Icons.more_vert, color: Colors.white70),
               onSelected: (value) {
-                if (value == 'edit') _openForm(event: event);
+                if (value == 'edit' && !_isEventPassed(event)) {
+                  _openForm(event: event);
+                }
                 if (value == 'delete') _deleteEvent(event);
+                if (value == 'enrollments') {
+                  showDialog(
+                    context: context,
+                    builder: (_) => EventEnrollmentsDialog(event: event),
+                  );
+                }
               },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'edit',
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit, color: Colors.white70),
-                      SizedBox(width: 8),
-                      Text('Editar', style: TextStyle(color: Colors.white)),
-                    ],
+              itemBuilder: (context) {
+                final isPassed = _isEventPassed(event);
+                return [
+                  PopupMenuItem(
+                    enabled: !isPassed,
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit, color: isPassed ? Colors.white30 : Colors.white70),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Editar',
+                          style: TextStyle(color: isPassed ? Colors.white30 : Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete, color: Color(0xFFBE1723)),
-                      SizedBox(width: 8),
-                      Text('Eliminar', style: TextStyle(color: Color(0xFFBE1723))),
-                    ],
+                  PopupMenuItem(
+                    value: 'enrollments',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.people, color: Color(0xFF4CAF50)),
+                        const SizedBox(width: 8),
+                        const Text('Ver inscripciones', style: TextStyle(color: Color(0xFF4CAF50))),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, color: Color(0xFFBE1723)),
+                        SizedBox(width: 8),
+                        Text('Eliminar', style: TextStyle(color: Color(0xFFBE1723))),
+                      ],
+                    ),
+                  ),
+                ];
+              },
             ),
           ),
         );

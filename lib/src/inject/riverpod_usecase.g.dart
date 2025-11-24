@@ -7,7 +7,7 @@ part of 'riverpod_usecase.dart';
 // **************************************************************************
 
 String _$authenticationUsecaseHash() =>
-    r'ee57cf90c8098ea9bcae90187a63e3065433eea9';
+    r'051d6a70754252a63abf4d657c491b8aba9afc5b';
 
 /// See also [authenticationUsecase].
 @ProviderFor(authenticationUsecase)
@@ -26,7 +26,7 @@ final authenticationUsecaseProvider =
 // ignore: unused_element
 typedef AuthenticationUsecaseRef =
     AutoDisposeProviderRef<AuthenticationUsecase>;
-String _$campusUsecaseHash() => r'5774f4d47b5ac97a246e849451a24bacd788ca64';
+String _$campusUsecaseHash() => r'a14063b9c3745a7004175a4de58b2a732a8dc4f6';
 
 /// See also [campusUsecase].
 @ProviderFor(campusUsecase)
@@ -43,7 +43,7 @@ final campusUsecaseProvider = AutoDisposeProvider<CampusUsecase>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CampusUsecaseRef = AutoDisposeProviderRef<CampusUsecase>;
-String _$roomUsecaseHash() => r'69b9c51b448d394e6365fbd4a331d33acfc2b768';
+String _$roomUsecaseHash() => r'93710984541ab7424872ccbfbd31896c40bf0d40';
 
 /// See also [roomUsecase].
 @ProviderFor(roomUsecase)
@@ -60,7 +60,7 @@ final roomUsecaseProvider = AutoDisposeProvider<RoomUsecase>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef RoomUsecaseRef = AutoDisposeProviderRef<RoomUsecase>;
-String _$eventUsecaseHash() => r'1557183b4d43198d99364e25e281ab38cde77603';
+String _$eventUsecaseHash() => r'775402ec38118a4094109665171f0c9a2201bf89';
 
 /// See also [eventUsecase].
 @ProviderFor(eventUsecase)
@@ -77,5 +77,40 @@ final eventUsecaseProvider = AutoDisposeProvider<EventUsecase>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef EventUsecaseRef = AutoDisposeProviderRef<EventUsecase>;
+String _$usersUsecaseHash() => r'85c77a7681d47cfc65f080a2b06565e59e8a7be5';
+
+/// See also [usersUsecase].
+@ProviderFor(usersUsecase)
+final usersUsecaseProvider = AutoDisposeProvider<UsersUsecase>.internal(
+  usersUsecase,
+  name: r'usersUsecaseProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$usersUsecaseHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef UsersUsecaseRef = AutoDisposeProviderRef<UsersUsecase>;
+String _$enrollmentUsecaseHash() => r'3f40b3dbc442684eb10b744aab63d611734d09e6';
+
+/// See also [enrollmentUsecase].
+@ProviderFor(enrollmentUsecase)
+final enrollmentUsecaseProvider =
+    AutoDisposeProvider<EnrollmentUsecase>.internal(
+      enrollmentUsecase,
+      name: r'enrollmentUsecaseProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$enrollmentUsecaseHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef EnrollmentUsecaseRef = AutoDisposeProviderRef<EnrollmentUsecase>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

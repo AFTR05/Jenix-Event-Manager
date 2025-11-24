@@ -3,6 +3,7 @@ import 'package:either_dart/either.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jenix_event_manager/src/core/exceptions/failure.dart';
 import 'package:jenix_event_manager/src/domain/entities/user_entity.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/role_enum.dart';
 import 'package:jenix_event_manager/src/domain/usecase/authentication_usecase.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_usecase.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
@@ -69,20 +70,28 @@ class AuthenticationController {
 
   UserEntity _mergeUserWithInfo(UserEntity base, UserEntity? info) {
     if (info == null) return base;
-    String chooseString(String a, String b) => b.isNotEmpty ? b : a;
 
     String? chooseToken(String? a, String? b) {
       if (b != null && b.isNotEmpty) return b;
       return a;
     }
 
+    RoleEnum chooseRole(RoleEnum a, RoleEnum b) {
+      // Si el rol de info es diferente del default (user), usa ese
+      return b != RoleEnum.user ? b : a;
+    }
+
     return base.copyWith(
-      email: chooseString(base.email, info.email),
-      name: chooseString(base.name, info.name),
-      phone: chooseString(base.phone, info.phone),
-      role: chooseString(base.role, info.role),
+      id: (info.id.isNotEmpty ? info.id : base.id),
+      email: (info.email.isNotEmpty ? info.email : base.email),
+      name: (info.name.isNotEmpty ? info.name : base.name),
+      phone: (info.phone.isNotEmpty ? info.phone : base.phone),
+      role: chooseRole(base.role, info.role),
       accessToken: chooseToken(base.accessToken, info.accessToken),
       refreshToken: chooseToken(base.refreshToken, info.refreshToken),
+      documentNumber: (info.documentNumber.isNotEmpty
+          ? info.documentNumber
+          : base.documentNumber),
     );
   }
 

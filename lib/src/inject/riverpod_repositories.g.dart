@@ -77,5 +77,41 @@ final eventRepositoryProvider = AutoDisposeProvider<EventRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef EventRepositoryRef = AutoDisposeProviderRef<EventRepository>;
+String _$usersRepositoryHash() => r'96fe98d43a35627df089fc3031d1ebd7fd50bd08';
+
+/// See also [usersRepository].
+@ProviderFor(usersRepository)
+final usersRepositoryProvider = AutoDisposeProvider<UsersRepository>.internal(
+  usersRepository,
+  name: r'usersRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$usersRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef UsersRepositoryRef = AutoDisposeProviderRef<UsersRepository>;
+String _$enrollmentRepositoryHash() =>
+    r'eec7d663c90a2628a85c4b56fa94a47bad77bed6';
+
+/// See also [enrollmentRepository].
+@ProviderFor(enrollmentRepository)
+final enrollmentRepositoryProvider =
+    AutoDisposeProvider<EnrollmentRepository>.internal(
+      enrollmentRepository,
+      name: r'enrollmentRepositoryProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$enrollmentRepositoryHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef EnrollmentRepositoryRef = AutoDisposeProviderRef<EnrollmentRepository>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
