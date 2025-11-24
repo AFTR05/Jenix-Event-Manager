@@ -72,6 +72,7 @@ class ManagementScreen extends StatelessWidget {
                 subtitle: 'Gestiona campus y localidades',
                 route: RoutesApp.campus,
               ),
+              SizedBox(height: isMobile ? 12 : 16),
               _buildAdminOption(
                 context: context,
                 icon: Icons.bar_chart_rounded,
