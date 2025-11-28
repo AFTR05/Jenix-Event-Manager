@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:jenix_event_manager/src/domain/entities/enrollment_entity.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
@@ -18,6 +19,24 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
   bool _isLoading = true;
   String? _error;
   List<EnrollmentEntity> _enrollments = [];
+
+  /// Calcula el tamaño responsivo de fuente
+  double _getResponsiveFontSize(double baseFontSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.9;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.15;
+    return baseFontSize * 1.3;
+  }
+
+  /// Calcula el padding/tamaño responsivo
+  double _getResponsiveDimension(double baseDimension) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseDimension * 0.9;
+    if (screenWidth < 600) return baseDimension;
+    if (screenWidth < 900) return baseDimension * 1.15;
+    return baseDimension * 1.3;
+  }
 
   @override
   void initState() {
@@ -79,13 +98,22 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? JenixColorsApp.backgroundColor : JenixColorsApp.backgroundWhite;
+    
+    final subtitleFontSize = _getResponsiveFontSize(18);
+    final bodyFontSize = _getResponsiveFontSize(14);
+    final smallFontSize = _getResponsiveFontSize(12);
+    final iconSize = _getResponsiveDimension(64);
+    final largeIconSize = _getResponsiveDimension(80);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1929),
+      backgroundColor: backgroundColor,
       appBar: SecondaryAppbarWidget(title: 'Mis Inscripciones'),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFBE1723)),
+                valueColor: const AlwaysStoppedAnimation<Color>(JenixColorsApp.accentColor),
               ),
             )
           : _error != null
@@ -93,23 +121,23 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.error_outline, color: Colors.red, size: 64),
-                      const SizedBox(height: 16),
-                      const Text(
+                      Icon(Icons.error_outline, color: JenixColorsApp.errorColor, size: iconSize),
+                      SizedBox(height: _getResponsiveDimension(16)),
+                      Text(
                         'Error al cargar inscripciones',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(color: isDark ? Colors.white : JenixColorsApp.darkColorText, fontSize: bodyFontSize),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: _getResponsiveDimension(8)),
                       Text(
                         _error ?? '',
-                        style: const TextStyle(color: Colors.white70, fontSize: 12),
+                        style: TextStyle(color: isDark ? Colors.white70 : JenixColorsApp.subtitleColor, fontSize: smallFontSize),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: _getResponsiveDimension(24)),
                       ElevatedButton(
                         onPressed: _loadEnrollments,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFBE1723),
+                          backgroundColor: JenixColorsApp.accentColor,
                         ),
                         child: const Text(
                           'Reintentar',
@@ -126,18 +154,18 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
                         children: [
                           Icon(
                             Icons.event_available_outlined,
-                            color: Colors.white30,
-                            size: 80,
+                            color: isDark ? Colors.white30 : JenixColorsApp.lightGray,
+                            size: largeIconSize,
                           ),
-                          const SizedBox(height: 24),
-                          const Text(
+                          SizedBox(height: _getResponsiveDimension(24)),
+                          Text(
                             'Sin inscripciones',
-                            style: TextStyle(color: Colors.white70, fontSize: 18),
+                            style: TextStyle(color: isDark ? Colors.white70 : JenixColorsApp.subtitleColor, fontSize: subtitleFontSize),
                           ),
-                          const SizedBox(height: 8),
-                          const Text(
+                          SizedBox(height: _getResponsiveDimension(8)),
+                          Text(
                             'Aún no te has inscrito en ningún evento',
-                            style: TextStyle(color: Colors.white54, fontSize: 14),
+                            style: TextStyle(color: isDark ? Colors.white54 : JenixColorsApp.lightGray, fontSize: bodyFontSize),
                           ),
                         ],
                       ),
@@ -147,6 +175,8 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
   }
 
   Widget _buildEnrollmentsList() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     // Separar inscripciones activas de canceladas
     final activeEnrollments = _enrollments
         .where(
@@ -163,19 +193,24 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
         )
         .toList();
 
+    final paddingMain = _getResponsiveDimension(16);
+    final sectionTitleFontSize = _getResponsiveFontSize(16);
+    final spacingBetweenSections = _getResponsiveDimension(24);
+    final sectionPaddingBottom = _getResponsiveDimension(12);
+
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(paddingMain),
       children: [
         // Sección de inscripciones activas
         if (activeEnrollments.isNotEmpty) ...[
-          const Padding(
-            padding: EdgeInsets.only(bottom: 12),
+          Padding(
+            padding: EdgeInsets.only(bottom: sectionPaddingBottom),
             child: Text(
               'Activas',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: sectionTitleFontSize,
               ),
             ),
           ),
@@ -185,15 +220,15 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
         ],
         // Sección de inscripciones inactivas
         if (inactiveEnrollments.isNotEmpty) ...[
-          const SizedBox(height: 24),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 12),
+          SizedBox(height: spacingBetweenSections),
+          Padding(
+            padding: EdgeInsets.only(bottom: sectionPaddingBottom),
             child: Text(
               'Canceladas/Rechazadas',
               style: TextStyle(
                 color: Colors.white54,
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: sectionTitleFontSize,
               ),
             ),
           ),
@@ -209,28 +244,52 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
   }
 
   Widget _buildEnrollmentCard(EnrollmentEntity enrollment, {bool inactive = false}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final statusColor = _getStatusColor(enrollment.status.value);
     final statusLabel = _getStatusLabel(enrollment.status.value);
     final eventInfo = enrollment.event;
 
+    final cardMargin = _getResponsiveDimension(16);
+    final cardPadding = _getResponsiveDimension(16);
+    final borderRadius = _getResponsiveDimension(16);
+    final borderWidth = _getResponsiveDimension(2);
+    final badgePaddingH = _getResponsiveDimension(12);
+    final badgePaddingV = _getResponsiveDimension(6);
+    final spacingAfterBadge = _getResponsiveDimension(16);
+    final infoPadding = _getResponsiveDimension(12);
+    final badgeIconSize = _getResponsiveDimension(16);
+    final badgeSpacing = _getResponsiveDimension(6);
+    final eventNameFontSize = _getResponsiveFontSize(18);
+    final infoBg = _getResponsiveDimension(12);
+    final infoRowSpacing = _getResponsiveDimension(12);
+    final enrollmentDateFontSize = _getResponsiveFontSize(12);
+    final enrollmentDateSpacing = _getResponsiveDimension(8);
+    final cancelledSectionSpacing = _getResponsiveDimension(12);
+    final badgeFontSize = _getResponsiveFontSize(12);
+
+    final cardColor = isDark 
+        ? (inactive ? JenixColorsApp.backgroundColor.withOpacity(0.5) : JenixColorsApp.surfaceColor)
+        : (inactive ? JenixColorsApp.backgroundLightGray.withOpacity(0.6) : JenixColorsApp.backgroundWhite);
+    final borderColor = isDark ? statusColor.withOpacity(0.3) : statusColor.withOpacity(0.2);
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: cardMargin),
       decoration: BoxDecoration(
-        color: inactive ? const Color(0xFF0F1F2E) : const Color(0xFF12263F),
-        borderRadius: BorderRadius.circular(16),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(
-          color: statusColor.withOpacity(0.3),
-          width: 2,
+          color: borderColor,
+          width: borderWidth,
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(cardPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Status Badge
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: EdgeInsets.symmetric(horizontal: badgePaddingH, vertical: badgePaddingV),
               decoration: BoxDecoration(
                 color: statusColor.withOpacity(0.2),
                 border: Border.all(color: statusColor, width: 1.5),
@@ -242,41 +301,43 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
                   Icon(
                     _getStatusIcon(enrollment.status.value),
                     color: statusColor,
-                    size: 16,
+                    size: badgeIconSize,
                   ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: badgeSpacing),
                   Text(
                     statusLabel,
                     style: TextStyle(
                       color: statusColor,
-                      fontSize: 12,
+                      fontSize: badgeFontSize,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: spacingAfterBadge),
             // Event Name - Grande y destacado
             if (eventInfo != null)
               Text(
                 eventInfo.name,
                 style: TextStyle(
-                  color: inactive ? Colors.white54 : Colors.white,
-                  fontSize: 18,
+                  color: isDark 
+                    ? (inactive ? Colors.white54 : Colors.white)
+                    : (inactive ? JenixColorsApp.subtitleColor : JenixColorsApp.darkColorText),
+                  fontSize: eventNameFontSize,
                   fontWeight: FontWeight.bold,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-            const SizedBox(height: 16),
+            SizedBox(height: spacingAfterBadge),
             // Evento Info - Mejor organizados
             if (eventInfo != null) ...[
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(infoPadding),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(12),
+                  color: isDark ? Colors.white.withOpacity(0.05) : JenixColorsApp.backgroundLightGray.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(infoBg),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -288,7 +349,7 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
                       value: dateFormat.format(eventInfo.initialDate),
                       inactive: inactive,
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: infoRowSpacing),
                     // Fecha final
                     _buildInfoRow(
                       icon: Icons.event_available,
@@ -299,33 +360,35 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: spacingAfterBadge),
             ],
             // Enrollment Date minimalista
             Padding(
-              padding: const EdgeInsets.only(top: 8),
+              padding: EdgeInsets.only(top: enrollmentDateSpacing),
               child: Text(
                 'Inscripción: ${dateFormat.format(enrollment.enrollmentDate)}',
                 style: TextStyle(
-                  color: inactive ? Colors.white38 : Colors.white54,
-                  fontSize: 12,
+                  color: isDark
+                    ? (inactive ? Colors.white38 : Colors.white54)
+                    : (inactive ? JenixColorsApp.lightGray : JenixColorsApp.subtitleColor),
+                  fontSize: enrollmentDateFontSize,
                 ),
               ),
             ),
             // Cancelled Date (si existe)
             if (enrollment.cancelledAt != null && inactive) ...[
-              const SizedBox(height: 12),
+              SizedBox(height: cancelledSectionSpacing),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(infoPadding),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.red.withOpacity(0.3), width: 1),
+                  color: JenixColorsApp.errorColor.withOpacity(isDark ? 0.1 : 0.08),
+                  borderRadius: BorderRadius.circular(infoBg),
+                  border: Border.all(color: JenixColorsApp.errorColor.withOpacity(isDark ? 0.3 : 0.2), width: 1),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.close, color: Colors.red, size: 18),
-                    const SizedBox(width: 8),
+                    Icon(Icons.close, color: JenixColorsApp.errorColor, size: badgeIconSize),
+                    SizedBox(width: _getResponsiveDimension(8)),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,16 +396,16 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
                           Text(
                             'Cancelada',
                             style: TextStyle(
-                              color: Colors.red.withOpacity(0.7),
-                              fontSize: 11,
+                              color: JenixColorsApp.errorColor.withOpacity(isDark ? 0.7 : 0.8),
+                              fontSize: _getResponsiveFontSize(11),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                           Text(
                             dateFormat.format(enrollment.cancelledAt!),
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontSize: 12,
+                            style: TextStyle(
+                              color: JenixColorsApp.errorColor,
+                              fontSize: enrollmentDateFontSize,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -366,15 +429,26 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
     required bool inactive,
     bool isGreen = false,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconSize = _getResponsiveDimension(18);
+    final spacingH = _getResponsiveDimension(8);
+    final spacingV = _getResponsiveDimension(2);
+    final labelFontSize = _getResponsiveFontSize(11);
+    final valueFontSize = _getResponsiveFontSize(13);
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(
           icon,
-          color: isGreen ? Colors.green : (inactive ? Colors.white38 : Colors.white54),
-          size: 18,
+          color: isGreen 
+            ? JenixColorsApp.successColor
+            : (isDark
+              ? (inactive ? Colors.white38 : Colors.white54)
+              : (inactive ? JenixColorsApp.lightGray : JenixColorsApp.subtitleColor)),
+          size: iconSize,
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: spacingH),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -382,17 +456,25 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
               Text(
                 label,
                 style: TextStyle(
-                  color: isGreen ? Colors.green.withOpacity(0.7) : (inactive ? Colors.white38 : Colors.white54),
-                  fontSize: 11,
+                  color: isGreen
+                    ? JenixColorsApp.successColor.withOpacity(0.8)
+                    : (isDark
+                      ? (inactive ? Colors.white38 : Colors.white54)
+                      : (inactive ? JenixColorsApp.lightGray : JenixColorsApp.subtitleColor)),
+                  fontSize: labelFontSize,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: spacingV),
               Text(
                 value,
                 style: TextStyle(
-                  color: isGreen ? Colors.green : (inactive ? Colors.white38 : Colors.white),
-                  fontSize: 13,
+                  color: isGreen
+                    ? JenixColorsApp.successColor
+                    : (isDark
+                      ? (inactive ? Colors.white38 : Colors.white)
+                      : (inactive ? JenixColorsApp.lightGray : JenixColorsApp.darkColorText)),
+                  fontSize: valueFontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -406,15 +488,15 @@ class _OwnEnrollmentsScreenState extends ConsumerState<OwnEnrollmentsScreen> {
   Color _getStatusColor(String status) {
     switch (status) {
       case 'ENROLLED':
-        return Colors.green;
+        return JenixColorsApp.successColor;
       case 'WAITLISTED':
-        return Colors.orange;
+        return JenixColorsApp.warningColor;
       case 'ATTENDED':
-        return Colors.blue;
+        return JenixColorsApp.infoColor;
       case 'CANCELLED':
-        return Colors.red;
+        return JenixColorsApp.errorColor;
       case 'REJECTED':
-        return Colors.red;
+        return JenixColorsApp.errorColor;
       default:
         return Colors.white70;
     }

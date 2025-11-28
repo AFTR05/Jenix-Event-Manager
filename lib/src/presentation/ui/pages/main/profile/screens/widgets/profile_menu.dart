@@ -1,14 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:jenix_event_manager/src/core/helpers/language_app.dart';
 import 'package:jenix_event_manager/src/domain/entities/enum/role_enum.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/general_widgets/selection_bottom_sheet_widget.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/widgets/profile_menu_tile.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:jenix_event_manager/src/routes_app.dart';
-import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:jenix_event_manager/translations/locale_keys.g.dart';
 
 class ProfileMenu extends ConsumerStatefulWidget {

@@ -21,6 +21,22 @@ class _UsersListScreenState extends ConsumerState<UsersListScreen> {
   bool _isProcessing = false;
   List<UserEntity> _users = [];
 
+  double _getResponsiveFontSize(double baseFontSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.9;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.15;
+    return baseFontSize * 1.3;
+  }
+
+  double _getResponsiveDimension(double baseDimension) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseDimension * 0.9;
+    if (screenWidth < 600) return baseDimension;
+    if (screenWidth < 900) return baseDimension * 1.15;
+    return baseDimension * 1.3;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -189,8 +205,9 @@ class _UsersListScreenState extends ConsumerState<UsersListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color(0xFF0C1C2C),
+      backgroundColor: isDark ? const Color(0xFF0C1C2C) : Colors.white,
       appBar: SecondaryAppbarWidget(title: 'Gestion de Usuarios'),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isProcessing ? null : _openForm,
@@ -202,9 +219,11 @@ class _UsersListScreenState extends ConsumerState<UsersListScreen> {
         children: [
           // Fondo institucional
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF0A2647), Color(0xFF09131E)],
+                colors: isDark
+                    ? [const Color(0xFF0A2647), const Color(0xFF09131E)]
+                    : [const Color(0xFFE3F2FD), const Color(0xFFBBDEFB)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -215,12 +234,21 @@ class _UsersListScreenState extends ConsumerState<UsersListScreen> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        isDark ? Colors.white : const Color(0xFF1976D2),
+                      ),
+                    ),
+                  )
                 : _users.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           'No hay usuarios disponibles',
-                          style: TextStyle(color: Colors.white70),
+                          style: TextStyle(
+                            color: isDark ? Colors.white70 : Colors.black54,
+                            fontSize: _getResponsiveFontSize(14),
+                          ),
                         ),
                       )
                     : _buildListView(_users),
@@ -230,19 +258,19 @@ class _UsersListScreenState extends ConsumerState<UsersListScreen> {
           if (_isProcessing)
             Container(
               color: Colors.black54,
-              child: const Center(
+              child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircularProgressIndicator(
+                    const CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFBE1723)),
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: _getResponsiveDimension(16)),
                     Text(
                       'Procesando...',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: _getResponsiveFontSize(16),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -256,17 +284,18 @@ class _UsersListScreenState extends ConsumerState<UsersListScreen> {
   }
 
   Widget _buildListView(List<UserEntity> list) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return ListView.builder(
       itemCount: list.length,
       itemBuilder: (context, index) {
         final user = list[index];
         return Container(
-          margin: const EdgeInsets.only(bottom: 16),
+          margin: EdgeInsets.only(bottom: _getResponsiveDimension(16)),
           decoration: BoxDecoration(
-            color: const Color(0xFF12263F).withOpacity(0.9),
+            color: isDark ? const Color(0xFF12263F).withOpacity(0.9) : Colors.white.withOpacity(0.9),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: Colors.white10,
+              color: isDark ? Colors.white10 : Colors.black.withOpacity(0.1),
             ),
             boxShadow: const [
               BoxShadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 4)),
@@ -275,31 +304,31 @@ class _UsersListScreenState extends ConsumerState<UsersListScreen> {
           child: ListTile(
             leading: CircleAvatar(
               radius: 26,
-              backgroundColor: Colors.white.withOpacity(0.1),
-              child: Icon(Icons.person, color: Colors.white.withOpacity(0.8), size: 28),
+              backgroundColor: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+              child: Icon(Icons.person, color: isDark ? Colors.white.withOpacity(0.8) : Colors.black54, size: _getResponsiveDimension(28)),
             ),
             title: Text(
               user.name,
-              style: const TextStyle(
-                color: Color(0xFFE6EEF5),
+              style: TextStyle(
+                color: isDark ? const Color(0xFFE6EEF5) : Colors.black87,
                 fontWeight: FontWeight.bold,
-                fontSize: 18,
+                fontSize: _getResponsiveFontSize(18),
               ),
             ),
             subtitle: Padding(
-              padding: const EdgeInsets.only(top: 6),
+              padding: EdgeInsets.only(top: _getResponsiveDimension(6)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Correo: ${user.email}", style: const TextStyle(color: Color(0xFF9DA9B9))),
-                  Text("Teléfono: ${user.phone}", style: const TextStyle(color: Color(0xFF9DA9B9))),
-                  Text("Rol: ${user.role.displayName}", style: const TextStyle(color: Color(0xFF9DA9B9))),
+                  Text("Correo: ${user.email}", style: TextStyle(color: isDark ? const Color(0xFF9DA9B9) : Colors.black54, fontSize: _getResponsiveFontSize(12))),
+                  Text("Teléfono: ${user.phone}", style: TextStyle(color: isDark ? const Color(0xFF9DA9B9) : Colors.black54, fontSize: _getResponsiveFontSize(12))),
+                  Text("Rol: ${user.role.displayName}", style: TextStyle(color: isDark ? const Color(0xFF9DA9B9) : Colors.black54, fontSize: _getResponsiveFontSize(12))),
                 ],
               ),
             ),
             trailing: PopupMenuButton<String>(
-              color: const Color(0xFF12263F),
-              icon: const Icon(Icons.more_vert, color: Colors.white70),
+              color: isDark ? const Color(0xFF12263F) : Colors.white,
+              icon: Icon(Icons.more_vert, color: isDark ? Colors.white70 : Colors.black54),
               onSelected: (value) {
                 if (value == 'edit') {
                   _editUser(user);
@@ -310,13 +339,13 @@ class _UsersListScreenState extends ConsumerState<UsersListScreen> {
                 }
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'edit',
                   child: Row(
                     children: [
-                      Icon(Icons.edit, color: Colors.white70, size: 18),
-                      SizedBox(width: 8),
-                      Text("Editar", style: TextStyle(color: Colors.white)),
+                      Icon(Icons.edit, color: isDark ? Colors.white70 : Colors.black54, size: 18),
+                      const SizedBox(width: 8),
+                      Text("Editar", style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                     ],
                   ),
                 ),
@@ -327,14 +356,14 @@ class _UsersListScreenState extends ConsumerState<UsersListScreen> {
                     children: [
                       Icon(
                         Icons.arrow_upward,
-                        color: user.role == RoleEnum.organizer ? Colors.grey : Colors.white70,
+                        color: user.role == RoleEnum.organizer ? (isDark ? Colors.grey : Colors.grey) : (isDark ? Colors.white70 : Colors.black54),
                         size: 18,
                       ),
                       const SizedBox(width: 8),
                       Text(
                         user.role == RoleEnum.organizer ? "Ya es organizador" : "Promover",
                         style: TextStyle(
-                          color: user.role == RoleEnum.organizer ? Colors.grey : Colors.white,
+                          color: user.role == RoleEnum.organizer ? (isDark ? Colors.grey : Colors.grey) : (isDark ? Colors.white : Colors.black87),
                         ),
                       ),
                     ],

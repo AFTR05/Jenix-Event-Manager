@@ -5,7 +5,7 @@
     "profileEditProfileLabel": "Edit Profile",
     "profileMyEventsLabel": "My Events",
     "profileLogoutLabel": "Log out",
-    "loginWelcome": "Welcome, {name}!",
+    "loginWelcome": "Welcome, {name}",
     "loginUnexpectedError": "An unexpected error occurred. Please try again.",
     "loginContactSupport": "Contact support to reset your password.",
     "registerPhoneOptionalLabel": "Phone number (optional)",

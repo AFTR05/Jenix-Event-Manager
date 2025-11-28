@@ -11,19 +11,41 @@ class EventsHeaderWidget extends StatelessWidget {
     super.key,
   });
 
+  double _getResponsiveFontSize(double baseFontSize, BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.9;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.15;
+    return baseFontSize * 1.3;
+  }
+
+  double _getResponsiveDimension(double baseDimension, BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseDimension * 0.9;
+    if (screenWidth < 600) return baseDimension;
+    if (screenWidth < 900) return baseDimension * 1.15;
+    return baseDimension * 1.3;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final titleFontSize = _getResponsiveFontSize(24, context);
+    final subtitleFontSize = _getResponsiveFontSize(14, context);
+    final titlePadding = _getResponsiveDimension(20, context);
+    final titleBottomPadding = _getResponsiveDimension(16, context);
+    final expandedHeight = _getResponsiveDimension(140, context);
+
     return SliverAppBar(
-      expandedHeight: 140,
-      pinned: true,
+      automaticallyImplyLeading: false,
+      expandedHeight: expandedHeight,
       elevation: 0,
       backgroundColor: isDark ? JenixColorsApp.backgroundDark : JenixColorsApp.backgroundWhite,
       flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
+        titlePadding: EdgeInsets.only(left: titlePadding, bottom: titleBottomPadding),
         title: Text(
           'Eventos Disponibles',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: titleFontSize,
             fontWeight: FontWeight.w900,
             color: isDark ? Colors.white : JenixColorsApp.primaryBlue,
           ),
@@ -34,8 +56,8 @@ class EventsHeaderWidget extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                JenixColorsApp.primaryBlue.withOpacity(0.15),
-                JenixColorsApp.primaryBlue.withOpacity(0.05),
+                JenixColorsApp.primaryBlue.withOpacity(0.25),
+                JenixColorsApp.primaryBlue.withOpacity(0.10),
               ],
             ),
           ),
@@ -44,11 +66,11 @@ class EventsHeaderWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 20),
+                padding: EdgeInsets.only(left: titlePadding),
                 child: Text(
                   '$eventCount eventos próximos',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: JenixColorsApp.primaryBlue,
                   ),

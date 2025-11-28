@@ -15,6 +15,15 @@ class ProfileScreen extends StatelessWidget {
   /// Constructor de ProfileScreen.
   const ProfileScreen({super.key});
 
+  /// Calcula el tamaño responsivo de fuente
+  double _getResponsiveFontSize(BuildContext context, double baseFontSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.85;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.1;
+    return baseFontSize * 1.2;
+  }
+
   @override
   Widget build(BuildContext context) {
     // Detecta si el modo oscuro está activo.
@@ -40,6 +49,9 @@ class ProfileScreen extends StatelessWidget {
         ? JenixColorsApp.primaryBlueLight 
         : JenixColorsApp.primaryBlue;
 
+    // Tamaño responsivo del título del AppBar
+    final titleFontSize = _getResponsiveFontSize(context, 20);
+
     // Estructura principal de la pantalla: Scaffold con AppBar y cuerpo.
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -55,7 +67,7 @@ class ProfileScreen extends StatelessWidget {
             fontFamily: 'OpenSansHebrew',
             color: titleColor,
             fontWeight: FontWeight.w700,
-            fontSize: 20,
+            fontSize: titleFontSize,
             letterSpacing: -0.5,
           ),
         ),

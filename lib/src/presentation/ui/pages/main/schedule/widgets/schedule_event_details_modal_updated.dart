@@ -57,6 +57,7 @@ class ScheduleEventDetailsModal {
     final headerPadding = _getResponsiveDimension(20, screenWidth);
     final spaceBetween = _getResponsiveDimension(20, screenWidth);
     final spaceBetweenSmall = _getResponsiveDimension(4, screenWidth);
+
     return Padding(
       padding: EdgeInsets.all(headerPadding),
       child: Column(
@@ -115,21 +116,27 @@ class ScheduleEventDetailsModal {
     final eventNameFontSize = _getResponsiveFontSize(15, screenWidth);
     final eventTimeFontSize = _getResponsiveFontSize(12, screenWidth);
     final numberFontSize = _getResponsiveFontSize(14, screenWidth);
-    final itemMarginH = _getResponsiveDimension(16, screenWidth);
-    final itemMarginV = _getResponsiveDimension(8, screenWidth);
-    final itemPadding = _getResponsiveDimension(14, screenWidth);
-    final itemRadius = _getResponsiveDimension(14, screenWidth);
-    
+    final containerMargin = EdgeInsets.symmetric(
+      horizontal: _getResponsiveDimension(16, screenWidth),
+      vertical: _getResponsiveDimension(8, screenWidth),
+    );
+    final containerPadding = _getResponsiveDimension(14, screenWidth);
+    final containerRadius = _getResponsiveDimension(14, screenWidth);
+    final numberBoxSize = _getResponsiveDimension(32, screenWidth);
+    final numberBoxRadius = _getResponsiveDimension(8, screenWidth);
+
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: itemMarginH, vertical: itemMarginV),
-      padding: EdgeInsets.all(itemPadding),
+      margin: containerMargin,
+      padding: EdgeInsets.all(containerPadding),
       decoration: BoxDecoration(
         color: isDark 
             ? JenixColorsApp.darkGray.withOpacity(0.3)
             : JenixColorsApp.backgroundWhite,
-        borderRadius: BorderRadius.circular(itemRadius),
+        borderRadius: BorderRadius.circular(containerRadius),
         border: Border.all(
-          color: JenixColorsApp.primaryBlue.withOpacity(0.15),
+          color: isDark
+              ? JenixColorsApp.primaryBlue.withOpacity(0.2)
+              : JenixColorsApp.primaryBlue.withOpacity(0.15),
           width: 1,
         ),
       ),
@@ -139,11 +146,11 @@ class ScheduleEventDetailsModal {
           Row(
             children: [
               Container(
-                width: _getResponsiveDimension(32, screenWidth),
-                height: _getResponsiveDimension(32, screenWidth),
+                width: numberBoxSize,
+                height: numberBoxSize,
                 decoration: BoxDecoration(
                   color: JenixColorsApp.primaryBlue.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(_getResponsiveDimension(8, screenWidth)),
+                  borderRadius: BorderRadius.circular(numberBoxRadius),
                 ),
                 child: Center(
                   child: Text(
@@ -196,22 +203,22 @@ class ScheduleEventDetailsModal {
               ],
             ),
           if (event.room != null) ...[
-            const SizedBox(height: 6),
+            SizedBox(height: _getResponsiveDimension(6, screenWidth)),
             Row(
               children: [
                 Icon(
                   Icons.location_on_rounded,
-                  size: 14,
+                  size: _getResponsiveDimension(14, screenWidth),
                   color: isDark 
                       ? JenixColorsApp.lightGray 
                       : JenixColorsApp.subtitleColor,
                 ),
-                const SizedBox(width: 6),
+                SizedBox(width: _getResponsiveDimension(6, screenWidth)),
                 Expanded(
                   child: Text(
                     event.room.name ?? 'Sala',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: eventTimeFontSize,
                       color: isDark 
                           ? JenixColorsApp.lightGray 
                           : JenixColorsApp.subtitleColor,
@@ -228,20 +235,20 @@ class ScheduleEventDetailsModal {
   }
 
   static Widget _buildCloseButton(BuildContext context, double screenWidth) {
-    final buttonFontSize = _getResponsiveFontSize(16, screenWidth);
-    final buttonPadding = _getResponsiveDimension(14, screenWidth);
+    final buttonPadding = _getResponsiveDimension(20, screenWidth);
+    final buttonVerticalPadding = _getResponsiveDimension(14, screenWidth);
     final buttonRadius = _getResponsiveDimension(12, screenWidth);
-    final containerPadding = _getResponsiveDimension(20, screenWidth);
-    
+    final buttonTextFontSize = _getResponsiveFontSize(16, screenWidth);
+
     return Padding(
-      padding: EdgeInsets.all(containerPadding),
+      padding: EdgeInsets.all(buttonPadding),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
           onPressed: () => Navigator.pop(context),
           style: ElevatedButton.styleFrom(
             backgroundColor: JenixColorsApp.primaryBlue,
-            padding: EdgeInsets.symmetric(vertical: buttonPadding),
+            padding: EdgeInsets.symmetric(vertical: buttonVerticalPadding),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(buttonRadius),
             ),
@@ -250,7 +257,7 @@ class ScheduleEventDetailsModal {
             'Cerrar',
             style: TextStyle(
               color: JenixColorsApp.backgroundWhite,
-              fontSize: buttonFontSize,
+              fontSize: buttonTextFontSize,
               fontWeight: FontWeight.w600,
             ),
           ),

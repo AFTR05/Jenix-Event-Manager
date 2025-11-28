@@ -5,7 +5,7 @@
     "profileEditProfileLabel": "Editar Perfil",
     "profileMyEventsLabel": "Mis Eventos",
     "profileLogoutLabel": "Cerrar Sesión",
-    "loginWelcome": "Bienvenido, {name}!",
+    "loginWelcome": "Bienvenido, {name}",
     "loginUnexpectedError": "Ocurrió un error inesperado. Intenta nuevamente.",
     "loginContactSupport": "Comunícate con soporte técnico para restablecer tu contraseña.",
     "registerPhoneOptionalLabel": "Número de teléfono (opcional)",

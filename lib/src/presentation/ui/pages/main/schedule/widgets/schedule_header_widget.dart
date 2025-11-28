@@ -20,67 +20,59 @@ class ScheduleHeaderWidget extends StatelessWidget {
     super.key,
   });
 
+  double _getResponsiveFontSize(double baseFontSize, double screenWidth) {
+    if (screenWidth < 360) return baseFontSize * 0.9;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.15;
+    return baseFontSize * 1.3;
+  }
+
+  double _getResponsiveDimension(double baseDimension, double screenWidth) {
+    if (screenWidth < 360) return baseDimension * 0.9;
+    if (screenWidth < 600) return baseDimension;
+    if (screenWidth < 900) return baseDimension * 1.15;
+    return baseDimension * 1.3;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
+    final titleFontSize = _getResponsiveFontSize(20, screenWidth);
+    final subtitleFontSize = _getResponsiveFontSize(12, screenWidth);
+    final buttonTextFontSize = _getResponsiveFontSize(13, screenWidth);
+    final containerRadius = _getResponsiveDimension(10, screenWidth);
+    final headerPadding = _getResponsiveDimension(16, screenWidth);
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isDark 
-              ? [JenixColorsApp.primaryBlueDark, JenixColorsApp.primaryBlue]
-              : [JenixColorsApp.primaryBlue, JenixColorsApp.primaryBlueLight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: JenixColorsApp.primaryBlue.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          )
-        ],
-      ),
+      padding: EdgeInsets.symmetric(vertical: headerPadding, horizontal: headerPadding),
+      color: isDark ? JenixColorsApp.surfaceColor : JenixColorsApp.surfaceColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Fila 1: Título y Mes
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: JenixColorsApp.backgroundWhite.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.calendar_view_week_rounded,
-                  color: JenixColorsApp.backgroundWhite,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
+              SizedBox(width: _getResponsiveDimension(12, screenWidth)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       LocaleKeys.scheduleTitle.tr(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
-                        fontSize: 20,
+                        fontSize: titleFontSize,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: _getResponsiveDimension(2, screenWidth)),
                     Text(
                       DateFormat('MMMM yyyy', Localizations.localeOf(context).toString()).format(currentWeekStart),
                       style: TextStyle(
                         color: JenixColorsApp.backgroundWhite.withOpacity(0.85),
-                        fontSize: 12,
+                        fontSize: subtitleFontSize,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -89,7 +81,7 @@ class ScheduleHeaderWidget extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: _getResponsiveDimension(14, screenWidth)),
           // Fila 2: Controles (responsive)
           if (screenWidth > 600)
             // Modo tablet/desktop
@@ -99,10 +91,10 @@ class ScheduleHeaderWidget extends StatelessWidget {
                   child: GestureDetector(
                     onTap: onDatePicker,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: EdgeInsets.symmetric(horizontal: _getResponsiveDimension(14, screenWidth), vertical: _getResponsiveDimension(10, screenWidth)),
                       decoration: BoxDecoration(
                         color: JenixColorsApp.backgroundWhite.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(containerRadius),
                         border: Border.all(
                           color: JenixColorsApp.backgroundWhite.withOpacity(0.2),
                         ),
@@ -113,14 +105,14 @@ class ScheduleHeaderWidget extends StatelessWidget {
                           Icon(
                             Icons.calendar_today_rounded,
                             color: JenixColorsApp.backgroundWhite,
-                            size: 16,
+                            size: _getResponsiveDimension(16, screenWidth),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: _getResponsiveDimension(8, screenWidth)),
                           Text(
                             dateRange,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 13,
+                              fontSize: buttonTextFontSize,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -129,10 +121,10 @@ class ScheduleHeaderWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                _buildNavButton(Icons.chevron_left_rounded, onPreviousWeek),
-                const SizedBox(width: 6),
-                _buildNavButton(Icons.chevron_right_rounded, onNextWeek),
+                SizedBox(width: _getResponsiveDimension(8, screenWidth)),
+                _buildNavButton(Icons.chevron_left_rounded, onPreviousWeek, screenWidth),
+                SizedBox(width: _getResponsiveDimension(6, screenWidth)),
+                _buildNavButton(Icons.chevron_right_rounded, onNextWeek, screenWidth),
               ],
             )
           else
@@ -143,10 +135,10 @@ class ScheduleHeaderWidget extends StatelessWidget {
                 GestureDetector(
                   onTap: onDatePicker,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    padding: EdgeInsets.symmetric(horizontal: _getResponsiveDimension(14, screenWidth), vertical: _getResponsiveDimension(12, screenWidth)),
                     decoration: BoxDecoration(
                       color: JenixColorsApp.backgroundWhite.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(containerRadius),
                       border: Border.all(
                         color: JenixColorsApp.backgroundWhite.withOpacity(0.2),
                       ),
@@ -157,14 +149,14 @@ class ScheduleHeaderWidget extends StatelessWidget {
                         Icon(
                           Icons.calendar_today_rounded,
                           color: JenixColorsApp.backgroundWhite,
-                          size: 18,
+                          size: _getResponsiveDimension(18, screenWidth),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: _getResponsiveDimension(8, screenWidth)),
                         Text(
                           dateRange,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 14,
+                            fontSize: buttonTextFontSize,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -172,29 +164,29 @@ class ScheduleHeaderWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: _getResponsiveDimension(10, screenWidth)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildNavButton(Icons.chevron_left_rounded, onPreviousWeek),
-                    const SizedBox(width: 12),
+                    _buildNavButton(Icons.chevron_left_rounded, onPreviousWeek, screenWidth),
+                    SizedBox(width: _getResponsiveDimension(12, screenWidth)),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: EdgeInsets.symmetric(horizontal: _getResponsiveDimension(12, screenWidth), vertical: _getResponsiveDimension(6, screenWidth)),
                       decoration: BoxDecoration(
                         color: JenixColorsApp.backgroundWhite.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(_getResponsiveDimension(8, screenWidth)),
                       ),
                       child: Text(
                         'Navegar',
                         style: TextStyle(
                           color: JenixColorsApp.backgroundWhite.withOpacity(0.8),
-                          fontSize: 12,
+                          fontSize: _getResponsiveFontSize(12, screenWidth),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    _buildNavButton(Icons.chevron_right_rounded, onNextWeek),
+                    SizedBox(width: _getResponsiveDimension(12, screenWidth)),
+                    _buildNavButton(Icons.chevron_right_rounded, onNextWeek, screenWidth),
                   ],
                 ),
               ],
@@ -204,11 +196,11 @@ class ScheduleHeaderWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildNavButton(IconData icon, VoidCallback onPressed) {
+  Widget _buildNavButton(IconData icon, VoidCallback onPressed, double screenWidth) {
     return Container(
       decoration: BoxDecoration(
         color: JenixColorsApp.backgroundWhite.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(_getResponsiveDimension(10, screenWidth)),
         border: Border.all(
           color: JenixColorsApp.backgroundWhite.withOpacity(0.2),
         ),
@@ -217,13 +209,13 @@ class ScheduleHeaderWidget extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onPressed,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(_getResponsiveDimension(10, screenWidth)),
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.all(_getResponsiveDimension(8, screenWidth)),
             child: Icon(
               icon,
               color: JenixColorsApp.backgroundWhite,
-              size: 20,
+              size: _getResponsiveDimension(20, screenWidth),
             ),
           ),
         ),
