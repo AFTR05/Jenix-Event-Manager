@@ -1,13 +1,16 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:jenix_event_manager/src/core/validators/fields_validators.dart';
-import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/buttons/custom_red_button_widget.dart';
-import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/inputs/custom_input_text_field_widget.dart';
+import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
+import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/buttons/custom_button_widget.dart';
+import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/form/custom_form_element.dart';
+import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/inputs/custom_auth_text_field_widget.dart';
 import 'package:jenix_event_manager/src/routes_app.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:jenix_event_manager/translations/locale_keys.g.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -17,30 +20,29 @@ class RegisterScreen extends ConsumerStatefulWidget {
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   bool _acceptTerms = false;
   bool disableValidationInPhone = true;
-  String _phoneCode = "+507"; // Panama por defecto
-
+  String _phoneCode = "+57";
   bool _loading = false;
 
-  String? _firstNameError;
-  String? _lastNameError;
+  String? _nameError;
   String? _emailError;
   String? _passwordError;
+  String? _confirmPasswordError;
 
   @override
   void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
+    _nameController.dispose();
     _phoneNumberController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -48,259 +50,213 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isTablet = size.width > 600;
-    final screenWidth = size.width;
+    final isMobile = size.width < 600;
 
     return Scaffold(
+      backgroundColor: const Color(0xFF0C1C2C),
       body: Stack(
         children: [
+          // Background gradient
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                tileMode: TileMode.clamp,
-                begin: Alignment.topLeft,
-                end: Alignment.centerRight,
-                stops: [0.4, 0.75],
                 colors: [
-                  JenixColorsApp.loginBeginGradient,
-                  JenixColorsApp.loginEndGradient,
+                  Color(0xFF0A2647),
+                  Color(0xFF103E69),
+                  Color(0xFF09131E),
                 ],
-              ),
-            ),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  // Logo section
-                  Expanded(
-                    flex: 2,
-                    child: Center(
-                      child: SvgPicture.asset(
-                        'assets/images/jenix_logo.svg',
-                        width: screenWidth < 600 ? 100 : 120,
-                        height: screenWidth < 600 ? 100 : 120,
-                        colorFilter: const ColorFilter.mode(
-                          Colors.white,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Form section
-                  Expanded(
-                    flex: 5,
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isTablet ? 60 : 24,
-                        vertical: 32,
-                      ),
-                      decoration: const BoxDecoration(
-                        color: JenixColorsApp.backgroundWhite,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                        ),
-                      ),
-                      child: SingleChildScrollView(
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: isTablet ? 400 : double.infinity,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Welcome text
-                                const Text(
-                                  'Create your account',
-                                  style: TextStyle(
-                                    fontSize: 25,
-                                    fontWeight: FontWeight.w500,
-                                    color: JenixColorsApp.subtitleColor,
-                                    fontFamily: 'OpenSansHebrew',
-                                  ),
-                                ),
-                                const SizedBox(height: 32),
-
-                                // First Name
-                                CustomInputTextFieldWidget(
-                                  controller: _firstNameController,
-                                  labelTitle: "First Name",
-                                  hintText: "Enter your first name",
-                                  textInputType: TextInputType.name,
-                                  textInputAction: TextInputAction.next,
-                                  isRequired: true,
-                                  errorText: _firstNameError,
-                                  prefix: const Icon(
-                                    Icons.person_outline,
-                                    color: JenixColorsApp.greyColorIcon,
-                                  ),
-                                  validator: FieldsValidators.fieldIsRequired,
-                                  onChanged: (_) {
-                                    if (_firstNameError != null) {
-                                      setState(() => _firstNameError = null);
-                                    }
-                                  },
-                                ),
-
-                                const SizedBox(height: 20),
-
-                                // Last Name
-                                CustomInputTextFieldWidget(
-                                  controller: _lastNameController,
-                                  labelTitle: "Last Name",
-                                  hintText: "Enter your last name",
-                                  textInputType: TextInputType.name,
-                                  textInputAction: TextInputAction.next,
-                                  isRequired: true,
-                                  errorText: _lastNameError,
-                                  prefix: const Icon(
-                                    Icons.person_outline,
-                                    color: JenixColorsApp.greyColorIcon,
-                                  ),
-                                  validator: FieldsValidators.fieldIsRequired,
-                                  onChanged: (_) {
-                                    if (_lastNameError != null) {
-                                      setState(() => _lastNameError = null);
-                                    }
-                                  },
-                                ),
-
-                                const SizedBox(height: 20),
-
-                                // Email
-                                CustomInputTextFieldWidget(
-                                  controller: _emailController,
-                                  labelTitle: "Email",
-                                  hintText: "Enter your email",
-                                  textInputType: TextInputType.emailAddress,
-                                  textInputAction: TextInputAction.next,
-                                  isRequired: true,
-                                  errorText: _emailError,
-                                  prefix: const Icon(
-                                    Icons.email_outlined,
-                                    color: JenixColorsApp.greyColorIcon,
-                                  ),
-                                  validator: FieldsValidators.emailValidator,
-                                  onChanged: (_) {
-                                    if (_emailError != null) {
-                                      setState(() => _emailError = null);
-                                    }
-                                  },
-                                ),
-
-                                const SizedBox(height: 20),
-
-                                // Phone Number
-                                _buildPhoneField(),
-
-                                const SizedBox(height: 20),
-
-                                // Password
-                                CustomInputTextFieldWidget(
-                                  controller: _passwordController,
-                                  labelTitle: "Password",
-                                  hintText: "At least 6 characters",
-                                  isPassword: true,
-                                  textInputAction: TextInputAction.done,
-                                  isRequired: true,
-                                  errorText: _passwordError,
-                                  validator: (value) =>
-                                      FieldsValidators.passwordValidator(
-                                        value,
-                                        minLength: 6,
-                                      ),
-                                  onChanged: (_) {
-                                    if (_passwordError != null) {
-                                      setState(() => _passwordError = null);
-                                    }
-                                  },
-                                  onFieldSubmitted: (_) => _registerAction(),
-                                ),
-
-                                const SizedBox(height: 16),
-
-                                // Terms & Conditions
-                                _buildTermsCheckbox(),
-
-                                const SizedBox(height: 24),
-
-                                // Register button
-                                CustomRedButtonWidget(
-                                  onPressed: _loading ? () {} : _registerAction,
-                                  title: _loading
-                                      ? "Creating..."
-                                      : "Create Account",
-                                  isLoading: _loading,
-                                  icon: _loading ? null : Icons.person_add,
-                                ),
-
-                                const SizedBox(height: 24),
-
-                                // Login link
-                                Center(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text(
-                                        "Already have an account? ",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: JenixColorsApp.slateGray,
-                                          fontWeight: FontWeight.w400,
-                                          fontFamily: 'OpenSansHebrew',
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.pushNamed(
-                                            context,
-                                            RoutesApp.login,
-                                          );
-                                        },
-                                        child: const Text(
-                                          'Log In',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: JenixColorsApp.primaryRed,
-                                            fontWeight: FontWeight.w600,
-                                            fontFamily: 'OpenSansHebrew',
-                                            decoration:
-                                                TextDecoration.underline,
-                                            decorationColor:
-                                                JenixColorsApp.primaryRed,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
           ),
 
-          // Loading overlay
+          // Main content
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isTablet ? 80 : 24,
+                  vertical: 40,
+                ),
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 460),
+                  padding: const EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF12263F).withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: const Color(0x33FFFFFF)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 20,
+                        offset: Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Logo
+                      Center(
+                        child: Hero(
+                          tag: 'app_logo',
+                          child: SvgPicture.asset(
+                            'assets/images/humboldt_logo.svg',
+                            width: isMobile ? 70 : 90,
+                            colorFilter: const ColorFilter.mode(
+                              Colors.white,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Title and subtitle
+                      Text(
+                        LocaleKeys.registerWelcome.tr(namedArgs: {'name': ''}).replaceAll('{name}', ''),
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          fontFamily: 'OpenSansHebrew',
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        LocaleKeys.registerOpeningPrivacy.tr(),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF9DA9B9),
+                          fontFamily: 'OpenSansHebrew',
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      // Form fields
+                      CustomFormElement(
+                        labelTitle: LocaleKeys.authRegisterEmailHint.tr(),
+                        isRequired: true,
+                        errorText: _nameError,
+                        widget: CustomAuthTextFieldWidget(
+                          controller: _nameController,
+                          hintText: "Ej: Camilo Correa",
+                          prefix: const Icon(Icons.person_outline, color: Colors.white70),
+                          keyboardType: TextInputType.name,
+                          onChanged: (_) => setState(() => _nameError = null),
+                        ),
+                      ),
+
+                      const SizedBox(height: 14),
+                      CustomFormElement(
+                        labelTitle: LocaleKeys.authRegisterEmailHint.tr(),
+                        isRequired: true,
+                        errorText: _emailError,
+                        widget: CustomAuthTextFieldWidget(
+                          controller: _emailController,
+                          hintText: LocaleKeys.authRegisterEmailHint.tr(),
+                          prefix: const Icon(Icons.email_outlined, color: Colors.white70),
+                          keyboardType: TextInputType.emailAddress,
+                          onChanged: (_) => setState(() => _emailError = null),
+                        ),
+                      ),
+
+                      const SizedBox(height: 14),
+                      _buildPhoneField(),
+
+                      const SizedBox(height: 14),
+                      CustomFormElement(
+                        labelTitle: LocaleKeys.authRegisterPasswordHint.tr(),
+                        isRequired: true,
+                        errorText: _passwordError,
+                        widget: CustomAuthTextFieldWidget(
+                          controller: _passwordController,
+                          hintText: LocaleKeys.authRegisterPasswordHint.tr(),
+                          isPasswordField: true,
+                          prefix: const Icon(Icons.lock_outline, color: Colors.white70),
+                          onChanged: (_) => setState(() => _passwordError = null),
+                        ),
+                      ),
+
+                      const SizedBox(height: 14),
+                      CustomFormElement(
+                        labelTitle: LocaleKeys.authRegisterConfirmPasswordHint.tr(),
+                        isRequired: true,
+                        errorText: _confirmPasswordError,
+                        widget: CustomAuthTextFieldWidget(
+                          controller: _confirmPasswordController,
+                          hintText: LocaleKeys.authRegisterConfirmPasswordHint.tr(),
+                          isPasswordField: true,
+                          prefix: const Icon(Icons.lock_person_outlined, color: Colors.white70),
+                          onChanged: (_) => setState(() => _confirmPasswordError = null),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+                      _buildTermsCheckbox(),
+
+                      const SizedBox(height: 24),
+
+                      // Submit
+                      CustomButtonWidget(
+                        onPressed: _loading ? () {} : _registerAction,
+                        title: LocaleKeys.authRegisterLoginHere.tr(),
+                        backgroundColor: const Color(0xFFBE1723),
+                        isLoading: _loading,
+                        icon: Icons.person_add_alt_1,
+                      ),
+
+                      const SizedBox(height: 32),
+                      Center(
+                        child: RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'OpenSansHebrew',
+                              color: Colors.white70,
+                            ),
+                            children: [
+                              TextSpan(text: LocaleKeys.authRegisterAlreadyHaveAccount.tr()),
+                              TextSpan(
+                                text: LocaleKeys.authRegisterLoginHere.tr(),
+                                style: const TextStyle(
+                                  color: Color(0xFFBE1723),
+                                  fontWeight: FontWeight.w600,
+                                  decoration: TextDecoration.underline,
+                                ),
+                                recognizer: TapGestureRecognizer()..onTap = _handleLogin,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Center(
+                        child: Text(
+                          LocaleKeys.homeFooterCopyright.tr(),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white.withOpacity(0.7),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Loader overlay
           if (_loading)
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.4),
+                color: Colors.black54,
                 child: const Center(
-                  child: SizedBox(
-                    height: 48,
-                    width: 48,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 4,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  ),
+                  child: CircularProgressIndicator(color: Colors.white),
                 ),
               ),
             ),
@@ -309,62 +265,41 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
-  // ============================================================================
-  // PHONE FIELD WIDGET
-  // ============================================================================
-
   Widget _buildPhoneField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RichText(
-          text: const TextSpan(
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: JenixColorsApp.darkColorText,
-              fontFamily: "OpenSansHebrew",
-            ),
-            children: [
-              TextSpan(text: 'Phone Number'),
-              TextSpan(
-                text: ' (optional)',
-                style: TextStyle(
-                  color: JenixColorsApp.secondaryTextColor,
-                  fontSize: 14,
-                ),
-              ),
-            ],
+        Text(
+          LocaleKeys.registerPhoneOptionalLabel.tr(),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontFamily: 'OpenSansHebrew',
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: JenixColorsApp.inputBackground,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: JenixColorsApp.inputBorder, width: 1),
+            color: const Color(0xFF1A2B44),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white24),
           ),
           child: IntlPhoneField(
             controller: _phoneNumberController,
             disableLengthCheck: disableValidationInPhone,
+            initialCountryCode: 'CO',
+            style: const TextStyle(color: Colors.white),
+            dropdownIcon: const Icon(Icons.arrow_drop_down, color: Colors.white),
             decoration: const InputDecoration(
-              hintText: "Phone number",
-              hintStyle: TextStyle(
-                color: JenixColorsApp.placeholderColor,
-                fontFamily: "OpenSansHebrew",
-              ),
+              hintText: "Ej: 3101234567",
+              hintStyle: TextStyle(color: Colors.white54),
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             ),
-            initialCountryCode: 'PA',
-            dropdownIconPosition: IconPosition.trailing,
-            style: const TextStyle(fontFamily: "OpenSansHebrew"),
             onChanged: (value) {
               setState(() {
-                _phoneCode = value.countryCode; // incluye '+'
+                _phoneCode = value.countryCode;
                 disableValidationInPhone = value.number.isEmpty;
               });
             },
@@ -374,66 +309,42 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
-  // ============================================================================
-  // TERMS CHECKBOX WIDGET
-  // ============================================================================
-
   Widget _buildTermsCheckbox() {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: 24,
-          width: 24,
-          child: Checkbox(
-            value: _acceptTerms,
-            onChanged: (value) {
-              setState(() {
-                _acceptTerms = value ?? false;
-              });
-            },
-            activeColor: JenixColorsApp.primaryRed,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
+        Checkbox(
+          value: _acceptTerms,
+          checkColor: Colors.white,
+          onChanged: (v) => setState(() => _acceptTerms = v ?? false),
         ),
-        const SizedBox(width: 8),
         Expanded(
           child: Text.rich(
             TextSpan(
+              text: LocaleKeys.authRegisterTermsPrefix.tr(),
               style: const TextStyle(
+                color: Colors.white70,
                 fontSize: 12,
-                color: JenixColorsApp.subtitleColor,
-                fontWeight: FontWeight.w400,
-                fontFamily: 'OpenSansHebrew',
               ),
               children: [
-                const TextSpan(text: 'I have read and agree to the '),
                 TextSpan(
-                  text: 'Terms and Conditions',
+                  text: LocaleKeys.authRegisterTerms.tr(),
                   style: const TextStyle(
-                    color: JenixColorsApp.primaryRed,
-                    fontWeight: FontWeight.w500,
+                    color: Color(0xFFBE1723),
                     decoration: TextDecoration.underline,
-                    decorationColor: JenixColorsApp.primaryRed,
                   ),
                   recognizer: TapGestureRecognizer()..onTap = _handleTermsTap,
                 ),
-                const TextSpan(text: ' and '),
+                TextSpan(text: LocaleKeys.authRegisterAndThe.tr()),
                 TextSpan(
-                  text: 'Privacy Policy.',
+                  text: LocaleKeys.authRegisterPrivacyPolicy.tr(),
                   style: const TextStyle(
-                    color: JenixColorsApp.primaryRed,
-                    fontWeight: FontWeight.w500,
+                    color: Color(0xFFBE1723),
                     decoration: TextDecoration.underline,
-                    decorationColor: JenixColorsApp.primaryRed,
                   ),
                   recognizer: TapGestureRecognizer()..onTap = _handlePrivacyTap,
                 ),
               ],
             ),
-            textAlign: TextAlign.start,
           ),
         ),
       ],
@@ -441,90 +352,97 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   // ============================================================================
-  // VALIDATION & ACTIONS
+  // VALIDATION & ACTIONS (idéntico al tuyo)
   // ============================================================================
 
   void _registerAction() {
-    // Limpiar errores
     setState(() {
-      _firstNameError = null;
-      _lastNameError = null;
+      _nameError = null;
       _emailError = null;
       _passwordError = null;
+      _confirmPasswordError = null;
     });
 
-    // Validar términos
     if (!_acceptTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('You must accept Terms & Privacy to continue.'),
-          backgroundColor: JenixColorsApp.errorColor,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      _showSnackBar(LocaleKeys.registerAcceptTermsError.tr(), color: Colors.redAccent);
       return;
     }
 
-    // Validar campos
-    final firstNameError = FieldsValidators.fieldIsRequired(
-      _firstNameController.text,
-    );
-    final lastNameError = FieldsValidators.fieldIsRequired(
-      _lastNameController.text,
-    );
+    final nameError = FieldsValidators.fieldIsRequired(_nameController.text);
     final emailError = FieldsValidators.emailValidator(_emailController.text);
-    final passwordError = FieldsValidators.passwordValidator(
-      _passwordController.text,
-      minLength: 6,
-    );
+    final passwordError =
+        FieldsValidators.passwordValidator(_passwordController.text);
+    String? confirmPasswordError;
 
-    if (firstNameError != null ||
-        lastNameError != null ||
+    if (_confirmPasswordController.text != _passwordController.text) {
+      confirmPasswordError = LocaleKeys.registerPasswordsNoMatch.tr();
+    }
+
+    if (nameError != null ||
         emailError != null ||
-        passwordError != null) {
+        passwordError != null ||
+        confirmPasswordError != null) {
       setState(() {
-        _firstNameError = firstNameError;
-        _lastNameError = lastNameError;
+        _nameError = nameError;
         _emailError = emailError;
         _passwordError = passwordError;
+        _confirmPasswordError = confirmPasswordError;
       });
       return;
     }
 
-    // Si todo está bien, registrar
     _performRegistration();
   }
 
   Future<void> _performRegistration() async {
     setState(() => _loading = true);
+    final authController = ref.read(authenticationControllerProvider);
+    final fullPhone = '$_phoneCode${_phoneNumberController.text.trim()}';
 
-    final first = _firstNameController.text.trim();
-    final last = _lastNameController.text.trim();
-    final email = _emailController.text.trim();
-    final pass = _passwordController.text;
-    final phoneRaw = _phoneNumberController.text.trim();
-    final phone = phoneRaw.isEmpty ? null : '$_phoneCode$phoneRaw';
+    try {
+      final result = await authController.register(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        name: _nameController.text.trim(),
+        phone: fullPhone,
+        role: 'user',
+        rememberMe: true,
+      );
 
-    //TODO: Lógica de registro real aquí
+      if (!mounted) return;
+      setState(() => _loading = false);
+
+      result.fold(
+        (failure) => _showSnackBar(LocaleKeys.registerErrorPrefix.tr(namedArgs: {'message': failure.message}), color: Colors.redAccent),
+        (user) {
+          _showSnackBar(LocaleKeys.registerWelcome.tr(namedArgs: {'name': user.name}));
+          Navigator.pushReplacementNamed(context, RoutesApp.main);
+        },
+      );
+    } catch (_) {
+      setState(() => _loading = false);
+      _showSnackBar(LocaleKeys.registerUnexpectedError.tr(), color: Colors.redAccent);
+    }
+  }
+
+  void _handleLogin() {
+    Navigator.pushReplacementNamed(context, RoutesApp.login);
   }
 
   void _handleTermsTap() {
-    // TODO: Navegar a términos y condiciones
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Terms and Conditions'),
-        backgroundColor: JenixColorsApp.infoColor,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    _showSnackBar(LocaleKeys.registerOpeningTerms.tr());
   }
 
   void _handlePrivacyTap() {
-    // TODO: Navegar a política de privacidad
+    _showSnackBar(LocaleKeys.registerOpeningPrivacy.tr());
+  }
+
+  void _showSnackBar(String message, {Color color = Colors.green}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Privacy Policy'),
-        backgroundColor: JenixColorsApp.infoColor,
+      SnackBar(
+        content: Text(message,
+            style: const TextStyle(color: Colors.white, fontSize: 14)),
+        backgroundColor: color,
         behavior: SnackBarBehavior.floating,
       ),
     );

@@ -13,98 +13,102 @@ extension HexColor on Color {
 
 class JenixColorsApp {
   // ============================================================================
-  // BRAND COLORS (Dynamic from Environment)
+  // BRAND COLORS - ALEXANDER VON HUMBOLDT
   // ============================================================================
 
-  /// Color principal de la aplicación (Rojo Jenix #e20503)
-  static final jenixAppColor = HexColor.fromHex(EnvironmentConfig.hexColor);
+  /// Color principal de la universidad (Azul Humboldt)
+  static const Color primaryBlue = Color(0xFF003A70); // Azul oscuro del logo
 
-  /// Color inverso de la aplicación
-  static final jenixAppColorInverse = HexColor.fromHex(
-    EnvironmentConfig.hexColorInverse,
-  );
+  /// Color secundario (Rojo Humboldt)
+  static const Color primaryRed = Color(0xFFD32F2F); // Rojo del logo
 
-  // ============================================================================
-  // PRIMARY COLORS
-  // ============================================================================
+  /// Azul más claro (variante)
+  static const Color primaryBlueLight = Color(0xFF1565C0);
 
-  /// Rojo principal Jenix
-  static const Color primaryRed = Color(0xFFE20503);
+  /// Azul oscuro (hover/pressed states)
+  static const Color primaryBlueDark = Color(0xFF002447);
 
   /// Rojo oscuro (hover/pressed states)
-  static const Color primaryRedDark = Color(0xFFC00402);
+  static const Color primaryRedDark = Color(0xFFB71C1C);
 
   /// Rojo claro (disabled/light variant)
-  static const Color primaryRedLight = Color(0xFFFF6B69);
+  static const Color primaryRedLight = Color(0xFFEF5350);
 
-  /// Azul primario
-  static const Color primaryBlue = Color(0xFF247BC3);
+  // Dynamic colors from Environment (mantén compatibilidad)
+  static final jenixAppColor = HexColor.fromHex(
+    EnvironmentConfig.hexColor.isNotEmpty
+        ? EnvironmentConfig.hexColor
+        : '003A70', // Azul Humboldt por defecto
+  );
 
-  /// Azul oscuro
-  static const Color primaryBlueDark = Color(0xFF1A5A8E);
+  static final jenixAppColorInverse = HexColor.fromHex(
+    EnvironmentConfig.hexColorInverse.isNotEmpty
+        ? EnvironmentConfig.hexColorInverse
+        : 'D32F2F', // Rojo Humboldt por defecto
+  );
 
   // ============================================================================
   // GRADIENT COLORS (Login Screen)
   // ============================================================================
 
-  /// Inicio del gradiente del login (Rojo intenso)
-  static const Color loginBeginGradient = Color(0xFFE20503);
+  /// Inicio del gradiente del login (Azul Humboldt)
+  static const Color loginBeginGradient = Color(0xFF003A70);
 
-  /// Fin del gradiente del login (Rojo más suave)
-  static const Color loginEndGradient = Color(0xFFFF4D4A);
+  /// Fin del gradiente del login (Azul más claro)
+  static const Color loginEndGradient = Color(0xFF1565C0);
 
-  /// Gradiente alternativo inicio
-  static const Color gradientRedStart = Color(0xFFE20503);
+  /// Gradiente alternativo inicio (Rojo)
+  static const Color gradientRedStart = Color(0xFFD32F2F);
 
-  /// Gradiente alternativo fin
-  static const Color gradientRedEnd = Color(0xFFFF8C8A);
+  /// Gradiente alternativo fin (Rojo claro)
+  static const Color gradientRedEnd = Color(0xFFEF5350);
 
   // ============================================================================
   // TEXT COLORS
   // ============================================================================
 
-  /// Texto principal oscuro
-  static const Color darkColorText = Color(0xFF1E1E1E);
+  /// Texto principal oscuro (Azul Humboldt)
+  static const Color darkColorText = Color(0xFF003A70);
 
-  /// Texto rojo (para resaltar)
-  static const Color textDarkColor = Color(0xFFE20503);
+  /// Texto destacado (Rojo Humboldt)
+  static const Color textDarkColor = Color(0xFFD32F2F);
 
   /// Texto subtítulo (gris medio)
-  static const Color subtitleColor = Color(0xFF5F5F5F);
+  static const Color subtitleColor = Color(0xFF5F6368);
 
   /// Texto secundario (gris claro)
-  static const Color secondaryTextColor = Color(0xFF8E8E8E);
+  static const Color secondaryTextColor = Color(0xFF80868B);
 
-  /// Texto en hover
-  static const Color hoverColorText = Color(0xFF617589);
+  /// Texto en hover (Azul medio)
+  static const Color hoverColorText = Color(0xFF1565C0);
 
   /// Texto placeholder
-  static const Color placeholderColor = Color(0xFFB0B0B0);
+  static const Color placeholderColor = Color(0xFF9AA0A6);
 
   // ============================================================================
   // GRAY SCALE
   // ============================================================================
 
   /// Gris muy oscuro (fondos oscuros)
-  static const Color darkBackground = Color(0xFF1E1E1E);
+  static const Color darkBackground = Color(0xFF202124);
 
   /// Gris oscuro
-  static const Color darkGray = Color(0xFF242425);
+  static const Color darkGray = Color(0xFF3C4043);
 
   /// Gris medio
-  static const Color grayColor = Color(0xFF696969);
+  static const Color grayColor = Color(0xFF5F6368);
 
   /// Gris claro
-  static const Color lightGray = Color(0xFFA6A1A1);
+  static const Color lightGray = Color(0xFF9AA0A6);
 
   /// Gris muy claro (bordes, divisores)
-  static const Color lightGrayBorder = Color(0xFFE0E0E0);
+  static const Color lightGrayBorder = Color(0xFFDADCE0);
 
   /// Gris iconos
-  static const Color greyColorIcon = Color(0xFF707070);
+  static const Color greyColorIcon = Color(0xFF5F6368);
 
   /// Gris pizarra (slate gray)
-  static const Color slateGray = Color(0xFF64748B);
+  static const Color slateGray = Color(0xFF80868B);
 
   // ============================================================================
   // BACKGROUND COLORS
@@ -114,63 +118,63 @@ class JenixColorsApp {
   static const Color backgroundWhite = Color(0xFFFFFFFF);
 
   /// Fondo gris muy claro
-  static const Color backgroundLightGray = Color(0xFFF5F5F5);
+  static const Color backgroundLightGray = Color(0xFFF8F9FA);
 
   /// Fondo gris claro (cards)
-  static const Color backgroundGrayCard = Color(0xFFFAFAFA);
+  static const Color backgroundGrayCard = Color(0xFFF1F3F4);
 
   /// Fondo oscuro
-  static const Color backgroundDark = Color(0xFF1E1E1E);
+  static const Color backgroundDark = Color(0xFF202124);
 
   // ============================================================================
   // INPUT & FORM COLORS
   // ============================================================================
 
   /// Borde de input (normal)
-  static const Color inputBorder = Color(0xFFE0E0E0);
+  static const Color inputBorder = Color(0xFFDADCE0);
 
-  /// Borde de input (focus)
-  static const Color inputBorderFocus = Color(0xFFE20503);
+  /// Borde de input (focus) - Azul Humboldt
+  static const Color inputBorderFocus = Color(0xFF003A70);
 
-  /// Borde de input (error)
-  static const Color inputBorderError = Color(0xFFDC2626);
+  /// Borde de input (error) - Rojo Humboldt
+  static const Color inputBorderError = Color(0xFFD32F2F);
 
   /// Fondo de input
-  static const Color inputBackground = Color(0xFFFAFAFA);
+  static const Color inputBackground = Color(0xFFF8F9FA);
 
   /// Fondo de input (focus)
   static const Color inputBackgroundFocus = Color(0xFFFFFFFF);
 
   // ============================================================================
-  // SEMANTIC COLORS (Success, Warning, Error, Info)
+  // SEMANTIC COLORS
   // ============================================================================
 
   /// Éxito (verde)
-  static const Color successColor = Color(0xFF10B981);
-  static const Color successLight = Color(0xFFD1FAE5);
-  static const Color successDark = Color(0xFF059669);
+  static const Color successColor = Color(0xFF0F9D58);
+  static const Color successLight = Color(0xFFE6F4EA);
+  static const Color successDark = Color(0xFF0B8043);
 
   /// Advertencia (amarillo/naranja)
-  static const Color warningColor = Color(0xFFF59E0B);
-  static const Color warningLight = Color(0xFFFEF3C7);
-  static const Color warningDark = Color(0xFFD97706);
+  static const Color warningColor = Color(0xFFF9AB00);
+  static const Color warningLight = Color(0xFFFEF7E0);
+  static const Color warningDark = Color(0xFFE37400);
 
-  /// Error (rojo)
-  static const Color errorColor = Color(0xFFDC2626);
-  static const Color errorLight = Color(0xFFFEE2E2);
-  static const Color errorDark = Color(0xFFB91C1C);
+  /// Error (rojo Humboldt)
+  static const Color errorColor = Color(0xFFD32F2F);
+  static const Color errorLight = Color(0xFFFCE8E6);
+  static const Color errorDark = Color(0xFFB71C1C);
 
-  /// Información (azul)
-  static const Color infoColor = Color(0xFF3B82F6);
-  static const Color infoLight = Color(0xFFDBEAFE);
-  static const Color infoDark = Color(0xFF2563EB);
+  /// Información (azul Humboldt)
+  static const Color infoColor = Color(0xFF003A70);
+  static const Color infoLight = Color(0xFFE8F0FE);
+  static const Color infoDark = Color(0xFF002447);
 
   // ============================================================================
   // UI ELEMENT COLORS
   // ============================================================================
 
   /// Color de divisores
-  static const Color dividerColor = Color(0xFFE5E7EB);
+  static const Color dividerColor = Color(0xFFDADCE0);
 
   /// Color de sombras
   static const Color shadowColor = Color(0x1A000000);
@@ -186,26 +190,28 @@ class JenixColorsApp {
   // BUTTON COLORS
   // ============================================================================
 
-  /// Botón primario (rojo)
-  static const Color buttonPrimary = Color(0xFFE20503);
-  static const Color buttonPrimaryHover = Color(0xFFC00402);
-  static const Color buttonPrimaryPressed = Color(0xFFA00301);
-  static const Color buttonPrimaryDisabled = Color(0xFFFFB3B2);
+  /// Botón primario (Azul Humboldt)
+  static const Color buttonPrimary = Color(0xFF003A70);
+  static const Color buttonPrimaryHover = Color(0xFF002447);
+  static const Color buttonPrimaryPressed = Color(0xFF001830);
+  static const Color buttonPrimaryDisabled = Color(0xFFB3C7D6);
 
-  /// Botón secundario (azul)
-  static const Color buttonSecondary = Color(0xFF247BC3);
-  static const Color buttonSecondaryHover = Color(0xFF1A5A8E);
+  /// Botón secundario (Rojo Humboldt)
+  static const Color buttonSecondary = Color(0xFFD32F2F);
+  static const Color buttonSecondaryHover = Color(0xFFB71C1C);
+  static const Color buttonSecondaryPressed = Color(0xFF9A0007);
+  static const Color buttonSecondaryDisabled = Color(0xFFE57373);
 
-  /// Botón outlined
-  static const Color buttonOutlined = Color(0xFFE20503);
-  static const Color buttonOutlinedHover = Color(0xFFFEE2E2);
+  /// Botón outlined (Azul)
+  static const Color buttonOutlined = Color(0xFF003A70);
+  static const Color buttonOutlinedHover = Color(0xFFE8F0FE);
 
-  /// Botón texto
-  static const Color buttonText = Color(0xFF247BC3);
-  static const Color buttonTextHover = Color(0xFF1A5A8E);
+  /// Botón texto (Azul)
+  static const Color buttonText = Color(0xFF003A70);
+  static const Color buttonTextHover = Color(0xFF002447);
 
   // ============================================================================
-  // SOCIAL COLORS (si necesitas login social)
+  // SOCIAL COLORS
   // ============================================================================
 
   static const Color googleColor = Color(0xFF4285F4);
@@ -217,13 +223,18 @@ class JenixColorsApp {
   // SPECIALIZED COLORS
   // ============================================================================
 
-  /// Océano azul
-  static const Color blueOcean = Color(0xFF247BC3);
+  /// Océano azul (Azul Humboldt)
+  static const Color blueOcean = Color(0xFF003A70);
 
-  /// Morado (si lo usas en algún lugar)
+  /// Morado (si lo necesitas)
   static const Color purpleColor = Color(0xFF8B5CF6);
   static const Color purpleLight = Color(0xFFEDE9FE);
   static const Color purpleDark = Color(0xFF7C3AED);
+
+  static const Color primaryColor = Color(0xFF103e69);
+  static const Color accentColor = Color(0xFFbe1723);
+  static const Color backgroundColor = Color(0xFF0d1b2a);
+  static const Color surfaceColor = Color(0xFF1b263b);
 
   // ============================================================================
   // UTILITY METHODS
