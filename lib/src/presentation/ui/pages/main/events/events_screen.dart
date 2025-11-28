@@ -22,6 +22,24 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
   bool _hasError = false;
   String _errorMessage = '';
 
+  /// Calcula el tamaño responsivo de fuente
+  double _getResponsiveFontSize(double baseFontSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.9;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.15;
+    return baseFontSize * 1.3;
+  }
+
+  /// Calcula el padding/tamaño responsivo
+  double _getResponsiveDimension(double baseDimension) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseDimension * 0.9;
+    if (screenWidth < 600) return baseDimension;
+    if (screenWidth < 900) return baseDimension * 1.15;
+    return baseDimension * 1.3;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -77,6 +95,12 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final eventController = ref.read(eventControllerProvider);
     final size = MediaQuery.of(context).size;
+    final errorIconSize = _getResponsiveDimension(64);
+    final errorTitleFontSize = _getResponsiveFontSize(20);
+    final errorMessageFontSize = _getResponsiveFontSize(14);
+    final errorPadding = _getResponsiveDimension(24);
+    final errorButtonPadding = _getResponsiveDimension(32);
+    final loadingTextFontSize = _getResponsiveFontSize(14);
 
     return Scaffold(
       backgroundColor: isDark ? JenixColorsApp.backgroundDark : JenixColorsApp.backgroundWhite,
@@ -94,40 +118,42 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                 SliverFillRemaining(
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      padding: EdgeInsets.symmetric(horizontal: errorPadding),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
                             Icons.error_outline,
-                            size: 64,
-                            color: Colors.red.withOpacity(0.7),
+                            size: errorIconSize,
+                            color: isDark ? Color(0xFFFF6B6B) : const Color(0xFFFF5252),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: _getResponsiveDimension(16)),
                           Text(
                             'Error al cargar',
                             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              color: isDark ? Colors.white : Colors.black,
+                              color: isDark ? Colors.white : Colors.black87,
                               fontWeight: FontWeight.bold,
+                              fontSize: errorTitleFontSize,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: _getResponsiveDimension(8)),
                           Text(
                             _errorMessage,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: isDark ? Colors.white70 : Colors.black54,
-                              fontSize: 14,
+                              color: isDark ? Colors.white : Colors.black54,
+                              fontSize: errorMessageFontSize,
                             ),
                           ),
-                          const SizedBox(height: 24),
+                          SizedBox(height: _getResponsiveDimension(24)),
                           ElevatedButton.icon(
                             onPressed: _loadEvents,
                             icon: const Icon(Icons.refresh),
                             label: const Text('Reintentar'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: JenixColorsApp.primaryBlue,
-                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(horizontal: errorButtonPadding, vertical: _getResponsiveDimension(12)),
                             ),
                           ),
                         ],
@@ -154,16 +180,17 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                       children: [
                         CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            JenixColorsApp.primaryBlue,
+                            isDark ? Colors.white : JenixColorsApp.primaryBlue,
                           ),
                           strokeWidth: 3,
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: _getResponsiveDimension(16)),
                         Text(
                           'Cargando eventos...',
                           style: TextStyle(
-                            color: isDark ? Colors.white70 : Colors.black54,
-                            fontSize: 14,
+                            color: isDark ? Colors.white : Colors.black54,
+                            fontSize: loadingTextFontSize,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
@@ -195,8 +222,8 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                 else
                   SliverPadding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: size.width > 600 ? size.width * 0.1 : 12,
-                      vertical: 12,
+                      horizontal: size.width > 600 ? size.width * 0.1 : _getResponsiveDimension(12),
+                      vertical: _getResponsiveDimension(12),
                     ),
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
@@ -216,10 +243,10 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                               ),
                               if (showDateSeparator)
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  padding: EdgeInsets.symmetric(vertical: _getResponsiveDimension(16)),
                                   child: Divider(
-                                    color: JenixColorsApp.primaryBlue.withOpacity(0.2),
-                                    thickness: 1,
+                                    color: JenixColorsApp.primaryBlue.withOpacity(0.35),
+                                    thickness: 1.5,
                                   ),
                                 ),
                             ],

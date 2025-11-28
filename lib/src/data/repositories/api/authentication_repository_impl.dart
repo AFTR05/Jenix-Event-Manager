@@ -102,7 +102,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     required String password,
     required String name,
     required String phone,
-    required String role,
+    required String documentNumber,
   }) async {
     final url = "$path/local/signup";
     final resultRequest = await ConsumerAPI.requestJSON<Map<String, dynamic>>(
@@ -113,7 +113,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         "password": password,
         "name": name,
         "phone": phone,
-        "role": role,
+        "documentNumber": documentNumber,
       },
     );
     return resultRequest.fold((failure) => Left(failure), (json) {

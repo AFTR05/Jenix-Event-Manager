@@ -62,6 +62,24 @@ class ProfileMenuTile extends ConsumerWidget {
     required this.iconColor,
   });
 
+  /// Calcula el tamaño responsivo de fuente
+  double _getResponsiveFontSize(BuildContext context, double baseFontSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.85;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.1;
+    return baseFontSize * 1.2;
+  }
+
+  /// Calcula el tamaño responsivo del icono
+  double _getResponsiveIconSize(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return 18;
+    if (screenWidth < 600) return 22;
+    if (screenWidth < 900) return 24;
+    return 26;
+  }
+
   /// Muestra un modal para confirmar el cierre de sesión.
   ///
   /// Si se confirma, ejecuta logout y navega a la pantalla de login eliminando el historial.
@@ -130,6 +148,11 @@ class ProfileMenuTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    
+    // Tamaños responsivos
+    final labelFontSize = _getResponsiveFontSize(context, 16);
+    final iconSize = _getResponsiveIconSize(context);
+    final arrowSize = iconSize * 0.9;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -200,8 +223,8 @@ class ProfileMenuTile extends ConsumerWidget {
                         ? (item.iconAsset!.endsWith('.svg')
                               ? SvgPicture.asset(
                                   item.iconAsset!,
-                                  width: 22,
-                                  height: 22,
+                                  width: iconSize,
+                                  height: iconSize,
                                   colorFilter: ColorFilter.mode(
                                     item.isLogout
                                         ? JenixColorsApp.errorColor
@@ -211,8 +234,8 @@ class ProfileMenuTile extends ConsumerWidget {
                                 )
                               : Image.asset(
                                   item.iconAsset!,
-                                  width: 22,
-                                  height: 22,
+                                  width: iconSize,
+                                  height: iconSize,
                                   color: item.isLogout
                                       ? JenixColorsApp.errorColor
                                       : iconColor,
@@ -222,7 +245,7 @@ class ProfileMenuTile extends ConsumerWidget {
                             color: item.isLogout
                                 ? JenixColorsApp.errorColor
                                 : iconColor,
-                            size: 22,
+                            size: iconSize,
                           ),
                   ),
                 ),
@@ -235,7 +258,7 @@ class ProfileMenuTile extends ConsumerWidget {
                     item.label,
                     style: TextStyle(
                       fontFamily: 'OpenSansHebrew',
-                      fontSize: 16,
+                      fontSize: labelFontSize,
                       color: item.isLogout
                           ? JenixColorsApp.errorColor
                           : textColor,
@@ -254,7 +277,7 @@ class ProfileMenuTile extends ConsumerWidget {
                                 ? JenixColorsApp.primaryBlueLight
                                 : JenixColorsApp.primaryBlue)
                             .withOpacity(0.4),
-                    size: 20,
+                    size: arrowSize,
                   ),
               ],
             ),

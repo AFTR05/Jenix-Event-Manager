@@ -11,27 +11,45 @@ class ScheduleTotalsCard extends StatelessWidget {
     super.key,
   });
 
+  double _getResponsiveFontSize(double baseFontSize, double screenWidth) {
+    if (screenWidth < 360) return baseFontSize * 0.9;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.15;
+    return baseFontSize * 1.3;
+  }
+
+  double _getResponsiveDimension(double baseDimension, double screenWidth) {
+    if (screenWidth < 360) return baseDimension * 0.9;
+    if (screenWidth < 600) return baseDimension;
+    if (screenWidth < 900) return baseDimension * 1.15;
+    return baseDimension * 1.3;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final containerMargin = _getResponsiveDimension(16, screenWidth);
+    final containerPadding = _getResponsiveDimension(16, screenWidth);
+    final containerRadius = _getResponsiveDimension(16, screenWidth);
 
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.all(containerMargin),
+      padding: EdgeInsets.all(containerPadding),
       decoration: BoxDecoration(
-        color: isDark ? JenixColorsApp.backgroundDark : JenixColorsApp.backgroundWhite,
-        borderRadius: BorderRadius.circular(16),
+        color: isDark ? JenixColorsApp.backgroundDark : JenixColorsApp.backgroundLightGray,
+        borderRadius: BorderRadius.circular(containerRadius),
         border: Border.all(
           color: isDark 
               ? JenixColorsApp.primaryBlue.withOpacity(0.2)
-              : JenixColorsApp.lightGrayBorder,
-          width: 1,
+              : JenixColorsApp.primaryBlue.withOpacity(0.15),
+          width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
             color: isDark 
                 ? Colors.black.withOpacity(0.3)
-                : JenixColorsApp.primaryBlue.withOpacity(0.08),
+                : JenixColorsApp.primaryBlue.withOpacity(0.15),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -41,11 +59,12 @@ class ScheduleTotalsCard extends StatelessWidget {
         children: [
           Expanded(
             child: _buildStatItem(
+              context,
               icon: Icons.event_rounded,
               iconColor: JenixColorsApp.primaryBlue,
               iconBgColor: isDark 
                   ? JenixColorsApp.primaryBlue.withOpacity(0.2)
-                  : JenixColorsApp.infoLight,
+                  : JenixColorsApp.primaryBlue.withOpacity(0.12),
               label: LocaleKeys.eventsThisWeek.tr(),
               value: '$totalEvents',
               valueColor: JenixColorsApp.primaryBlue,
@@ -57,7 +76,8 @@ class ScheduleTotalsCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem({
+  Widget _buildStatItem(
+    BuildContext context, {
     required IconData icon,
     required Color iconColor,
     required Color iconBgColor,
@@ -66,17 +86,26 @@ class ScheduleTotalsCard extends StatelessWidget {
     required Color valueColor,
     required bool isDark,
   }) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final labelFontSize = _getResponsiveFontSize(12, screenWidth);
+    final valueFontSize = _getResponsiveFontSize(18, screenWidth);
+    final iconPadding = _getResponsiveDimension(10, screenWidth);
+    final iconSize = _getResponsiveDimension(22, screenWidth);
+    final iconRadius = _getResponsiveDimension(12, screenWidth);
+    final spaceBetween = _getResponsiveDimension(12, screenWidth);
+    final spaceBetweenRows = _getResponsiveDimension(4, screenWidth);
+
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(iconPadding),
           decoration: BoxDecoration(
             color: iconBgColor,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(iconRadius),
           ),
-          child: Icon(icon, color: iconColor, size: 22),
+          child: Icon(icon, color: iconColor, size: iconSize),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: spaceBetween),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,19 +115,19 @@ class ScheduleTotalsCard extends StatelessWidget {
                 style: TextStyle(
                   color: isDark 
                       ? JenixColorsApp.lightGray
-                      : JenixColorsApp.subtitleColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+                      : JenixColorsApp.darkColorText,
+                  fontSize: labelFontSize,
+                  fontWeight: FontWeight.w600,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: spaceBetweenRows),
               Text(
                 value,
                 style: TextStyle(
                   color: valueColor,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  fontSize: valueFontSize,
                 ),
               ),
             ],

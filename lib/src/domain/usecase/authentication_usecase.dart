@@ -20,14 +20,14 @@ class AuthenticationUsecase {
     required String password,
     required String name,
     required String phone,
-    required String role,
+    required String documentNumber,
   }) {
     return authenticationRepository.signUp(
       email: email,
       password: password,
       name: name,
       phone: phone,
-      role: role,
+      documentNumber: documentNumber,
     );
   }
 

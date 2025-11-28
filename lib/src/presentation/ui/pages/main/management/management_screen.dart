@@ -1,25 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:jenix_event_manager/src/routes_app.dart';
+import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 
 class ManagementScreen extends StatelessWidget {
   const ManagementScreen({super.key});
+
+  double _getResponsiveFontSize(double baseFontSize, BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.9;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.15;
+    return baseFontSize * 1.3;
+  }
+
+  double _getResponsiveDimension(double baseDimension, BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseDimension * 0.9;
+    if (screenWidth < 600) return baseDimension;
+    if (screenWidth < 900) return baseDimension * 1.15;
+    return baseDimension * 1.3;
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final isMobile = screenSize.width < 600;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? JenixColorsApp.backgroundColor : JenixColorsApp.backgroundWhite;
+    final gradientStart = isDark ? JenixColorsApp.backgroundColor : JenixColorsApp.infoLight;
+    final gradientEnd = isDark ? JenixColorsApp.backgroundColor : JenixColorsApp.infoLight;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0C1C2C),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0A2647),
-        title: const Text('Administración'),
-        elevation: 0,
-      ),
+      backgroundColor: backgroundColor,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF0A2647), Color(0xFF09131E)],
+            colors: [gradientStart, gradientEnd],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -35,50 +51,54 @@ class ManagementScreen extends StatelessWidget {
               Text(
                 'Centro de Administración',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: isMobile ? 20 : 26,
+                  color: isDark ? Colors.white : JenixColorsApp.primaryBlue,
+                  fontSize: _getResponsiveFontSize(26, context),
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
-              const Text(
+              SizedBox(height: _getResponsiveDimension(8, context)),
+              Text(
                 'Selecciona una opción para gestionar',
                 style: TextStyle(
-                  color: Color(0xFF9DA9B9),
-                  fontSize: 14,
+                  color: isDark ? JenixColorsApp.lightGray : JenixColorsApp.subtitleColor,
+                  fontSize: _getResponsiveFontSize(14, context),
                 ),
               ),
-              SizedBox(height: isMobile ? 20 : 28),
+              SizedBox(height: _getResponsiveDimension(24, context)),
               _buildAdminOption(
                 context: context,
                 icon: Icons.people_rounded,
                 title: 'Usuarios',
                 subtitle: 'Gestiona usuarios y organizadores',
                 route: RoutesApp.users,
+                isDark: isDark,
               ),
-              SizedBox(height: isMobile ? 12 : 16),
+              SizedBox(height: _getResponsiveDimension(12, context)),
               _buildAdminOption(
                 context: context,
                 icon: Icons.meeting_room_rounded,
                 title: 'Salones',
                 subtitle: 'Gestiona salones y espacios disponibles',
                 route: RoutesApp.rooms,
+                isDark: isDark,
               ),
-              SizedBox(height: isMobile ? 12 : 16),
+              SizedBox(height: _getResponsiveDimension(12, context)),
               _buildAdminOption(
                 context: context,
                 icon: Icons.location_city_rounded,
                 title: 'Campus',
                 subtitle: 'Gestiona campus y localidades',
                 route: RoutesApp.campus,
+                isDark: isDark,
               ),
-              SizedBox(height: isMobile ? 12 : 16),
+              SizedBox(height: _getResponsiveDimension(12, context)),
               _buildAdminOption(
                 context: context,
                 icon: Icons.bar_chart_rounded,
                 title: 'Reportes',
                 subtitle: 'Ver reportes y estadísticas',
                 route: RoutesApp.reports,
+                isDark: isDark,
               ),
             ],
           ),
@@ -93,6 +113,7 @@ class ManagementScreen extends StatelessWidget {
     required String title,
     required String subtitle,
     required String route,
+    required bool isDark,
   }) {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
@@ -102,11 +123,11 @@ class ManagementScreen extends StatelessWidget {
         onTap: () => Navigator.pushNamed(context, route),
         borderRadius: BorderRadius.circular(14),
         child: Container(
-          padding: EdgeInsets.all(isMobile ? 14 : 18),
+          padding: EdgeInsets.all(_getResponsiveDimension(14, context)),
           decoration: BoxDecoration(
-            color: const Color(0xFF12263F).withOpacity(0.7),
+            color: isDark ? JenixColorsApp.surfaceColor.withOpacity(0.7) : JenixColorsApp.backgroundWhite,
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: isDark ? Colors.white.withOpacity(0.1) : JenixColorsApp.lightGrayBorder,
               width: 1,
             ),
             borderRadius: BorderRadius.circular(14),
@@ -114,18 +135,18 @@ class ManagementScreen extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(_getResponsiveDimension(10, context)),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFBE1723).withOpacity(0.15),
+                  color: isDark ? JenixColorsApp.accentColor.withOpacity(0.15) : JenixColorsApp.accentColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   icon,
-                  color: const Color(0xFFBE1723),
-                  size: isMobile ? 24 : 28,
+                  color: JenixColorsApp.accentColor,
+                  size: _getResponsiveDimension(24, context),
                 ),
               ),
-              SizedBox(width: isMobile ? 12 : 16),
+              SizedBox(width: _getResponsiveDimension(12, context)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,17 +155,17 @@ class ManagementScreen extends StatelessWidget {
                     Text(
                       title,
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: isMobile ? 14 : 16,
+                        color: isDark ? Colors.white : JenixColorsApp.darkColorText,
+                        fontSize: _getResponsiveFontSize(16, context),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: _getResponsiveDimension(4, context)),
                     Text(
                       subtitle,
-                      style: const TextStyle(
-                        color: Color(0xFF9DA9B9),
-                        fontSize: 12,
+                      style: TextStyle(
+                        color: isDark ? JenixColorsApp.lightGray : JenixColorsApp.subtitleColor,
+                        fontSize: _getResponsiveFontSize(12, context),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -154,8 +175,8 @@ class ManagementScreen extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right,
-                color: Colors.white.withOpacity(0.5),
-                size: isMobile ? 20 : 24,
+                color: isDark ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.5),
+                size: _getResponsiveDimension(24, context),
               ),
             ],
           ),

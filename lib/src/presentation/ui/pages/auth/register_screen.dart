@@ -21,8 +21,9 @@ class RegisterScreen extends ConsumerStatefulWidget {
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _institutionalEmailController = TextEditingController();
+  final TextEditingController _nitController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
@@ -32,15 +33,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _loading = false;
 
   String? _nameError;
-  String? _emailError;
+  String? _institutionalEmailError;
+  String? _nitError;
   String? _passwordError;
   String? _confirmPasswordError;
 
   @override
   void dispose() {
     _nameController.dispose();
+    _institutionalEmailController.dispose();
+    _nitController.dispose();
     _phoneNumberController.dispose();
-    _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -124,21 +127,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           fontFamily: 'OpenSansHebrew',
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        LocaleKeys.registerOpeningPrivacy.tr(),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF9DA9B9),
-                          fontFamily: 'OpenSansHebrew',
-                        ),
-                      ),
 
                       const SizedBox(height: 32),
 
                       // Form fields
                       CustomFormElement(
-                        labelTitle: LocaleKeys.authRegisterEmailHint.tr(),
+                        labelTitle: 'Nombre',
                         isRequired: true,
                         errorText: _nameError,
                         widget: CustomAuthTextFieldWidget(
@@ -152,15 +146,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                       const SizedBox(height: 14),
                       CustomFormElement(
-                        labelTitle: LocaleKeys.authRegisterEmailHint.tr(),
+                        labelTitle: 'Ingresa tu correo institucional',
                         isRequired: true,
-                        errorText: _emailError,
+                        errorText: _institutionalEmailError,
                         widget: CustomAuthTextFieldWidget(
-                          controller: _emailController,
-                          hintText: LocaleKeys.authRegisterEmailHint.tr(),
+                          controller: _institutionalEmailController,
+                          hintText: "Ingresa tu correo institucional",
                           prefix: const Icon(Icons.email_outlined, color: Colors.white70),
                           keyboardType: TextInputType.emailAddress,
-                          onChanged: (_) => setState(() => _emailError = null),
+                          onChanged: (_) => setState(() => _institutionalEmailError = null),
+                        ),
+                      ),
+
+                      const SizedBox(height: 14),
+                      CustomFormElement(
+                        labelTitle: 'Número de documento',
+                        isRequired: true,
+                        errorText: _nitError,
+                        widget: CustomAuthTextFieldWidget(
+                          controller: _nitController,
+                          hintText: "Ej: 12345678",
+                          prefix: const Icon(Icons.badge_outlined, color: Colors.white70),
+                          keyboardType: TextInputType.number,
+                          onChanged: (_) => setState(() => _nitError = null),
                         ),
                       ),
 
@@ -270,7 +278,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.registerPhoneOptionalLabel.tr(),
+          'Número de teléfono',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 14,
@@ -358,7 +366,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   void _registerAction() {
     setState(() {
       _nameError = null;
-      _emailError = null;
+      _institutionalEmailError = null;
+      _nitError = null;
       _passwordError = null;
       _confirmPasswordError = null;
     });
@@ -369,7 +378,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
 
     final nameError = FieldsValidators.fieldIsRequired(_nameController.text);
-    final emailError = FieldsValidators.emailValidator(_emailController.text);
+    final institutionalEmailError = FieldsValidators.emailValidator(_institutionalEmailController.text);
+    final nitError = FieldsValidators.fieldIsRequired(_nitController.text);
+    final phoneError = FieldsValidators.fieldIsRequired(_phoneNumberController.text);
     final passwordError =
         FieldsValidators.passwordValidator(_passwordController.text);
     String? confirmPasswordError;
@@ -379,12 +390,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
 
     if (nameError != null ||
-        emailError != null ||
+        institutionalEmailError != null ||
+        nitError != null ||
+        phoneError != null ||
         passwordError != null ||
         confirmPasswordError != null) {
       setState(() {
         _nameError = nameError;
-        _emailError = emailError;
+        _institutionalEmailError = institutionalEmailError;
+        _nitError = nitError;
         _passwordError = passwordError;
         _confirmPasswordError = confirmPasswordError;
       });
@@ -401,11 +415,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     try {
       final result = await authController.register(
-        email: _emailController.text.trim(),
+        email: _institutionalEmailController.text.trim(),
         password: _passwordController.text,
         name: _nameController.text.trim(),
         phone: fullPhone,
-        role: 'user',
+        documentNumber: _nitController.text.trim(),
         rememberMe: true,
       );
 

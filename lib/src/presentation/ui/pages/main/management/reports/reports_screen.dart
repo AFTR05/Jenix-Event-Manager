@@ -20,6 +20,22 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   List<EventEntity> _events = [];
   List<EnrollmentEntity> _enrollments = [];
 
+  double _getResponsiveFontSize(double baseFontSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.9;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.15;
+    return baseFontSize * 1.3;
+  }
+
+  double _getResponsiveDimension(double baseDimension) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseDimension * 0.9;
+    if (screenWidth < 600) return baseDimension;
+    if (screenWidth < 900) return baseDimension * 1.15;
+    return baseDimension * 1.3;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -97,13 +113,17 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF0A1929) : Colors.white;
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1929),
+      backgroundColor: backgroundColor,
       appBar: SecondaryAppbarWidget(title: 'Reportes y Estadísticas'),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFBE1723)),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  isDark ? Colors.white : const Color(0xFFBE1723),
+                ),
               ),
             )
           : _error != null
@@ -111,19 +131,19 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.error_outline, color: Colors.red, size: 64),
-                      const SizedBox(height: 16),
-                      const Text(
+                      Icon(Icons.error_outline, color: isDark ? Colors.white : Colors.red, size: _getResponsiveDimension(64)),
+                      SizedBox(height: _getResponsiveDimension(16)),
+                      Text(
                         'Error al cargar datos',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: _getResponsiveFontSize(16)),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: _getResponsiveDimension(8)),
                       Text(
                         _error ?? '',
-                        style: const TextStyle(color: Colors.white70, fontSize: 12),
+                        style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: _getResponsiveFontSize(12)),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: _getResponsiveDimension(24)),
                       ElevatedButton(
                         onPressed: _loadData,
                         style: ElevatedButton.styleFrom(
@@ -138,7 +158,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                   ),
                 )
               : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(_getResponsiveDimension(16)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -151,20 +171,22 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                               label: 'Total Eventos',
                               value: _events.length.toString(),
                               color: Colors.blue,
+                              isDark: isDark,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: _getResponsiveDimension(12)),
                           Expanded(
                             child: _buildKpiCard(
                               icon: Icons.person_add,
                               label: 'Total Inscripciones',
                               value: _enrollments.length.toString(),
                               color: Colors.green,
+                              isDark: isDark,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: _getResponsiveDimension(16)),
                       Row(
                         children: [
                           Expanded(
@@ -173,28 +195,30 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                               label: 'Eventos Activos',
                               value: _getActiveEventsCount().toString(),
                               color: Colors.orange,
+                              isDark: isDark,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: _getResponsiveDimension(12)),
                           Expanded(
                             child: _buildKpiCard(
                               icon: Icons.check_circle,
                               label: 'Asistencias',
                               value: _getAttendedCount().toString(),
                               color: Colors.purple,
+                              isDark: isDark,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: _getResponsiveDimension(24)),
                       // Gráfico de pastel - Estado de Inscripciones
-                      _buildEnrollmentPieChart(),
-                      const SizedBox(height: 24),
+                      _buildEnrollmentPieChart(isDark),
+                      SizedBox(height: _getResponsiveDimension(24)),
                       // Gráfico de barras - Capacidad de eventos
-                      _buildEventCapacityBarChart(),
-                      const SizedBox(height: 24),
+                      _buildEventCapacityBarChart(isDark),
+                      SizedBox(height: _getResponsiveDimension(24)),
                       // Estadísticas de eventos
-                      _buildEventStats(),
+                      _buildEventStats(isDark),
                     ],
                   ),
                 ),
@@ -206,39 +230,40 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     required String label,
     required String value,
     required Color color,
+    required bool isDark,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(_getResponsiveDimension(16)),
       decoration: BoxDecoration(
-        color: const Color(0xFF12263F),
+        color: isDark ? const Color(0xFF12263F) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.withOpacity(0.3), width: 1.5),
       ),
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(_getResponsiveDimension(10)),
             decoration: BoxDecoration(
               color: color.withOpacity(0.2),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: _getResponsiveDimension(24)),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: _getResponsiveDimension(12)),
           Text(
             value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+              fontSize: _getResponsiveFontSize(24),
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: _getResponsiveDimension(4)),
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.white54,
-              fontSize: 12,
+            style: TextStyle(
+              color: isDark ? Colors.white54 : Colors.black54,
+              fontSize: _getResponsiveFontSize(12),
             ),
             textAlign: TextAlign.center,
           ),
@@ -247,7 +272,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     );
   }
 
-  Widget _buildEnrollmentPieChart() {
+  Widget _buildEnrollmentPieChart(bool isDark) {
     final enrolled = _enrollments.where((e) => e.status.value == 'ENROLLED').length;
     final waitlisted = _enrollments.where((e) => e.status.value == 'WAITLISTED').length;
     final attended = _enrollments.where((e) => e.status.value == 'ATTENDED').length;
@@ -256,33 +281,33 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
 
     if (total == 0) {
       return Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(_getResponsiveDimension(16)),
         decoration: BoxDecoration(
-          color: const Color(0xFF12263F),
+          color: isDark ? const Color(0xFF12263F) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
         ),
-        child: const Center(
-          child: Text('Sin datos de inscripciones', style: TextStyle(color: Colors.white54)),
+        child: Center(
+          child: Text('Sin datos de inscripciones', style: TextStyle(color: isDark ? Colors.white54 : Colors.black54)),
         ),
       );
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(_getResponsiveDimension(16)),
       decoration: BoxDecoration(
-        color: const Color(0xFF12263F),
+        color: isDark ? const Color(0xFF12263F) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Distribución de Inscripciones',
-            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: _getResponsiveFontSize(16), fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: _getResponsiveDimension(20)),
           SizedBox(
             height: 250,
             child: PieChart(
@@ -321,14 +346,14 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: _getResponsiveDimension(20)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildLegendItem('Inscrito', Colors.green, '$enrolled'),
-              _buildLegendItem('Espera', Colors.orange, '$waitlisted'),
-              _buildLegendItem('Asistió', Colors.blue, '$attended'),
-              _buildLegendItem('Cancelada', Colors.red, '$cancelled'),
+              _buildLegendItem('Inscrito', Colors.green, '$enrolled', isDark),
+              _buildLegendItem('Espera', Colors.orange, '$waitlisted', isDark),
+              _buildLegendItem('Asistió', Colors.blue, '$attended', isDark),
+              _buildLegendItem('Cancelada', Colors.red, '$cancelled', isDark),
             ],
           ),
         ],
@@ -336,7 +361,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     );
   }
 
-  Widget _buildLegendItem(String label, Color color, String count) {
+  Widget _buildLegendItem(String label, Color color, String count, bool isDark) {
     return Column(
       children: [
         Container(
@@ -345,23 +370,23 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
           decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
         ),
         const SizedBox(height: 4),
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 11)),
-        Text(count, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+        Text(label, style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: _getResponsiveFontSize(11))),
+        Text(count, style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: _getResponsiveFontSize(12), fontWeight: FontWeight.bold)),
       ],
     );
   }
 
-  Widget _buildEventCapacityBarChart() {
+  Widget _buildEventCapacityBarChart(bool isDark) {
     if (_events.isEmpty) {
       return Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(_getResponsiveDimension(16)),
         decoration: BoxDecoration(
-          color: const Color(0xFF12263F),
+          color: isDark ? const Color(0xFF12263F) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
         ),
-        child: const Center(
-          child: Text('Sin eventos', style: TextStyle(color: Colors.white54)),
+        child: Center(
+          child: Text('Sin eventos', style: TextStyle(color: isDark ? Colors.white54 : Colors.black54)),
         ),
       );
     }
@@ -369,20 +394,20 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     final topEvents = _events.take(5).toList();
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(_getResponsiveDimension(16)),
       decoration: BoxDecoration(
-        color: const Color(0xFF12263F),
+        color: isDark ? const Color(0xFF12263F) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Capacidad de Eventos (Top 5)',
-            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: _getResponsiveFontSize(16), fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: _getResponsiveDimension(20)),
           SizedBox(
             height: 300,
             child: BarChart(
@@ -427,7 +452,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                             padding: const EdgeInsets.only(top: 8),
                             child: Text(
                               eventName.length > 10 ? '${eventName.substring(0, 10)}...' : eventName,
-                              style: const TextStyle(color: Colors.white70, fontSize: 10),
+                              style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: _getResponsiveFontSize(10)),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -443,7 +468,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                       getTitlesWidget: (value, meta) {
                         return Text(
                           '${value.toInt()}',
-                          style: const TextStyle(color: Colors.white54, fontSize: 10),
+                          style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontSize: _getResponsiveFontSize(10)),
                         );
                       },
                     ),
@@ -462,16 +487,16 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: _getResponsiveDimension(16)),
           Row(
             children: [
               Container(width: 12, height: 12, color: Colors.green),
-              const SizedBox(width: 6),
-              const Text('Inscritos', style: TextStyle(color: Colors.white70, fontSize: 12)),
-              const SizedBox(width: 16),
+              SizedBox(width: _getResponsiveDimension(6)),
+              Text('Inscritos', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: _getResponsiveFontSize(12))),
+              SizedBox(width: _getResponsiveDimension(16)),
               Container(width: 12, height: 12, color: Colors.grey),
-              const SizedBox(width: 6),
-              const Text('Disponible', style: TextStyle(color: Colors.white70, fontSize: 12)),
+              SizedBox(width: _getResponsiveDimension(6)),
+              Text('Disponible', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: _getResponsiveFontSize(12))),
             ],
           ),
         ],
@@ -479,7 +504,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     );
   }
 
-  Widget _buildEventStats() {
+  Widget _buildEventStats(bool isDark) {
     final now = DateTime.now();
     final upcomingEvents = _events
         .where((e) => e.initialDate.isAfter(now))
@@ -492,43 +517,46 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         _events.isNotEmpty ? (_events.map((e) => e.maxAttendees).reduce((a, b) => a + b) / _events.length).toStringAsFixed(1) : '0';
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(_getResponsiveDimension(16)),
       decoration: BoxDecoration(
-        color: const Color(0xFF12263F),
+        color: isDark ? const Color(0xFF12263F) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Estadísticas Generales',
             style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
+              color: isDark ? Colors.white : Colors.black87,
+              fontSize: _getResponsiveFontSize(16),
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: _getResponsiveDimension(16)),
           _buildStatRow(
             icon: Icons.trending_up,
             label: 'Eventos Próximos',
             value: upcomingEvents.toString(),
             color: Colors.cyan,
+            isDark: isDark,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: _getResponsiveDimension(12)),
           _buildStatRow(
             icon: Icons.history,
             label: 'Eventos Pasados',
             value: pastEvents.toString(),
             color: Colors.orange,
+            isDark: isDark,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: _getResponsiveDimension(12)),
           _buildStatRow(
             icon: Icons.people,
             label: 'Capacidad Promedio',
             value: avgCapacity,
             color: Colors.purple,
+            isDark: isDark,
           ),
         ],
       ),
@@ -540,29 +568,30 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     required String label,
     required String value,
     required Color color,
+    required bool isDark,
   }) {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: EdgeInsets.all(_getResponsiveDimension(8)),
           decoration: BoxDecoration(
             color: color.withOpacity(0.2),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: color, size: 18),
+          child: Icon(icon, color: color, size: _getResponsiveDimension(18)),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: _getResponsiveDimension(12)),
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(color: Colors.white70, fontSize: 13),
+            style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: _getResponsiveFontSize(13)),
           ),
         ),
         Text(
           value,
           style: TextStyle(
             color: color,
-            fontSize: 14,
+            fontSize: _getResponsiveFontSize(14),
             fontWeight: FontWeight.bold,
           ),
         ),

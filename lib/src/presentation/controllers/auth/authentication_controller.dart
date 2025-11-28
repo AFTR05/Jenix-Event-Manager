@@ -58,8 +58,9 @@ class AuthenticationController {
   /// Clear all session data
   Future<void> _clearSession() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_keyRememberMe);
+    await prefs.setBool(_keyRememberMe, false);
     await prefs.remove(_keyUserData);
+    ref.read(loginProviderProvider.notifier).setState(null);
   }
 
   /// Check if remember me is enabled
@@ -134,7 +135,7 @@ class AuthenticationController {
     required String password,
     required String name,
     required String phone,
-    required String role,
+    required String documentNumber,
     bool rememberMe = true,
   }) async {
     final either = await authenticationUsecase.register(
@@ -142,7 +143,7 @@ class AuthenticationController {
       password: password,
       name: name,
       phone: phone,
-      role: role,
+      documentNumber: documentNumber,
     );
 
     await either.fold((failure) async => null, (user) async {

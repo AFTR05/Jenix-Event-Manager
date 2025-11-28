@@ -16,8 +16,8 @@ class BottomNavBarWidget extends ConsumerWidget {
     
     final icons = [
       Icons.home_rounded,
-      Icons.schedule_rounded,
-      if (isAdmin) Icons.event_rounded,
+      Icons.event_rounded,
+      if (isAdmin) Icons.dashboard_rounded,
       Icons.person_rounded,
     ];
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:jenix_event_manager/src/domain/entities/event_entity.dart';
 import 'package:jenix_event_manager/src/domain/entities/enum/modality_enum.dart';
 import 'package:jenix_event_manager/src/domain/entities/room_entity.dart';
@@ -339,20 +340,27 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
       Navigator.pop(context, true);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text(widget.event == null ? 'Evento creado' : 'Evento actualizado')),
+          content: Text(widget.event == null ? 'Evento creado' : 'Evento actualizado',
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: JenixColorsApp.successColor,
+        ),
       );
     } else {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      final dialogBg = isDark ? JenixColorsApp.backgroundColor : JenixColorsApp.backgroundWhite;
+      final textColor = isDark ? Colors.white : JenixColorsApp.darkColorText;
+
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          backgroundColor: const Color(0xFF1A1A1A),
-          title: const Text('Error', style: TextStyle(color: Colors.white)),
-          content: Text(res.left.toString(), style: const TextStyle(color: Colors.white)),
+          backgroundColor: dialogBg,
+          title: Text('Error', style: TextStyle(color: isDark ? Colors.white : JenixColorsApp.darkColorText, fontWeight: FontWeight.bold)),
+          content: Text(res.left.toString(), style: TextStyle(color: textColor)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cerrar', style: TextStyle(color: Colors.redAccent)),
+              child: Text('Cerrar', style: TextStyle(color: JenixColorsApp.errorColor, fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -361,16 +369,20 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
   }
 
   void _showErrorDialog(String message) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dialogBg = isDark ? JenixColorsApp.backgroundColor : JenixColorsApp.backgroundWhite;
+    final textColor = isDark ? Colors.white : JenixColorsApp.darkColorText;
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text('Error', style: TextStyle(color: Colors.white)),
-        content: Text(message, style: const TextStyle(color: Colors.white)),
+        backgroundColor: dialogBg,
+        title: Text('Error', style: TextStyle(color: isDark ? Colors.white : JenixColorsApp.darkColorText, fontWeight: FontWeight.bold)),
+        content: Text(message, style: TextStyle(color: textColor)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar', style: TextStyle(color: Colors.redAccent)),
+            child: Text('Cerrar', style: TextStyle(color: JenixColorsApp.errorColor, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -379,10 +391,14 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dialogBg = isDark ? JenixColorsApp.surfaceColor.withOpacity(0.95) : JenixColorsApp.backgroundWhite;
+    final titleColor = isDark ? Colors.white : JenixColorsApp.darkColorText;
+
     return ScaleTransition(
       scale: _scaleAnim,
       child: Dialog(
-        backgroundColor: const Color(0xFF12263F).withOpacity(0.95),
+        backgroundColor: dialogBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
         child: Padding(
@@ -396,8 +412,8 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
                 children: [
                   Text(
                     widget.event == null ? "Nuevo Evento" : "Editar Evento",
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+                    style: TextStyle(
+                        color: titleColor, fontWeight: FontWeight.bold, fontSize: 22),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
@@ -464,8 +480,8 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
                       children: [
                         Text(
                           'Seleccionar Fechas',
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : JenixColorsApp.darkColorText,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
@@ -486,12 +502,12 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
                                     builder: (context, child) => Theme(
                                       data: Theme.of(context).copyWith(
                                         colorScheme: const ColorScheme.dark(
-                                          primary: Color(0xFFBE1723),
+                                          primary: JenixColorsApp.accentColor,
                                           onPrimary: Colors.white,
                                           surface: Color(0xFF2C2C2C),
                                           onSurface: Colors.white,
                                         ),
-                                        dialogBackgroundColor: const Color(0xFF1A1A1A),
+                                        dialogBackgroundColor: Color(0xFF1A1A1A),
                                       ),
                                       child: child!,
                                     ),
@@ -522,12 +538,12 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
                                     builder: (context, child) => Theme(
                                       data: Theme.of(context).copyWith(
                                         colorScheme: const ColorScheme.dark(
-                                          primary: Color(0xFFBE1723),
+                                          primary: JenixColorsApp.accentColor,
                                           onPrimary: Colors.white,
                                           surface: Color(0xFF2C2C2C),
                                           onSurface: Colors.white,
                                         ),
-                                        dialogBackgroundColor: const Color(0xFF1A1A1A),
+                                        dialogBackgroundColor: Color(0xFF1A1A1A),
                                       ),
                                       child: child!,
                                     ),
@@ -541,8 +557,8 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
                         // Horas
                         Text(
                           'Seleccionar Horas',
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : JenixColorsApp.darkColorText,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
@@ -563,7 +579,7 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
                                           builder: (context, child) => Theme(
                                             data: Theme.of(context).copyWith(
                                               colorScheme: const ColorScheme.dark(
-                                                primary: Color(0xFFBE1723),
+                                                primary: JenixColorsApp.accentColor,
                                                 onPrimary: Colors.white,
                                                 surface: Color(0xFF2C2C2C),
                                                 onSurface: Colors.white,
@@ -592,7 +608,7 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
                                           builder: (context, child) => Theme(
                                             data: Theme.of(context).copyWith(
                                               colorScheme: const ColorScheme.dark(
-                                                primary: Color(0xFFBE1723),
+                                                primary: JenixColorsApp.accentColor,
                                                 onPrimary: Colors.white,
                                                 surface: Color(0xFF2C2C2C),
                                                 onSurface: Colors.white,
@@ -829,18 +845,18 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
         return Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFD32F2F).withOpacity(0.2),
+            color: JenixColorsApp.errorColor.withOpacity(0.2),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFD32F2F), width: 1),
+            border: Border.all(color: JenixColorsApp.errorColor, width: 1),
           ),
           child: Row(
             children: [
-              const Icon(Icons.event_busy, color: Color(0xFFD32F2F), size: 20),
+              const Icon(Icons.event_busy, color: JenixColorsApp.errorColor, size: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   unavailableReason ?? 'Salón no disponible en ese horario',
-                  style: const TextStyle(color: Color(0xFFD32F2F), fontSize: 12),
+                  style: const TextStyle(color: JenixColorsApp.errorColor, fontSize: 12),
                 ),
               ),
             ],
@@ -854,18 +870,18 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
           return Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFD32F2F).withOpacity(0.2),
+              color: JenixColorsApp.errorColor.withOpacity(0.2),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFD32F2F), width: 1),
+              border: Border.all(color: JenixColorsApp.errorColor, width: 1),
             ),
             child: Row(
               children: [
-                const Icon(Icons.warning_amber_rounded, color: Color(0xFFD32F2F), size: 20),
+                const Icon(Icons.warning_amber_rounded, color: JenixColorsApp.errorColor, size: 20),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Capacidad insuficiente: ${maxAttendees} > ${roomCapacity}',
-                    style: const TextStyle(color: Color(0xFFD32F2F), fontSize: 12),
+                    style: const TextStyle(color: JenixColorsApp.errorColor, fontSize: 12),
                   ),
                 ),
               ],
@@ -875,18 +891,18 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
           return Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFA500).withOpacity(0.2),
+              color: JenixColorsApp.warningColor.withOpacity(0.2),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFFFA500), width: 1),
+              border: Border.all(color: JenixColorsApp.warningColor, width: 1),
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline, color: Color(0xFFFFA500), size: 20),
+                const Icon(Icons.info_outline, color: JenixColorsApp.warningColor, size: 20),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Capacidad exacta: ${roomCapacity} personas',
-                    style: const TextStyle(color: Color(0xFFFFA500), fontSize: 12),
+                    style: const TextStyle(color: JenixColorsApp.warningColor, fontSize: 12),
                   ),
                 ),
               ],
@@ -896,18 +912,18 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
           return Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF4CAF50).withOpacity(0.2),
+              color: JenixColorsApp.successColor.withOpacity(0.2),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFF4CAF50), width: 1),
+              border: Border.all(color: JenixColorsApp.successColor, width: 1),
             ),
             child: Row(
               children: [
-                const Icon(Icons.check_circle_outline, color: Color(0xFF4CAF50), size: 20),
+                const Icon(Icons.check_circle_outline, color: JenixColorsApp.successColor, size: 20),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Disponible - Capacidad: ${maxAttendees}/${roomCapacity}',
-                    style: const TextStyle(color: Color(0xFF4CAF50), fontSize: 12),
+                    style: const TextStyle(color: JenixColorsApp.successColor, fontSize: 12),
                   ),
                 ),
               ],
@@ -921,18 +937,18 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
         return Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFF2196F3).withOpacity(0.2),
+            color: JenixColorsApp.infoColor.withOpacity(0.2),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFF2196F3), width: 1),
+            border: Border.all(color: JenixColorsApp.infoColor, width: 1),
           ),
           child: Row(
             children: [
-              const Icon(Icons.info_outline, color: Color(0xFF2196F3), size: 20),
+              const Icon(Icons.info_outline, color: JenixColorsApp.infoColor, size: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'Sin límite de asistentes. Salón: ${roomCapacity} (resto virtual)',
-                  style: const TextStyle(color: Color(0xFF2196F3), fontSize: 12),
+                  style: const TextStyle(color: JenixColorsApp.infoColor, fontSize: 12),
                 ),
               ),
             ],
@@ -947,12 +963,16 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
   }
 
   Widget _buildInfoCard({required Widget child}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? JenixColorsApp.primaryColor.withOpacity(0.3) : JenixColorsApp.backgroundLightGray;
+    final borderColor = isDark ? Colors.white10 : JenixColorsApp.lightGrayBorder;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0A2647),
+        color: cardBg,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white10, width: 1),
+        border: Border.all(color: borderColor, width: 1),
       ),
       child: child,
     );
@@ -963,21 +983,34 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
     required DateTime? date,
     required VoidCallback? onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? JenixColorsApp.primaryColor.withOpacity(0.3) : JenixColorsApp.backgroundLightGray;
+    final borderColor = onTap == null 
+        ? (isDark ? Colors.white10 : JenixColorsApp.lightGrayBorder)
+        : JenixColorsApp.accentColor.withOpacity(0.4);
+    final iconColor = onTap == null 
+        ? (isDark ? Colors.white30 : JenixColorsApp.lightGray)
+        : JenixColorsApp.accentColor;
+    final labelColor = isDark ? Colors.white70 : JenixColorsApp.subtitleColor;
+    final dateTextColor = onTap == null 
+        ? (isDark ? Colors.white30 : JenixColorsApp.lightGray)
+        : (isDark ? Colors.white : JenixColorsApp.darkColorText);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFF0A2647),
+          color: bgColor,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: onTap == null ? Colors.white10 : const Color(0xFFBE1723).withOpacity(0.4),
+            color: borderColor,
             width: 1.5,
           ),
         ),
         child: Row(
           children: [
-            Icon(Icons.calendar_today, color: onTap == null ? Colors.white30 : const Color(0xFFBE1723), size: 20),
+            Icon(Icons.calendar_today, color: iconColor, size: 20),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -986,7 +1019,7 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
                   Text(
                     label,
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: labelColor,
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
                     ),
@@ -995,7 +1028,7 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
                   Text(
                     date != null ? DateFormat('dd/MM/yyyy').format(date) : 'Seleccionar',
                     style: TextStyle(
-                      color: onTap == null ? Colors.white30 : Colors.white,
+                      color: dateTextColor,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -1014,15 +1047,28 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
     required TimeOfDay? time,
     required VoidCallback? onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? JenixColorsApp.primaryColor.withOpacity(0.3) : JenixColorsApp.backgroundLightGray;
+    final borderColor = onTap == null 
+        ? (isDark ? Colors.white10 : JenixColorsApp.lightGrayBorder)
+        : JenixColorsApp.accentColor.withOpacity(0.4);
+    final iconColor = onTap == null 
+        ? (isDark ? Colors.white30 : JenixColorsApp.lightGray)
+        : JenixColorsApp.accentColor;
+    final labelColor = isDark ? Colors.white70 : JenixColorsApp.subtitleColor;
+    final timeTextColor = onTap == null 
+        ? (isDark ? Colors.white30 : JenixColorsApp.lightGray)
+        : (isDark ? Colors.white : JenixColorsApp.darkColorText);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFF0A2647),
+          color: bgColor,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: onTap == null ? Colors.white10 : const Color(0xFFBE1723).withOpacity(0.4),
+            color: borderColor,
             width: 1.5,
           ),
         ),
@@ -1032,7 +1078,7 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
             Text(
               label,
               style: TextStyle(
-                color: Colors.white70,
+                color: labelColor,
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
               ),
@@ -1041,12 +1087,12 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.access_time, color: onTap == null ? Colors.white30 : const Color(0xFFBE1723), size: 16),
+                Icon(Icons.access_time, color: iconColor, size: 16),
                 const SizedBox(width: 6),
                 Text(
                   time != null ? time.format(context) : '--:--',
                   style: TextStyle(
-                    color: onTap == null ? Colors.white30 : Colors.white,
+                    color: timeTextColor,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1069,32 +1115,40 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
     void Function(String)? onChanged,
     String? Function(String?)? validator,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fillColor = enabled 
+        ? (isDark ? JenixColorsApp.primaryColor.withOpacity(0.3) : JenixColorsApp.backgroundLightGray)
+        : (isDark ? Colors.white10 : JenixColorsApp.lightGrayBorder);
+    final labelColor = enabled ? (isDark ? Colors.white70 : JenixColorsApp.subtitleColor) : JenixColorsApp.lightGray;
+    final inputTextColor = isDark ? Colors.white : JenixColorsApp.darkColorText;
+    const accentColor = JenixColorsApp.accentColor;
+
     return TextFormField(
       controller: controller,
       enabled: enabled,
       keyboardType: keyboard ?? TextInputType.text,
       onChanged: onChanged,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: inputTextColor),
       validator: validator ?? (validatorMsg != null
           ? (v) => v == null || v.isEmpty ? validatorMsg : null
           : null),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: icon != null ? Icon(icon, color: const Color(0xFFBE1723)) : null,
+        labelStyle: TextStyle(color: labelColor),
+        prefixIcon: icon != null ? Icon(icon, color: accentColor) : null,
         filled: true,
-        fillColor: const Color(0xFF0A2647),
+        fillColor: fillColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Colors.white10),
+          borderSide: BorderSide(color: isDark ? Colors.white10 : JenixColorsApp.lightGrayBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFBE1723), width: 1.4),
+          borderSide: const BorderSide(color: accentColor, width: 1.4),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Colors.redAccent),
+          borderSide: const BorderSide(color: JenixColorsApp.errorColor),
         ),
       ),
     );
@@ -1108,25 +1162,32 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
     String Function(T)? displayLabel,
     bool enabled = true,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fillColor = enabled 
+        ? (isDark ? JenixColorsApp.primaryColor.withOpacity(0.3) : JenixColorsApp.backgroundLightGray)
+        : (isDark ? Colors.white10 : JenixColorsApp.lightGrayBorder);
+    final labelColor = enabled ? (isDark ? Colors.white70 : JenixColorsApp.subtitleColor) : JenixColorsApp.lightGray;
+    const accentColor = JenixColorsApp.accentColor;
+
     return DropdownButtonFormField<T>(
       value: value,
       onChanged: enabled ? onChanged : null,
-      style: const TextStyle(color: Colors.white),
-      dropdownColor: const Color(0xFF0A2647),
+      style: TextStyle(color: isDark ? Colors.white : JenixColorsApp.darkColorText),
+      dropdownColor: isDark ? JenixColorsApp.primaryColor.withOpacity(0.5) : JenixColorsApp.backgroundLightGray,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: enabled ? Colors.white70 : Colors.white30),
+        labelStyle: TextStyle(color: labelColor),
         filled: true,
-        fillColor: enabled ? const Color(0xFF0A2647) : const Color(0xFF1A1A1A),
+        fillColor: fillColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(
-            color: enabled ? Colors.white10 : Colors.white10,
+            color: isDark ? Colors.white10 : JenixColorsApp.lightGrayBorder,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFBE1723), width: 1.4),
+          borderSide: const BorderSide(color: accentColor, width: 1.4),
         ),
       ),
       items: items
@@ -1134,7 +1195,7 @@ class _EventFormDialogState extends ConsumerState<EventFormDialog> with SingleTi
                 value: e,
                 child: Text(
                   displayLabel != null ? displayLabel(e) : e.toString(),
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: isDark ? Colors.white : JenixColorsApp.darkColorText),
                 ),
               ))
           .toList(),

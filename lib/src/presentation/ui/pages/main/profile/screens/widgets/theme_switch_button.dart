@@ -14,6 +14,33 @@ class ThemeSwitchButton extends ConsumerWidget {
   /// Constructor del widget.
   const ThemeSwitchButton({super.key});
 
+  /// Calcula el tamaño responsivo de fuente
+  double _getResponsiveFontSize(BuildContext context, double baseFontSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.85;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.1;
+    return baseFontSize * 1.2;
+  }
+
+  /// Calcula el tamaño responsivo del icono
+  double _getResponsiveIconSize(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return 18;
+    if (screenWidth < 600) return 22;
+    if (screenWidth < 900) return 24;
+    return 26;
+  }
+
+  /// Calcula el tamaño responsivo del contenedor del icono
+  double _getResponsiveContainerSize(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return 32;
+    if (screenWidth < 600) return 40;
+    if (screenWidth < 900) return 44;
+    return 48;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Detecta si el tema actual es oscuro.
@@ -38,6 +65,11 @@ class ThemeSwitchButton extends ConsumerWidget {
     final themeIcon = isDarkmode 
         ? PhosphorIconsBold.moon 
         : PhosphorIconsBold.sun;
+
+    // Tamaños responsivos
+    final titleFontSize = _getResponsiveFontSize(context, 16);
+    final iconSize = _getResponsiveIconSize(context);
+    final containerSize = _getResponsiveContainerSize(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -64,8 +96,8 @@ class ThemeSwitchButton extends ConsumerWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           leading: Container(
-            width: 40,
-            height: 40,
+            width: containerSize,
+            height: containerSize,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: iconColor.withOpacity(0.12),
@@ -73,7 +105,7 @@ class ThemeSwitchButton extends ConsumerWidget {
             child: Icon(
               themeIcon, 
               color: iconColor, 
-              size: 22,
+              size: iconSize,
             ),
           ),
           title: Text(
@@ -81,7 +113,7 @@ class ThemeSwitchButton extends ConsumerWidget {
             style: TextStyle(
               fontFamily: 'OpenSansHebrew',
               fontWeight: FontWeight.w500,
-              fontSize: 16,
+              fontSize: titleFontSize,
               color: textColor,
               letterSpacing: -0.2,
             ),

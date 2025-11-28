@@ -13,7 +13,7 @@ abstract class AuthenticationRepository {
     required String password,
     required String name,
     required String phone,
-    required String role,
+    required String documentNumber,
   });
 
   Future<Either<Failure, bool>> logOut({

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 
@@ -16,6 +17,24 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _phoneController;
   late TextEditingController _documentNumberController;
   bool _submitting = false;
+
+  /// Calcula el tamaño responsivo de fuente
+  double _getResponsiveFontSize(double baseFontSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.9;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.15;
+    return baseFontSize * 1.3;
+  }
+
+  /// Calcula el padding responsivo
+  double _getResponsivePadding(double basePadding) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return basePadding * 0.9;
+    if (screenWidth < 600) return basePadding;
+    if (screenWidth < 900) return basePadding * 1.15;
+    return basePadding * 1.3;
+  }
 
   @override
   void initState() {
@@ -35,24 +54,46 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   InputDecoration _inputDecoration(String label) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final labelFontSize = _getResponsiveFontSize(14);
+    final verticalPadding = _getResponsivePadding(18);
+    final horizontalPadding = _getResponsivePadding(18);
+    
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: Color(0xFF9DA9B9), fontSize: 12),
+      labelStyle: TextStyle(
+        color: isDark ? JenixColorsApp.lightGray : JenixColorsApp.subtitleColor,
+        fontSize: labelFontSize,
+        fontWeight: FontWeight.w600,
+      ),
       filled: true,
-      fillColor: const Color(0xFF0A2647),
+      fillColor: isDark ? JenixColorsApp.surfaceColor : JenixColorsApp.backgroundWhite,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF2E5090), width: 1),
+        borderSide: BorderSide(
+          color: isDark ? JenixColorsApp.primaryColor : JenixColorsApp.inputBorder,
+          width: 1.5,
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF2E5090), width: 1),
+        borderSide: BorderSide(
+          color: isDark ? JenixColorsApp.primaryColor : JenixColorsApp.inputBorder,
+          width: 1.5,
+        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFBE1723), width: 2),
+        borderSide: BorderSide(
+          color: JenixColorsApp.accentColor,
+          width: 2.5,
+        ),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: verticalPadding,
+      ),
+      isDense: false,
     );
   }
 
@@ -78,18 +119,18 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       if (mounted) {
         if (res.isRight) {
           print('✅ Perfil actualizado: ${res.right.email}');
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Perfil actualizado exitosamente'),
-            backgroundColor: Color(0xFF2E7D32),
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text('Perfil actualizado exitosamente'),
+            backgroundColor: JenixColorsApp.successColor,
             behavior: SnackBarBehavior.floating,
           ));
           Navigator.pop(context, true);
         } else {
           print('❌ Error al actualizar perfil: ${res.left}');
           setState(() => _submitting = false);
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Error al actualizar perfil'),
-            backgroundColor: Color(0xFFBE1723),
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text('Error al actualizar perfil'),
+            backgroundColor: JenixColorsApp.errorColor,
             behavior: SnackBarBehavior.floating,
           ));
         }
@@ -100,7 +141,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         setState(() => _submitting = false);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Error inesperado: $e'),
-          backgroundColor: const Color(0xFFBE1723),
+          backgroundColor: JenixColorsApp.errorColor,
           behavior: SnackBarBehavior.floating,
         ));
       }
@@ -109,26 +150,47 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Tamaños responsivos - Base aumentada para mejor legibilidad
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? JenixColorsApp.backgroundColor : JenixColorsApp.backgroundWhite;
+    final appBarBg = isDark ? JenixColorsApp.primaryColor : JenixColorsApp.primaryBlue;
+    final gradientStart = isDark ? JenixColorsApp.primaryColor : JenixColorsApp.infoLight;
+    final gradientEnd = isDark ? JenixColorsApp.surfaceColor : JenixColorsApp.infoLight;
+    
+    final appBarTitleFontSize = _getResponsiveFontSize(22);
+    final inputTextFontSize = _getResponsiveFontSize(18);
+    final buttonTextFontSize = _getResponsiveFontSize(18);
+    final spacingBetweenFields = _getResponsivePadding(24);
+    final paddingForm = _getResponsivePadding(28);
+    final spacingButton = _getResponsivePadding(40);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0C1C2C),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A2647),
-        title: const Text('Editar Perfil'),
+        backgroundColor: appBarBg,
+        title: Text(
+          'Editar Perfil',
+          style: TextStyle(
+            fontSize: appBarTitleFontSize,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         elevation: 0,
       ),
       body: Stack(
         children: [
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF0A2647), Color(0xFF09131E)],
+                colors: [gradientStart, gradientEnd],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
             ),
           ),
           SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(paddingForm),
             child: Form(
               key: _formKey,
               child: Column(
@@ -136,38 +198,38 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   TextFormField(
                     controller: _nameController,
                     enabled: !_submitting,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: inputTextFontSize),
                     decoration: _inputDecoration("Nombre completo"),
                     validator: (v) => v == null || v.isEmpty ? 'Ingrese el nombre' : null,
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: spacingBetweenFields),
                   TextFormField(
                     controller: _phoneController,
                     enabled: !_submitting,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: inputTextFontSize),
                     decoration: _inputDecoration("Teléfono"),
                     validator: (v) => v == null || v.isEmpty ? 'Ingrese el teléfono' : null,
                     keyboardType: TextInputType.phone,
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: spacingBetweenFields),
                   TextFormField(
                     controller: _documentNumberController,
                     enabled: !_submitting,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: inputTextFontSize),
                     decoration: _inputDecoration("Número de documento"),
                     validator: (v) => v == null || v.isEmpty ? 'Ingrese el número de documento' : null,
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: spacingButton),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _submitting ? null : _submit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _submitting ? Colors.grey : const Color(0xFFBE1723),
+                        backgroundColor: _submitting ? Colors.grey : JenixColorsApp.accentColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding: EdgeInsets.symmetric(vertical: spacingButton * 0.4),
                       ),
                       child: _submitting
                           ? const SizedBox(
@@ -178,11 +240,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             )
-                          : const Text(
+                          : Text(
                               'Guardar cambios',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 16,
+                                fontSize: buttonTextFontSize,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
