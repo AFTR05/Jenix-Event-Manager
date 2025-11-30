@@ -1,6 +1,5 @@
 import 'package:either_dart/either.dart';
 import 'package:jenix_event_manager/src/core/exceptions/failure.dart';
-import 'package:jenix_event_manager/src/domain/entities/enum/organization_area_enum.dart';
 import 'package:jenix_event_manager/src/domain/entities/user_entity.dart';
 import 'package:jenix_event_manager/src/domain/repository/authentication_repository.dart';
 
@@ -21,16 +20,14 @@ class AuthenticationUsecase {
     required String password,
     required String name,
     required String phone,
-    required String documentNumber,
-    required OrganizationAreaEnum organizationArea,
+    required String documentNumber
   }) {
     return authenticationRepository.signUp(
       email: email,
       password: password,
       name: name,
       phone: phone,
-      documentNumber: documentNumber,
-      organizationArea: organizationArea
+      documentNumber: documentNumber
     );
   }
 

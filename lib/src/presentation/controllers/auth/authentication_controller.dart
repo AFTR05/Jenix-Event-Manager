@@ -136,8 +136,7 @@ class AuthenticationController {
     required String password,
     required String name,
     required String phone,
-    required String documentNumber,
-    required OrganizationAreaEnum organizationArea, 
+    required String documentNumber, 
     bool rememberMe = true,
   }) async {
     final either = await authenticationUsecase.register(
@@ -145,8 +144,7 @@ class AuthenticationController {
       password: password,
       name: name,
       phone: phone,
-      documentNumber: documentNumber,
-      organizationArea: organizationArea,
+      documentNumber: documentNumber
     );
 
     await either.fold((failure) async => null, (user) async {

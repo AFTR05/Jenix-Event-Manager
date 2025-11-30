@@ -14,8 +14,7 @@ abstract class AuthenticationRepository {
     required String password,
     required String name,
     required String phone,
-    required String documentNumber,
-    required OrganizationAreaEnum organizationArea,
+    required String documentNumber
   });
 
   Future<Either<Failure, bool>> logOut({

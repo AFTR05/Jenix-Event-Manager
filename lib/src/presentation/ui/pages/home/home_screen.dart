@@ -68,9 +68,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ],
             ),
             actions: [
-              _HeaderButton(label: "Inicio", onTap: () {}),
-              _HeaderButton(label: "Eventos", onTap: () {}),
-              _HeaderButton(label: "Nosotros", onTap: () {}),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: ElevatedButton(
@@ -133,27 +130,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              ElevatedButton(
-                                onPressed: () =>
-                                    Navigator.pushNamed(context, '/about'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: accentRed,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 22,
-                                    vertical: 12,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: Text(
-                                  'Conoce más',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 15,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
+                              //ElevatedButton(
+                              //  onPressed: () =>
+                              //      Navigator.pushNamed(context, '/about'),
+                              //  style: ElevatedButton.styleFrom(
+                              //    backgroundColor: accentRed,
+                              //    padding: const EdgeInsets.symmetric(
+                              //      horizontal: 22,
+                              //      vertical: 12,
+                              //    ),
+                              //    shape: RoundedRectangleBorder(
+                              //      borderRadius: BorderRadius.circular(10),
+                              //    ),
+                              //  ),
+                              //  child: Text(
+                              //    'Conoce más',
+                              //    style: GoogleFonts.poppins(
+                              //      fontSize: 15,
+                              //      color: Colors.white,
+                              //    ),
+                              //  ),
+                              //),
                               const SizedBox(width: 12),
                               OutlinedButton(
                                 onPressed: () {},

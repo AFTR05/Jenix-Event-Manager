@@ -9,6 +9,7 @@ import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/buttons/custom_button_widget.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/form/custom_form_element.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/inputs/custom_auth_text_field_widget.dart';
+import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/modals/html_modal_widget.dart';
 import 'package:jenix_event_manager/src/routes_app.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:jenix_event_manager/translations/locale_keys.g.dart';
@@ -32,8 +33,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool disableValidationInPhone = true;
   String _phoneCode = "+57";
   bool _loading = false;
-  OrganizationAreaEnum? _selectedOrganizationArea = OrganizationAreaEnum.allFaculties;
-
   String? _nameError;
   String? _institutionalEmailError;
   String? _nitError;
@@ -178,9 +177,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       _buildPhoneField(),
 
                       const SizedBox(height: 14),
-                      _buildOrganizationAreaField(),
-
-                      const SizedBox(height: 14),
                       CustomFormElement(
                         labelTitle: LocaleKeys.authRegisterPasswordHint.tr(),
                         isRequired: true,
@@ -322,53 +318,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
-  Widget _buildOrganizationAreaField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Facultad',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontFamily: 'OpenSansHebrew',
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A2B44),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white24),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: DropdownButton<OrganizationAreaEnum>(
-            value: _selectedOrganizationArea,
-            isExpanded: true,
-            underline: const SizedBox(),
-            hint: const Text(
-              'Selecciona tu facultad',
-              style: TextStyle(color: Colors.white54),
-            ),
-            dropdownColor: const Color(0xFF1A2B44),
-            items: OrganizationAreaEnum.values.map((area) {
-              return DropdownMenuItem(
-                value: area,
-                child: Text(
-                  area.displayName,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() => _selectedOrganizationArea = value);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildTermsCheckbox() {
     return Row(
       children: [
@@ -472,7 +421,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         name: _nameController.text.trim(),
         phone: fullPhone,
         documentNumber: _nitController.text.trim(),
-        organizationArea: _selectedOrganizationArea ?? OrganizationAreaEnum.allFaculties,
         rememberMe: true,
       );      if (!mounted) return;
       setState(() => _loading = false);
@@ -495,11 +443,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   void _handleTermsTap() {
-    _showSnackBar(LocaleKeys.registerOpeningTerms.tr());
+    HtmlModalWidget.show(
+      context: context,
+      assetPath: 'assets/terminos y condiciones jenix.html',
+      title: LocaleKeys.authRegisterTerms.tr(),
+    );
   }
 
   void _handlePrivacyTap() {
-    _showSnackBar(LocaleKeys.registerOpeningPrivacy.tr());
+    HtmlModalWidget.show(
+      context: context,
+      assetPath: 'assets/terminos y condiciones jenix.html',
+      title: LocaleKeys.authRegisterPrivacyPolicy.tr(),
+    );
   }
 
   void _showSnackBar(String message, {Color color = Colors.green}) {
