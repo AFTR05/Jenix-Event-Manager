@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:either_dart/either.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/organization_area_enum.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jenix_event_manager/src/core/exceptions/failure.dart';
 import 'package:jenix_event_manager/src/domain/entities/user_entity.dart';
@@ -58,8 +59,9 @@ class AuthenticationController {
   /// Clear all session data
   Future<void> _clearSession() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_keyRememberMe);
+    await prefs.setBool(_keyRememberMe, false);
     await prefs.remove(_keyUserData);
+    ref.read(loginProviderProvider.notifier).setState(null);
   }
 
   /// Check if remember me is enabled
@@ -134,7 +136,7 @@ class AuthenticationController {
     required String password,
     required String name,
     required String phone,
-    required String role,
+    required String documentNumber, 
     bool rememberMe = true,
   }) async {
     final either = await authenticationUsecase.register(
@@ -142,7 +144,7 @@ class AuthenticationController {
       password: password,
       name: name,
       phone: phone,
-      role: role,
+      documentNumber: documentNumber
     );
 
     await either.fold((failure) async => null, (user) async {

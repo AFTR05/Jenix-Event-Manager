@@ -12,6 +12,33 @@ class ProfileHeader extends ConsumerWidget {
 
   const ProfileHeader({super.key, this.textColor});
 
+  /// Calcula el tamaño responsivo de fuente
+  double _getResponsiveFontSize(BuildContext context, double baseFontSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.85;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.1;
+    return baseFontSize * 1.2;
+  }
+
+  /// Calcula el radio responsivo del avatar
+  double _getResponsiveAvatarRadius(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return 40;
+    if (screenWidth < 600) return 56;
+    if (screenWidth < 900) return 64;
+    return 72;
+  }
+
+  /// Calcula el tamaño responsivo del icono del avatar
+  double _getResponsiveIconSize(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return 40;
+    if (screenWidth < 600) return 56;
+    if (screenWidth < 900) return 64;
+    return 72;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -25,6 +52,13 @@ class ProfileHeader extends ConsumerWidget {
     // Color de texto (usa el proporcionado o el del tema)
     final effectiveTextColor = textColor ?? 
         (isDark ? JenixColorsApp.backgroundWhite : JenixColorsApp.darkColorText);
+
+    // Tamaños responsivos
+    final avatarRadius = _getResponsiveAvatarRadius(context);
+    final iconSize = _getResponsiveIconSize(context);
+    final nameFontSize = _getResponsiveFontSize(context, 22);
+    final emailFontSize = _getResponsiveFontSize(context, 14);
+    final roleFontSize = _getResponsiveFontSize(context, 11);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -59,10 +93,10 @@ class ProfileHeader extends ConsumerWidget {
               ],
             ),
             child: CircleAvatar(
-              radius: 56,
+              radius: avatarRadius + 4,
               backgroundColor: Colors.transparent,
               child: CircleAvatar(
-                radius: 52,
+                radius: avatarRadius,
                 backgroundColor: isDark 
                     ? JenixColorsApp.darkBackground 
                     : JenixColorsApp.backgroundWhite,
@@ -71,7 +105,7 @@ class ProfileHeader extends ConsumerWidget {
                   color: isDark 
                       ? JenixColorsApp.primaryBlueLight 
                       : JenixColorsApp.primaryBlue,
-                  size: 56,
+                  size: iconSize,
                 ),
               ),
             ),
@@ -85,7 +119,7 @@ class ProfileHeader extends ConsumerWidget {
             style: TextStyle(
               fontFamily: 'OpenSansHebrew',
               fontWeight: FontWeight.w700,
-              fontSize: 22,
+              fontSize: nameFontSize,
               color: effectiveTextColor,
               letterSpacing: -0.5,
             ),
@@ -101,7 +135,7 @@ class ProfileHeader extends ConsumerWidget {
               style: TextStyle(
                 fontFamily: 'OpenSansHebrew',
                 fontWeight: FontWeight.w400,
-                fontSize: 14,
+                fontSize: emailFontSize,
                 color: effectiveTextColor.withOpacity(0.7),
                 letterSpacing: 0.2,
               ),
@@ -131,7 +165,7 @@ class ProfileHeader extends ConsumerWidget {
                 style: TextStyle(
                   fontFamily: 'OpenSansHebrew',
                   fontWeight: FontWeight.w600,
-                  fontSize: 11,
+                  fontSize: roleFontSize,
                   color: isDark 
                       ? JenixColorsApp.primaryBlueLight 
                       : JenixColorsApp.primaryBlue,

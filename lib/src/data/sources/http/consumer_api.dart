@@ -64,7 +64,7 @@ class ConsumerAPI {
   static Future<Either<Failure, String>> getData({
     required String url,
     Map<String, String>? headers,
-    bool validateNetwork = true,
+    bool validateNetwork = false,
     Duration timeout = timeoutDurationDefault,
   }) async {
     try {
@@ -103,7 +103,7 @@ class ConsumerAPI {
     Object? params,
     Map<String, String>? headers,
     Encoding? encoding,
-    bool validateNetwork = true,
+    bool validateNetwork = false,
     Duration timeout = timeoutDurationDefault,
   }) async {
     try {
@@ -175,7 +175,7 @@ class ConsumerAPI {
     required Map<String, dynamic> formData,
     HTTPMethod method = HTTPMethod.post,
     Map<String, String>? headers,
-    bool validateNetwork = true,
+    bool validateNetwork = false,
     Duration? timeout,
   }) async {
     try {
@@ -225,7 +225,7 @@ class ConsumerAPI {
     dynamic jsonObject,
     Map<String, String>? headers,
     bool isJSONRequestBody = true,
-    bool validateNetwork = true,
+    bool validateNetwork = false,
     Duration? timeout,
   }) async {
     try {
@@ -280,7 +280,7 @@ class ConsumerAPI {
     HTTPMethod method = HTTPMethod.post,
     required Map<String, String> params,
     Map<String, String>? headers,
-    bool validateNetwork = true,
+    bool validateNetwork = false,
     Duration? timeout,
   }) async {
     if (validateNetwork) {

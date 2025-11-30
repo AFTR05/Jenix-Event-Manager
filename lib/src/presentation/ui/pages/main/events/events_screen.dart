@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jenix_event_manager/src/core/helpers/jenix_colors_app.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/organization_area_enum.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/events/utils/events_utils.dart';
@@ -21,6 +22,25 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
   bool _isLoading = false;
   bool _hasError = false;
   String _errorMessage = '';
+  OrganizationAreaEnum? _selectedFilter = OrganizationAreaEnum.allFaculties;
+
+  /// Calcula el tamaño responsivo de fuente
+  double _getResponsiveFontSize(double baseFontSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.9;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.15;
+    return baseFontSize * 1.3;
+  }
+
+  /// Calcula el padding/tamaño responsivo
+  double _getResponsiveDimension(double baseDimension) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseDimension * 0.9;
+    if (screenWidth < 600) return baseDimension;
+    if (screenWidth < 900) return baseDimension * 1.15;
+    return baseDimension * 1.3;
+  }
 
   @override
   void initState() {
@@ -72,11 +92,27 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
     }
   }
 
+  /// Filtra eventos por facultad seleccionada
+  List<dynamic> _getFilteredEvents(List<dynamic> events) {
+    if (_selectedFilter == null || _selectedFilter == OrganizationAreaEnum.allFaculties) {
+      return events;
+    }
+    return events.where((event) {
+      return event.organizationArea == _selectedFilter!.displayName;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final eventController = ref.read(eventControllerProvider);
     final size = MediaQuery.of(context).size;
+    final errorIconSize = _getResponsiveDimension(64);
+    final errorTitleFontSize = _getResponsiveFontSize(20);
+    final errorMessageFontSize = _getResponsiveFontSize(14);
+    final errorPadding = _getResponsiveDimension(24);
+    final errorButtonPadding = _getResponsiveDimension(32);
+    final loadingTextFontSize = _getResponsiveFontSize(14);
 
     return Scaffold(
       backgroundColor: isDark ? JenixColorsApp.backgroundDark : JenixColorsApp.backgroundWhite,
@@ -94,40 +130,42 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                 SliverFillRemaining(
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      padding: EdgeInsets.symmetric(horizontal: errorPadding),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
                             Icons.error_outline,
-                            size: 64,
-                            color: Colors.red.withOpacity(0.7),
+                            size: errorIconSize,
+                            color: isDark ? Color(0xFFFF6B6B) : const Color(0xFFFF5252),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: _getResponsiveDimension(16)),
                           Text(
                             'Error al cargar',
                             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              color: isDark ? Colors.white : Colors.black,
+                              color: isDark ? Colors.white : Colors.black87,
                               fontWeight: FontWeight.bold,
+                              fontSize: errorTitleFontSize,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: _getResponsiveDimension(8)),
                           Text(
                             _errorMessage,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: isDark ? Colors.white70 : Colors.black54,
-                              fontSize: 14,
+                              color: isDark ? Colors.white : Colors.black54,
+                              fontSize: errorMessageFontSize,
                             ),
                           ),
-                          const SizedBox(height: 24),
+                          SizedBox(height: _getResponsiveDimension(24)),
                           ElevatedButton.icon(
                             onPressed: _loadEvents,
                             icon: const Icon(Icons.refresh),
                             label: const Text('Reintentar'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: JenixColorsApp.primaryBlue,
-                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(horizontal: errorButtonPadding, vertical: _getResponsiveDimension(12)),
                             ),
                           ),
                         ],
@@ -154,16 +192,17 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                       children: [
                         CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            JenixColorsApp.primaryBlue,
+                            isDark ? Colors.white : JenixColorsApp.primaryBlue,
                           ),
                           strokeWidth: 3,
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: _getResponsiveDimension(16)),
                         Text(
                           'Cargando eventos...',
                           style: TextStyle(
-                            color: isDark ? Colors.white70 : Colors.black54,
-                            fontSize: 14,
+                            color: isDark ? Colors.white : Colors.black54,
+                            fontSize: loadingTextFontSize,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
@@ -175,6 +214,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
           }
           final streamData = snapshot.data ?? eventController.cache;
           final events = EventsUtils.getActiveEvents(streamData);
+          final filteredEvents = _getFilteredEvents(events);
 
           return RefreshIndicator(
             onRefresh: _loadEvents,
@@ -183,29 +223,146 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
               slivers: [
                 // Header elegante
                 EventsHeaderWidget(
-                  eventCount: events.length,
+                  eventCount: filteredEvents.length,
                   isDark: isDark,
                 ),
 
+                // Filtro por facultad - Dropdown elegante
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: size.width > 600 ? size.width * 0.1 : _getResponsiveDimension(12),
+                      vertical: _getResponsiveDimension(12),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            JenixColorsApp.primaryBlue.withOpacity(0.08),
+                            JenixColorsApp.primaryBlueLight.withOpacity(0.05),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: JenixColorsApp.primaryBlue.withOpacity(0.2),
+                          width: 1.5,
+                        ),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: _getResponsiveDimension(12),
+                        vertical: _getResponsiveDimension(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.filter_list_rounded,
+                            color: JenixColorsApp.primaryBlue,
+                            size: _getResponsiveFontSize(20),
+                          ),
+                          SizedBox(width: _getResponsiveDimension(12)),
+                          Expanded(
+                            child: DropdownButton<OrganizationAreaEnum>(
+                              value: _selectedFilter,
+                              isExpanded: true,
+                              underline: const SizedBox(),
+                              style: TextStyle(
+                                fontSize: _getResponsiveFontSize(14),
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white : Colors.black87,
+                              ),
+                              dropdownColor: isDark 
+                                  ? JenixColorsApp.backgroundColor 
+                                  : Colors.white,
+                              items: [
+                                DropdownMenuItem(
+                                  value: OrganizationAreaEnum.allFaculties,
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.public_rounded,
+                                        color: JenixColorsApp.primaryBlue,
+                                        size: _getResponsiveFontSize(18),
+                                      ),
+                                      SizedBox(width: _getResponsiveDimension(8)),
+                                      Text('Todas las facultades'),
+                                    ],
+                                  ),
+                                ),
+                                ...OrganizationAreaEnum.values
+                                    .where((area) =>
+                                        area != OrganizationAreaEnum.allFaculties)
+                                    .map((area) {
+                                  return DropdownMenuItem(
+                                    value: area,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.school_rounded,
+                                          color: JenixColorsApp.primaryBlueLight,
+                                          size: _getResponsiveFontSize(18),
+                                        ),
+                                        SizedBox(width: _getResponsiveDimension(8)),
+                                        Expanded(
+                                          child: Text(
+                                            area.displayName.split('Facultad de ').length > 1
+                                                ? area.displayName.split('Facultad de ')[1]
+                                                : area.displayName,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              ],
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() => _selectedFilter = value);
+                                }
+                              },
+                            ),
+                          ),
+                          if (_selectedFilter != OrganizationAreaEnum.allFaculties)
+                            GestureDetector(
+                              onTap: () {
+                                setState(() => _selectedFilter = OrganizationAreaEnum.allFaculties);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(_getResponsiveDimension(4)),
+                                child: Icon(
+                                  Icons.close_rounded,
+                                  color: JenixColorsApp.primaryBlue,
+                                  size: _getResponsiveFontSize(18),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
                 // Lista de eventos o estado vacío
-                if (events.isEmpty)
+                if (filteredEvents.isEmpty)
                   SliverToBoxAdapter(
                     child: EventsEmptyState(isDark: isDark),
                   )
                 else
                   SliverPadding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: size.width > 600 ? size.width * 0.1 : 12,
-                      vertical: 12,
+                      horizontal: size.width > 600 ? size.width * 0.1 : _getResponsiveDimension(12),
+                      vertical: _getResponsiveDimension(12),
                     ),
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          final event = events[index];
-                          final nextEvent = index < events.length - 1 ? events[index + 1] : null;
+                          final event = filteredEvents[index];
+                          final nextEvent = index < filteredEvents.length - 1 ? filteredEvents[index + 1] : null;
                           final showDateSeparator =
                               EventsUtils.isDatesSeparator(event, nextEvent) &&
-                                  index < events.length - 1;
+                                  index < filteredEvents.length - 1;
 
                           return Column(
                             children: [
@@ -216,16 +373,16 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                               ),
                               if (showDateSeparator)
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  padding: EdgeInsets.symmetric(vertical: _getResponsiveDimension(16)),
                                   child: Divider(
-                                    color: JenixColorsApp.primaryBlue.withOpacity(0.2),
-                                    thickness: 1,
+                                    color: JenixColorsApp.primaryBlue.withOpacity(0.35),
+                                    thickness: 1.5,
                                   ),
                                 ),
                             ],
                           );
                         },
-                        childCount: events.length,
+                        childCount: filteredEvents.length,
                       ),
                     ),
                   ),

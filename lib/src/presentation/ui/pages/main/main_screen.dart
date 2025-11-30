@@ -5,7 +5,6 @@ import 'package:jenix_event_manager/src/domain/entities/enum/role_enum.dart';
 import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 import 'package:jenix_event_manager/src/presentation/providers_ui/bottom_nav_bar_state.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/events/events_screen.dart';
-import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/my_events/event_list_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/management/management_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/schedule/screens/schedule_screen.dart';
 import 'package:jenix_event_manager/src/presentation/ui/pages/main/profile/screens/profile_screen.dart';
@@ -35,7 +34,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     final validIndex = currentIndex < screens.length ? currentIndex : 0;
 
     return Scaffold(
-      backgroundColor: JenixColorsApp.backgroundColor,
+      backgroundColor: JenixColorsApp.surfaceColor,
       appBar: _buildAppBar(),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),

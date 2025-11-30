@@ -21,6 +21,7 @@ class EventRepositoryImpl implements EventRepository {
     required DateTime? initialDate,
     required DateTime? finalDate,
     required String token,
+    required String responsiblePersonId,
   }) async {
 
     final body = {
@@ -29,6 +30,7 @@ class EventRepositoryImpl implements EventRepository {
       'endHour': endHour,
       'roomId': roomId,
       'organizationArea': organizationArea,
+      'responsiblePersonId': responsiblePersonId,
       'description': description,
       'state': state,
       'modality': modality,

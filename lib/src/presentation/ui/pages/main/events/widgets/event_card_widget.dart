@@ -19,19 +19,35 @@ class EventCardWidget extends ConsumerWidget {
     super.key,
   });
 
+  double _getResponsiveFontSize(double baseFontSize, BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.9;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.15;
+    return baseFontSize * 1.3;
+  }
+
+  double _getResponsiveDimension(double baseDimension, BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseDimension * 0.9;
+    if (screenWidth < 600) return baseDimension;
+    if (screenWidth < 900) return baseDimension * 1.15;
+    return baseDimension * 1.3;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
-      elevation: 2,
+      elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: JenixColorsApp.primaryBlue.withOpacity(0.2),
-          width: 1.5,
+          color: JenixColorsApp.primaryBlue.withOpacity(0.35),
+          width: 2,
         ),
       ),
       color: isDark ? JenixColorsApp.backgroundDark : Colors.white,
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: _getResponsiveDimension(12, context)),
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -56,18 +72,18 @@ class EventCardWidget extends ConsumerWidget {
                       topLeft: Radius.circular(16),
                       topRight: Radius.circular(16),
                     ),
-                    child: _buildEventImage(event.urlImage!),
+                    child: _buildEventImage(event.urlImage!, context),
                   ),
                   // Badge con fecha
-                  _buildDateBadge(),
+                  _buildDateBadge(context),
                 ],
               )
             else
-              _buildImagePlaceholder(),
+              _buildImagePlaceholder(context),
 
             // Contenido
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(_getResponsiveDimension(16, context)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -77,13 +93,13 @@ class EventCardWidget extends ConsumerWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: _getResponsiveFontSize(18, context),
                       fontWeight: FontWeight.w900,
                       color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: _getResponsiveDimension(12, context)),
 
                   // Información en fila
                   Row(
@@ -93,20 +109,22 @@ class EventCardWidget extends ConsumerWidget {
                           icon: Icons.access_time_outlined,
                           label: event.beginHour ?? 'Por definir',
                           isDark: isDark,
+                          context: context,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: _getResponsiveDimension(8, context)),
                       Expanded(
                         child: InfoChip(
                           icon: Icons.location_on_outlined,
-                          label: event.room.type,
+                          label: event.room?.type ?? (event.modality.name == 'virtual' ? 'Virtual' : 'Por definir'),
                           isDark: isDark,
+                          context: context,
                         ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: _getResponsiveDimension(12, context)),
 
                   // Descripción
                   if (event.description.isNotEmpty)
@@ -115,14 +133,14 @@ class EventCardWidget extends ConsumerWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: _getResponsiveFontSize(13, context),
                         fontWeight: FontWeight.w500,
                         color: isDark ? Colors.white70 : Colors.black54,
                         height: 1.5,
                       ),
                     ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: _getResponsiveDimension(12, context)),
 
                   // Información adicional
                   Row(
@@ -133,6 +151,7 @@ class EventCardWidget extends ConsumerWidget {
                           icon: Icons.group_outlined,
                           text: '${event.maxAttendees} lugares',
                           isDark: isDark,
+                          context: context,
                         ),
                       ),
                       Flexible(
@@ -140,33 +159,34 @@ class EventCardWidget extends ConsumerWidget {
                           icon: Icons.videocam_outlined,
                           text: event.modality.label,
                           isDark: isDark,
+                          context: context,
                         ),
                       ),
                       // Botón de ver detalles
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: _getResponsiveDimension(12, context),
+                          vertical: _getResponsiveDimension(8, context),
                         ),
                         decoration: BoxDecoration(
                           color: JenixColorsApp.primaryBlue,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(_getResponsiveDimension(8, context)),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               'Ver',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: _getResponsiveFontSize(12, context),
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
                               ),
                             ),
-                            SizedBox(width: 4),
+                            SizedBox(width: _getResponsiveDimension(4, context)),
                             Icon(
                               Icons.arrow_forward,
-                              size: 12,
+                              size: _getResponsiveDimension(12, context),
                               color: Colors.white,
                             ),
                           ],
@@ -183,32 +203,36 @@ class EventCardWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildImagePlaceholder() {
+  Widget _buildImagePlaceholder(BuildContext context) {
+    final imageHeight = _getResponsiveDimension(200, context);
+    final iconSize = _getResponsiveDimension(80, context);
+
     return Container(
-      height: 200,
+      height: imageHeight,
       decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(_getResponsiveDimension(16, context)),
+          topRight: Radius.circular(_getResponsiveDimension(16, context)),
         ),
         gradient: LinearGradient(
           colors: [
-            JenixColorsApp.primaryBlue.withOpacity(0.2),
-            JenixColorsApp.primaryBlue.withOpacity(0.05),
+            JenixColorsApp.primaryBlue.withOpacity(0.25),
+            JenixColorsApp.primaryBlue.withOpacity(0.12),
           ],
         ),
       ),
       child: Center(
         child: Icon(
           Icons.event_note_outlined,
-          size: 80,
-          color: JenixColorsApp.primaryBlue.withOpacity(0.4),
+          size: iconSize,
+          color: JenixColorsApp.primaryBlue.withOpacity(0.65),
         ),
       ),
     );
   }
 
-  Widget _buildEventImage(String imageUrl) {
+  Widget _buildEventImage(String imageUrl, BuildContext context) {
+    final imageHeight = _getResponsiveDimension(200, context);
     final imageProvider = NetworkImage(imageUrl);
 
     // Precache la imagen y captura errores silenciosamente
@@ -224,32 +248,40 @@ class EventCardWidget extends ConsumerWidget {
         );
 
     return SizedBox(
-      height: 200,
+      height: imageHeight,
       width: double.infinity,
       child: Image.network(
         imageUrl,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          return _buildImagePlaceholder();
+          return _buildImagePlaceholder(context);
         },
       ),
     );
   }
 
-  Widget _buildDateBadge() {
+  Widget _buildDateBadge(BuildContext context) {
+    final badgePaddingH = _getResponsiveDimension(12, context);
+    final badgePaddingV = _getResponsiveDimension(8, context);
+    final badgeTop = _getResponsiveDimension(12, context);
+    final badgeLeft = _getResponsiveDimension(12, context);
+    final badgeBorderRadius = _getResponsiveDimension(12, context);
+    final dayFontSize = _getResponsiveFontSize(16, context);
+    final monthFontSize = _getResponsiveFontSize(11, context);
+
     return Positioned(
-      top: 12,
-      left: 12,
+      top: badgeTop,
+      left: badgeLeft,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: badgePaddingH, vertical: badgePaddingV),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(badgeBorderRadius),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(0.25),
+              blurRadius: 12,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -257,16 +289,16 @@ class EventCardWidget extends ConsumerWidget {
           children: [
             Text(
               '${event.initialDate.day}',
-              style: const TextStyle(
-                fontSize: 16,
+              style: TextStyle(
+                fontSize: dayFontSize,
                 fontWeight: FontWeight.w900,
                 color: JenixColorsApp.primaryBlue,
               ),
             ),
             Text(
               EventsUtils.formatMonthAbbr(event.initialDate.month),
-              style: const TextStyle(
-                fontSize: 11,
+              style: TextStyle(
+                fontSize: monthFontSize,
                 fontWeight: FontWeight.w700,
                 color: JenixColorsApp.primaryBlue,
               ),

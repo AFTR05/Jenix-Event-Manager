@@ -125,6 +125,7 @@ class EventController {
         initialDate: initialDate,
         finalDate: finalDate,
         token: t,
+        responsiblePersonId: ref.read(loginProviderProvider)?.id ?? '',
       ),
       token,
     );

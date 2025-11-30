@@ -71,12 +71,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         Navigator.pushReplacementNamed(context, RoutesApp.main);
       } else {
         // No hay sesión, ir a Login
-        Navigator.pushReplacementNamed(context, RoutesApp.main);
+        Navigator.pushReplacementNamed(context, RoutesApp.login);
       }
     } catch (e) {
       // En caso de error, ir a Login por seguridad
       if (mounted) {
-        Navigator.pushReplacementNamed(context, RoutesApp.main);
+        Navigator.pushReplacementNamed(context, RoutesApp.login);
       }
     }
   }

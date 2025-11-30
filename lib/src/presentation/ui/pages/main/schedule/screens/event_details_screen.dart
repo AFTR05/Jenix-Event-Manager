@@ -25,6 +25,21 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
   int currentEnrollments = 0;
   String? userEnrollmentId; // ID de la inscripción del usuario
 
+  // Responsive sizing methods
+  double _getResponsiveFontSize(double baseFontSize, double screenWidth) {
+    if (screenWidth < 360) return baseFontSize * 0.9;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.15;
+    return baseFontSize * 1.3;
+  }
+
+  double _getResponsiveDimension(double baseDimension, double screenWidth) {
+    if (screenWidth < 360) return baseDimension * 0.9;
+    if (screenWidth < 600) return baseDimension;
+    if (screenWidth < 900) return baseDimension * 1.15;
+    return baseDimension * 1.3;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -118,6 +133,7 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenWidth = MediaQuery.of(context).size.width;
     final backgroundColor = isDark
         ? JenixColorsApp.darkBackground
         : JenixColorsApp.backgroundLightGray;
@@ -127,25 +143,25 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            _buildAppBar(isDark),
+            _buildAppBar(isDark, screenWidth),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(_getResponsiveDimension(16, screenWidth)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildEventHeader(isDark),
-                    const SizedBox(height: 24),
-                    _buildEventInfo(isDark),
-                    const SizedBox(height: 24),
-                    _buildDescription(isDark),
-                    const SizedBox(height: 24),
-                    _buildLocationAndTime(isDark),
-                    const SizedBox(height: 24),
-                    _buildCapacity(isDark),
-                    const SizedBox(height: 32),
-                    _buildActionButton(),
-                    const SizedBox(height: 16),
+                    _buildEventHeader(isDark, screenWidth),
+                    SizedBox(height: _getResponsiveDimension(24, screenWidth)),
+                    _buildEventInfo(isDark, screenWidth),
+                    SizedBox(height: _getResponsiveDimension(24, screenWidth)),
+                    _buildDescription(isDark, screenWidth),
+                    SizedBox(height: _getResponsiveDimension(24, screenWidth)),
+                    _buildLocationAndTime(isDark, screenWidth),
+                    SizedBox(height: _getResponsiveDimension(24, screenWidth)),
+                    _buildCapacity(isDark, screenWidth),
+                    SizedBox(height: _getResponsiveDimension(32, screenWidth)),
+                    _buildActionButton(screenWidth),
+                    SizedBox(height: _getResponsiveDimension(16, screenWidth)),
                   ],
                 ),
               ),
@@ -156,13 +172,16 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
     );
   }
 
-  Widget _buildAppBar(bool isDark) {
+  Widget _buildAppBar(bool isDark, double screenWidth) {
+    final appBarHeight = _getResponsiveDimension(200, screenWidth);
+    final iconSize = _getResponsiveDimension(80, screenWidth);
+    
     return SliverAppBar(
-      expandedHeight: 200,
+      expandedHeight: appBarHeight,
       pinned: true,
       backgroundColor: JenixColorsApp.primaryBlue,
       leading: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(_getResponsiveDimension(8, screenWidth)),
         child: CircleAvatar(
           backgroundColor: JenixColorsApp.backgroundWhite.withOpacity(0.2),
           child: IconButton(
@@ -196,7 +215,7 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
                   child: Center(
                     child: Icon(
                       Icons.event_rounded,
-                      size: 80,
+                      size: iconSize,
                       color: JenixColorsApp.backgroundWhite.withOpacity(0.3),
                     ),
                   ),
@@ -217,41 +236,49 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
     );
   }
 
-  Widget _buildEventHeader(bool isDark) {
+  Widget _buildEventHeader(bool isDark, double screenWidth) {
+    final titleFontSize = _getResponsiveFontSize(28, screenWidth);
+    final orgFontSize = _getResponsiveFontSize(14, screenWidth);
+    final stateFontSize = _getResponsiveFontSize(12, screenWidth);
+    final headerPadding = _getResponsiveDimension(12, screenWidth);
+    final stateHPadding = _getResponsiveDimension(12, screenWidth);
+    final stateVPadding = _getResponsiveDimension(6, screenWidth);
+    final stateRadius = _getResponsiveDimension(20, screenWidth);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: EdgeInsets.symmetric(horizontal: stateHPadding, vertical: stateVPadding),
           decoration: BoxDecoration(
             color: JenixColorsApp.primaryBlue.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(stateRadius),
           ),
           child: Text(
             widget.event.state,
             style: TextStyle(
               color: JenixColorsApp.primaryBlue,
-              fontSize: 12,
+              fontSize: stateFontSize,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: headerPadding),
         Text(
           widget.event.name,
           style: TextStyle(
-            fontSize: 28,
+            fontSize: titleFontSize,
             fontWeight: FontWeight.w700,
             color: isDark
                 ? JenixColorsApp.backgroundWhite
                 : JenixColorsApp.darkColorText,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: _getResponsiveDimension(8, screenWidth)),
         Text(
           widget.event.organizationArea,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: orgFontSize,
             color: isDark
                 ? JenixColorsApp.lightGray
                 : JenixColorsApp.subtitleColor,
@@ -261,7 +288,9 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
     );
   }
 
-  Widget _buildEventInfo(bool isDark) {
+  Widget _buildEventInfo(bool isDark, double screenWidth) {
+    final spacingH = _getResponsiveDimension(12, screenWidth);
+    
     return Row(
       children: [
         Expanded(
@@ -271,15 +300,17 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
             value:
                 '${widget.event.beginHour ?? '--:--'} - ${widget.event.endHour ?? '--:--'}',
             isDark: isDark,
+            screenWidth: screenWidth,
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: spacingH),
         Expanded(
           child: _buildInfoCard(
             icon: Icons.location_on_rounded,
             label: 'Ubicación',
-            value: widget.event.room.type,
+            value: widget.event.room?.type ?? (widget.event.modality.name == 'virtual' ? 'Virtual' : 'Por definir'),
             isDark: isDark,
+            screenWidth: screenWidth,
           ),
         ),
       ],
@@ -291,16 +322,23 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
     required String label,
     required String value,
     required bool isDark,
+    required double screenWidth,
   }) {
+    final cardPadding = _getResponsiveDimension(12, screenWidth);
+    final cardRadius = _getResponsiveDimension(14, screenWidth);
+    final iconSize = _getResponsiveDimension(24, screenWidth);
+    final labelFontSize = _getResponsiveFontSize(12, screenWidth);
+    final valueFontSize = _getResponsiveFontSize(14, screenWidth);
+    
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(cardPadding),
       decoration: BoxDecoration(
         color: isDark
             ? JenixColorsApp.darkGray.withOpacity(0.3)
-            : JenixColorsApp.infoLight,
-        borderRadius: BorderRadius.circular(14),
+            : JenixColorsApp.backgroundWhite,
+        borderRadius: BorderRadius.circular(cardRadius),
         border: Border.all(
-          color: JenixColorsApp.primaryBlue.withOpacity(0.2),
+          color: JenixColorsApp.primaryBlue.withOpacity(0.15),
           width: 1,
         ),
       ),
@@ -309,12 +347,12 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, size: 16, color: JenixColorsApp.primaryBlue),
-              const SizedBox(width: 6),
+              Icon(icon, size: iconSize, color: JenixColorsApp.primaryBlue),
+              SizedBox(width: _getResponsiveDimension(6, screenWidth)),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: labelFontSize,
                   color: isDark
                       ? JenixColorsApp.lightGray
                       : JenixColorsApp.subtitleColor,
@@ -323,11 +361,11 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: _getResponsiveDimension(6, screenWidth)),
           Text(
             value,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: valueFontSize,
               fontWeight: FontWeight.w600,
               color: isDark
                   ? JenixColorsApp.backgroundWhite
@@ -340,25 +378,29 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
     );
   }
 
-  Widget _buildDescription(bool isDark) {
+  Widget _buildDescription(bool isDark, double screenWidth) {
+    final titleFontSize = _getResponsiveFontSize(16, screenWidth);
+    final descFontSize = _getResponsiveFontSize(14, screenWidth);
+    final spacing = _getResponsiveDimension(8, screenWidth);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Descripción',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: titleFontSize,
             fontWeight: FontWeight.w700,
             color: isDark
                 ? JenixColorsApp.backgroundWhite
                 : JenixColorsApp.darkColorText,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: spacing),
         Text(
           widget.event.description,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: descFontSize,
             color: isDark
                 ? JenixColorsApp.lightGray
                 : JenixColorsApp.secondaryTextColor,
@@ -369,18 +411,22 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
     );
   }
 
-  Widget _buildLocationAndTime(bool isDark) {
+  Widget _buildLocationAndTime(bool isDark, double screenWidth) {
+    final containerPadding = _getResponsiveDimension(14, screenWidth);
+    final containerRadius = _getResponsiveDimension(16, screenWidth);
+    final spacing = _getResponsiveDimension(12, screenWidth);
+    
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(containerPadding),
       decoration: BoxDecoration(
         color: isDark
             ? JenixColorsApp.darkGray.withOpacity(0.3)
             : JenixColorsApp.backgroundWhite,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(containerRadius),
         border: Border.all(
           color: isDark
               ? JenixColorsApp.darkGray.withOpacity(0.5)
-              : JenixColorsApp.lightGrayBorder,
+              : JenixColorsApp.primaryBlue.withOpacity(0.15),
           width: 1,
         ),
       ),
@@ -393,39 +439,46 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
             value:
                 '${widget.event.initialDate.day}/${widget.event.initialDate.month}/${widget.event.initialDate.year}',
             isDark: isDark,
+            screenWidth: screenWidth,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: spacing),
           _buildDetailRow(
             icon: Icons.calendar_today_rounded,
             label: 'Fin',
             value:
                 '${widget.event.finalDate.day}/${widget.event.finalDate.month}/${widget.event.finalDate.year}',
             isDark: isDark,
+            screenWidth: screenWidth,
           ),
           if (widget.event.responsablePerson != null) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: spacing),
             _buildDetailRow(
-              icon: Icons.person_rounded,
-              label: 'Responsable',
+            icon: Icons.person_rounded,
+            label: 'Responsable',
               value: widget.event.responsablePerson?.name ?? 'N/A',
               isDark: isDark,
+              screenWidth: screenWidth,
             ),
           ],
         ],
       ),
     );
-  }
-
-  Widget _buildDetailRow({
+  }  Widget _buildDetailRow({
     required IconData icon,
     required String label,
     required String value,
     required bool isDark,
+    required double screenWidth,
   }) {
+    final iconSize = _getResponsiveDimension(18, screenWidth);
+    final labelFontSize = _getResponsiveFontSize(12, screenWidth);
+    final valueFontSize = _getResponsiveFontSize(14, screenWidth);
+    final spacing = _getResponsiveDimension(12, screenWidth);
+    
     return Row(
       children: [
-        Icon(icon, size: 18, color: JenixColorsApp.primaryBlue),
-        const SizedBox(width: 12),
+        Icon(icon, size: iconSize, color: JenixColorsApp.primaryBlue),
+        SizedBox(width: spacing),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -433,17 +486,17 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: labelFontSize,
                   color: isDark
                       ? JenixColorsApp.lightGray
                       : JenixColorsApp.subtitleColor,
                 ),
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: _getResponsiveDimension(2, screenWidth)),
               Text(
                 value,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: valueFontSize,
                   fontWeight: FontWeight.w600,
                   color: isDark
                       ? JenixColorsApp.backgroundWhite
@@ -457,17 +510,24 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
     );
   }
 
-  Widget _buildCapacity(bool isDark) {
+  Widget _buildCapacity(bool isDark, double screenWidth) {
     final spotsAvailable = widget.event.maxAttendees - currentEnrollments;
     final isFull = spotsAvailable <= 0;
+    
+    final containerPadding = _getResponsiveDimension(14, screenWidth);
+    final containerRadius = _getResponsiveDimension(16, screenWidth);
+    final iconSize = _getResponsiveDimension(24, screenWidth);
+    final labelFontSize = _getResponsiveFontSize(12, screenWidth);
+    final valueFontSize = _getResponsiveFontSize(14, screenWidth);
+    final spacing = _getResponsiveDimension(12, screenWidth);
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(containerPadding),
       decoration: BoxDecoration(
         color: isFull
             ? Colors.red.withOpacity(0.12)
             : JenixColorsApp.primaryBlue.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(containerRadius),
         border: Border.all(
           color: isFull
               ? Colors.red.withOpacity(0.2)
@@ -479,10 +539,10 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
         children: [
           Icon(
             Icons.group_rounded,
-            size: 24,
+            size: iconSize,
             color: isFull ? Colors.red : JenixColorsApp.primaryBlue,
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: spacing),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -490,19 +550,19 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
                 Text(
                   'Capacidad',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: labelFontSize,
                     color: isDark
                         ? JenixColorsApp.lightGray
                         : JenixColorsApp.subtitleColor,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: _getResponsiveDimension(4, screenWidth)),
                 Text(
                   isFull
                       ? 'Evento lleno'
                       : 'Máximo ${widget.event.maxAttendees} participantes',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: valueFontSize,
                     fontWeight: FontWeight.w600,
                     color: isFull ? Colors.red : JenixColorsApp.primaryBlue,
                   ),
@@ -532,7 +592,7 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
     );
   }
 
-  Widget _buildActionButton() {
+  Widget _buildActionButton(double screenWidth) {
     final isButtonDisabled = isLoading || 
         (isEventFull && !isRegistered) || 
         (isEventPassed && !isRegistered);
@@ -563,16 +623,19 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
       textColor = JenixColorsApp.backgroundWhite;
     }
 
+    final buttonHeight = _getResponsiveDimension(56, screenWidth);
+    final buttonFontSize = _getResponsiveFontSize(16, screenWidth);
+
     return SizedBox(
       width: double.infinity,
-      height: 56,
+      height: buttonHeight,
       child: ElevatedButton(
         onPressed: (isButtonDisabled || (isEventPassed && isRegistered)) ? null : _handleRegistration,
         style: ElevatedButton.styleFrom(
           backgroundColor: buttonColor,
           disabledBackgroundColor: Colors.grey.withOpacity(0.5),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(_getResponsiveDimension(14, screenWidth)),
           ),
           elevation: 0,
         ),
@@ -588,7 +651,7 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
             : Text(
                 buttonText,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: buttonFontSize,
                   fontWeight: FontWeight.w600,
                   color: textColor,
                 ),

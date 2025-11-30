@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jenix_event_manager/src/core/validators/fields_validators.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
+import 'package:jenix_event_manager/src/inject/states_providers/login_provider.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/buttons/custom_button_widget.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/form/custom_form_element.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/inputs/custom_auth_text_field_widget.dart';
@@ -39,6 +40,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final size = MediaQuery.of(context).size;
     final isTablet = size.width > 600;
     final isMobile = size.width < 600;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0C1C2C),
@@ -74,7 +76,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     color: Color(0x55BE1723),
                     blurRadius: 200,
                     spreadRadius: 100,
-                  )
+                  ),
                 ],
               ),
             ),
@@ -89,9 +91,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: MouseRegion(
                   cursor: SystemMouseCursors.click,
                   child: GestureDetector(
-                    onTap: () => Navigator.pushReplacementNamed(context, RoutesApp.home),
+                    onTap: () =>
+                        Navigator.pushReplacementNamed(context, RoutesApp.home),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -104,10 +110,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ],
                       ),
-                          child: Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                          const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             LocaleKeys.authLoginBackToHome.tr(),
@@ -171,7 +181,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(height: 24),
 
                         /// ===== TITULO =====
-                        Text(LocaleKeys.authLoginTitle.tr(),
+                        Text(
+                          LocaleKeys.authLoginTitle.tr(),
                           style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w700,
@@ -180,7 +191,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(LocaleKeys.authLoginSubtitle.tr(),
+                        Text(
+                          LocaleKeys.authLoginSubtitle.tr(),
                           style: const TextStyle(
                             fontSize: 14,
                             color: Color(0xFF9DA9B9),
@@ -198,8 +210,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             controller: _emailController,
                             hintText: LocaleKeys.authLoginEmailHint.tr(),
                             keyboardType: TextInputType.emailAddress,
-                            prefix: const Icon(Icons.email_outlined,
-                                color: Colors.white70, size: 20),
+                            prefix: Icon(
+                              Icons.email_outlined,
+                              color: isDark ? Colors.white70 : Colors.white70,
+                              size: 20,
+                            ),
                             validator: FieldsValidators.emailValidator,
                             onChanged: (_) {
                               if (_emailError != null) {
@@ -219,8 +234,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             controller: _passwordController,
                             hintText: LocaleKeys.authLoginForgotPassword.tr(),
                             isPasswordField: true,
-                            prefix: const Icon(Icons.lock_outline_rounded,
-                                color: Colors.white70, size: 20),
+                            prefix: Icon(
+                              Icons.lock_outline_rounded,
+                              color: isDark ? Colors.white70 : Colors.white70,
+                              size: 20,
+                            ),
                             validator: FieldsValidators.fieldIsRequired,
                             onChanged: (_) {
                               if (_passwordError != null) {
@@ -236,7 +254,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             InkWell(
-                              onTap: () => setState(() => _rememberMe = !_rememberMe),
+                              onTap: () =>
+                                  setState(() => _rememberMe = !_rememberMe),
                               borderRadius: BorderRadius.circular(8),
                               child: Row(
                                 children: [
@@ -245,22 +264,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     width: 20,
                                     child: Checkbox(
                                       value: _rememberMe,
-                                      onChanged: (v) =>
-                                          setState(() => _rememberMe = v ?? false),
+                                      onChanged: (v) => setState(
+                                        () => _rememberMe = v ?? false,
+                                      ),
                                       activeColor: const Color(0xFFBE1723),
                                       checkColor: Colors.white,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                            Text(
-                                              LocaleKeys.authLoginRememberMe.tr(),
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.white70,
-                                                fontWeight: FontWeight.w500,
-                                                fontFamily: 'OpenSansHebrew',
-                                              ),
-                                            ),
+                                  Text(
+                                    LocaleKeys.authLoginRememberMe.tr(),
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white70,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: 'OpenSansHebrew',
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -269,12 +289,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               style: TextButton.styleFrom(
                                 foregroundColor: const Color(0xFFBE1723),
                               ),
-                child: Text(
-                  LocaleKeys.authLoginForgotPassword.tr(),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600),
-                  ),
+                              child: Text(
+                                LocaleKeys.authLoginForgotPassword.tr(),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -298,8 +319,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 fontSize: 14,
                                 color: Colors.white70,
                               ),
-                                children: [
-                                TextSpan(text: LocaleKeys.authLoginNoAccount.tr()),
+                              children: [
+                                TextSpan(
+                                  text: LocaleKeys.authLoginNoAccount.tr(),
+                                ),
                                 TextSpan(
                                   text: LocaleKeys.authLoginRegisterHere.tr(),
                                   style: const TextStyle(
@@ -357,8 +380,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     final emailError = FieldsValidators.emailValidator(_emailController.text);
-    final passwordError =
-        FieldsValidators.fieldIsRequired(_passwordController.text);
+    final passwordError = FieldsValidators.fieldIsRequired(
+      _passwordController.text,
+    );
 
     if (emailError != null || passwordError != null) {
       setState(() {
@@ -384,7 +408,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
 
       if (!mounted) return;
-
+      final loginName = ref.read(loginProviderProvider)?.name ?? '';
       result.fold(
         (failure) {
           setState(() {
@@ -392,16 +416,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             _isLoading = false;
           });
           _showSnackBar(
-              message: failure.message,
-              icon: Icons.error_outline_rounded,
-              backgroundColor: Colors.redAccent);
+            message: failure.message,
+            icon: Icons.error_outline_rounded,
+            backgroundColor: Colors.redAccent,
+          );
         },
         (user) {
-      setState(() => _isLoading = false);
-      _showSnackBar(
-        message: LocaleKeys.loginWelcome.tr(namedArgs: {'name': user.name}),
-        icon: Icons.check_circle_outline_rounded,
-        backgroundColor: Colors.green);
+          setState(() => _isLoading = false);
+          _showSnackBar(
+            message: LocaleKeys.loginWelcome.tr(namedArgs: {'name': loginName}),
+            icon: Icons.check_circle_outline_rounded,
+            backgroundColor: Colors.green,
+          );
           Future.delayed(const Duration(milliseconds: 600), () {
             if (mounted) {
               Navigator.pushReplacementNamed(context, RoutesApp.main);

@@ -3,6 +3,7 @@ import 'package:jenix_event_manager/src/domain/entities/enum/enrollment_status_e
 class EnrollmentEntity {
   final String id;
   final String? userId;
+  final String? username;
   final String? eventId;
   final EnrollmentStatus status;
   final DateTime enrollmentDate;
@@ -12,6 +13,7 @@ class EnrollmentEntity {
   EnrollmentEntity({
     required this.id,
     this.userId,
+    this.username,
     this.eventId,
     required this.status,
     required this.enrollmentDate,
@@ -23,6 +25,7 @@ class EnrollmentEntity {
     return EnrollmentEntity(
       id: json['enrollmentId'] as String,
       userId: json['userId'] as String?,
+      username: json['username'] as String?,
       eventId: json['eventId'] as String?,
       status: EnrollmentStatus.fromString(json['status'] as String),
       enrollmentDate: DateTime.parse(json['enrollmentDate'] as String),

@@ -24,6 +24,22 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
   bool _isProcessing = false;
   List<CampusEntity> _campuses = [];
 
+  double _getResponsiveFontSize(double baseFontSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseFontSize * 0.9;
+    if (screenWidth < 600) return baseFontSize;
+    if (screenWidth < 900) return baseFontSize * 1.15;
+    return baseFontSize * 1.3;
+  }
+
+  double _getResponsiveDimension(double baseDimension) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 360) return baseDimension * 0.9;
+    if (screenWidth < 600) return baseDimension;
+    if (screenWidth < 900) return baseDimension * 1.15;
+    return baseDimension * 1.3;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -230,8 +246,9 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color(0xFF0C1C2C),
+      backgroundColor: isDark ? const Color(0xFF0C1C2C) : Colors.white,
       appBar: SecondaryAppbarWidget(title: 'Gestion de Sedes'),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isProcessing ? null : () => _openForm(),
@@ -243,9 +260,11 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
         children: [
           /// Fondo con gradiente institucional
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF0A2647), Color(0xFF09131E)],
+                colors: isDark
+                    ? [const Color(0xFF0A2647), const Color(0xFF09131E)]
+                    : [const Color(0xFFE3F2FD), const Color(0xFFBBDEFB)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -256,12 +275,21 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        isDark ? Colors.white : const Color(0xFF1976D2),
+                      ),
+                    ),
+                  )
                 : _campuses.isEmpty
-                ? const Center(
+                ? Center(
                     child: Text(
                       'No hay campus disponibles',
-                      style: TextStyle(color: Colors.white70),
+                      style: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.black54,
+                        fontSize: _getResponsiveFontSize(14),
+                      ),
                     ),
                   )
                 : _buildListView(_campuses),
@@ -271,21 +299,21 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
           if (_isProcessing)
             Container(
               color: Colors.black54,
-              child: const Center(
+              child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
+                      valueColor: const AlwaysStoppedAnimation<Color>(
                         Color(0xFFBE1723),
                       ),
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: _getResponsiveDimension(16)),
                     Text(
                       'Procesando...',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: _getResponsiveFontSize(16),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -299,6 +327,7 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
   }
 
   Widget _buildListView(List<CampusEntity> list) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return ListView.builder(
       key: ValueKey(
         'campus_list_${list.length}_${DateTime.now().millisecondsSinceEpoch}',
@@ -310,9 +339,9 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
           key: ValueKey(
             'campus_${campus.id}_${campus.state.toText()}_${campus.name}',
           ),
-          margin: const EdgeInsets.only(bottom: 16),
+          margin: EdgeInsets.only(bottom: _getResponsiveDimension(16)),
           decoration: BoxDecoration(
-            color: const Color(0xFF12263F).withOpacity(0.9),
+            color: isDark ? const Color(0xFF12263F).withOpacity(0.9) : Colors.white.withOpacity(0.9),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: campus.state == CampusStatusEnum.abierto
@@ -332,40 +361,46 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
           child: ListTile(
             leading: CircleAvatar(
               radius: 26,
-              backgroundColor: Colors.white.withOpacity(0.1),
+              backgroundColor: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
               child: Icon(
                 Icons.apartment,
-                color: Colors.white.withOpacity(0.8),
-                size: 28,
+                color: isDark ? Colors.white.withOpacity(0.8) : Colors.black54,
+                size: _getResponsiveDimension(28),
               ),
             ),
             title: Text(
               campus.name,
-              style: const TextStyle(
-                color: Color(0xFFE6EEF5),
+              style: TextStyle(
+                color: isDark ? const Color(0xFFE6EEF5) : Colors.black87,
                 fontWeight: FontWeight.bold,
-                fontSize: 18,
+                fontSize: _getResponsiveFontSize(18),
               ),
             ),
             subtitle: Padding(
-              padding: const EdgeInsets.only(top: 6),
+              padding: EdgeInsets.only(top: _getResponsiveDimension(6)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "Estado: ${_displayName(campus.state)}",
-                    style: const TextStyle(color: Color(0xFF9DA9B9)),
+                    style: TextStyle(
+                      color: isDark ? const Color(0xFF9DA9B9) : Colors.black54,
+                      fontSize: _getResponsiveFontSize(12),
+                    ),
                   ),
                   Text(
                     "Creado: ${dateFormat.format(campus.createdAt)}",
-                    style: const TextStyle(color: Color(0xFF9DA9B9)),
+                    style: TextStyle(
+                      color: isDark ? const Color(0xFF9DA9B9) : Colors.black54,
+                      fontSize: _getResponsiveFontSize(12),
+                    ),
                   ),
                 ],
               ),
             ),
             trailing: PopupMenuButton<String>(
-              color: const Color(0xFF12263F),
-              icon: const Icon(Icons.more_vert, color: Colors.white70),
+              color: isDark ? const Color(0xFF12263F) : Colors.white,
+              icon: Icon(Icons.more_vert, color: isDark ? Colors.white70 : Colors.black54),
               onSelected: (value) {
                 if (value == 'edit') {
                   _openForm(campus: campus);
@@ -374,23 +409,23 @@ class _CampusListScreenState extends ConsumerState<CampusListScreen> {
                 }
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'edit',
                   child: Row(
                     children: [
-                      Icon(Icons.edit, color: Colors.white70, size: 18),
-                      SizedBox(width: 8),
-                      Text("Editar", style: TextStyle(color: Colors.white)),
+                      Icon(Icons.edit, color: isDark ? Colors.white70 : Colors.black54, size: 18),
+                      const SizedBox(width: 8),
+                      Text("Editar", style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                     ],
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete, color: Color(0xFFBE1723), size: 18),
-                      SizedBox(width: 8),
-                      Text(
+                      const Icon(Icons.delete, color: Color(0xFFBE1723), size: 18),
+                      const SizedBox(width: 8),
+                      const Text(
                         "Eliminar",
                         style: TextStyle(color: Color(0xFFBE1723)),
                       ),
