@@ -55,6 +55,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final size = MediaQuery.of(context).size;
     final isTablet = size.width > 600;
     final isMobile = size.width < 600;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0C1C2C),
@@ -139,7 +140,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         widget: CustomAuthTextFieldWidget(
                           controller: _nameController,
                           hintText: "Ej: Camilo Correa",
-                          prefix: const Icon(Icons.person_outline, color: Colors.white70),
+                          prefix: Icon(Icons.person_outline, color: isDark ? Colors.white70 : Colors.white70),
                           keyboardType: TextInputType.name,
                           onChanged: (_) => setState(() => _nameError = null),
                         ),
@@ -153,7 +154,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         widget: CustomAuthTextFieldWidget(
                           controller: _institutionalEmailController,
                           hintText: "Ingresa tu correo institucional",
-                          prefix: const Icon(Icons.email_outlined, color: Colors.white70),
+                          prefix: Icon(Icons.email_outlined, color: isDark ? Colors.white70 : Colors.white70),
                           keyboardType: TextInputType.emailAddress,
                           onChanged: (_) => setState(() => _institutionalEmailError = null),
                         ),
@@ -167,7 +168,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         widget: CustomAuthTextFieldWidget(
                           controller: _nitController,
                           hintText: "Ej: 12345678",
-                          prefix: const Icon(Icons.badge_outlined, color: Colors.white70),
+                          prefix: Icon(Icons.badge_outlined, color: isDark ? Colors.white70 : Colors.white70),
                           keyboardType: TextInputType.number,
                           onChanged: (_) => setState(() => _nitError = null),
                         ),
@@ -185,7 +186,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           controller: _passwordController,
                           hintText: LocaleKeys.authRegisterPasswordHint.tr(),
                           isPasswordField: true,
-                          prefix: const Icon(Icons.lock_outline, color: Colors.white70),
+                          prefix: Icon(Icons.lock_outline, color: isDark ? Colors.white70 : Colors.white70),
                           onChanged: (_) => setState(() => _passwordError = null),
                         ),
                       ),
@@ -199,7 +200,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           controller: _confirmPasswordController,
                           hintText: LocaleKeys.authRegisterConfirmPasswordHint.tr(),
                           isPasswordField: true,
-                          prefix: const Icon(Icons.lock_person_outlined, color: Colors.white70),
+                          prefix: Icon(Icons.lock_person_outlined, color: isDark ? Colors.white70 : Colors.white70),
                           onChanged: (_) => setState(() => _confirmPasswordError = null),
                         ),
                       ),

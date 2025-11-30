@@ -40,6 +40,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final size = MediaQuery.of(context).size;
     final isTablet = size.width > 600;
     final isMobile = size.width < 600;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0C1C2C),
@@ -209,9 +210,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             controller: _emailController,
                             hintText: LocaleKeys.authLoginEmailHint.tr(),
                             keyboardType: TextInputType.emailAddress,
-                            prefix: const Icon(
+                            prefix: Icon(
                               Icons.email_outlined,
-                              color: Colors.white70,
+                              color: isDark ? Colors.white70 : Colors.white70,
                               size: 20,
                             ),
                             validator: FieldsValidators.emailValidator,
@@ -233,9 +234,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             controller: _passwordController,
                             hintText: LocaleKeys.authLoginForgotPassword.tr(),
                             isPasswordField: true,
-                            prefix: const Icon(
+                            prefix: Icon(
                               Icons.lock_outline_rounded,
-                              color: Colors.white70,
+                              color: isDark ? Colors.white70 : Colors.white70,
                               size: 20,
                             ),
                             validator: FieldsValidators.fieldIsRequired,

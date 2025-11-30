@@ -53,6 +53,9 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/images/playstore_logo.png"
+  web:
+    generate: true
+    image_path: "assets/images/playstore_logo.png"
   windows:
     generate: true
     image_path: "assets/images/playstore_logo.png"

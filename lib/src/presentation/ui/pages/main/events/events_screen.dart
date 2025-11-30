@@ -292,8 +292,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                                 ),
                                 ...OrganizationAreaEnum.values
                                     .where((area) =>
-                                        area != OrganizationAreaEnum.allFaculties &&
-                                        area != OrganizationAreaEnum.withoutFaculty)
+                                        area != OrganizationAreaEnum.allFaculties)
                                     .map((area) {
                                   return DropdownMenuItem(
                                     value: area,
