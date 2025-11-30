@@ -308,7 +308,7 @@ class _EventDetailsScreenState extends ConsumerState<EventDetailsScreen> {
           child: _buildInfoCard(
             icon: Icons.location_on_rounded,
             label: 'Ubicación',
-            value: widget.event.room.type,
+            value: widget.event.room?.type ?? (widget.event.modality.name == 'virtual' ? 'Virtual' : 'Por definir'),
             isDark: isDark,
             screenWidth: screenWidth,
           ),

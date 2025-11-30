@@ -283,7 +283,7 @@ class _EventEnrollmentsDialogState extends ConsumerState<EventEnrollmentsDialog>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Usuario ID: ${enrollment.userId ?? 'N/A'}',
+                      'Usuario: ${enrollment.username ?? 'N/A'}',
                       style: TextStyle(
                         color: textColor,
                         fontWeight: FontWeight.w600,

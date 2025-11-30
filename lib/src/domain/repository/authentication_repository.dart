@@ -1,5 +1,6 @@
 import 'package:either_dart/either.dart';
 import 'package:jenix_event_manager/src/core/exceptions/failure.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/organization_area_enum.dart';
 import 'package:jenix_event_manager/src/domain/entities/user_entity.dart';
 
 abstract class AuthenticationRepository {
@@ -14,6 +15,7 @@ abstract class AuthenticationRepository {
     required String name,
     required String phone,
     required String documentNumber,
+    required OrganizationAreaEnum organizationArea,
   });
 
   Future<Either<Failure, bool>> logOut({

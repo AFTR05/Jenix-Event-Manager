@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:jenix_event_manager/src/domain/entities/enum/organization_area_enum.dart';
 import 'package:jenix_event_manager/src/domain/entities/enum/role_enum.dart';
 
 class UserEntity {
@@ -9,6 +10,7 @@ class UserEntity {
   final String phone;
   final RoleEnum role;
   final String documentNumber;
+  final OrganizationAreaEnum? organizationArea;
   final String? accessToken;
   final String? refreshToken;
 
@@ -19,6 +21,7 @@ class UserEntity {
     required this.phone,
     required this.role,
     required this.documentNumber,
+    required this.organizationArea,
     this.accessToken,
     this.refreshToken,
   });
@@ -29,6 +32,7 @@ class UserEntity {
     String? name,
     String? phone,
     RoleEnum? role,
+    OrganizationAreaEnum? organizationArea,
     String? documentNumber,
     String? accessToken,
     String? refreshToken,
@@ -39,6 +43,7 @@ class UserEntity {
       name: name ?? this.name,
       phone: phone ?? this.phone,
       role: role ?? this.role,
+      organizationArea: organizationArea ?? this.organizationArea,
       documentNumber: documentNumber ?? this.documentNumber,
       accessToken: accessToken ?? this.accessToken,
       refreshToken: refreshToken ?? this.refreshToken,
@@ -55,6 +60,9 @@ class UserEntity {
       documentNumber: (map['documentNumber'] ?? '') as String,
       accessToken: map['accessToken'] as String?,
       refreshToken: map['refreshToken'] as String?,
+      organizationArea: OrganizationAreaEnum.fromString(
+              (map['organizationArea'] ?? '') as String,
+            )
     );
   }
 
@@ -96,7 +104,16 @@ class UserEntity {
   }
 
   @override
-  int get hashCode => Object.hash(id, email, name, phone, documentNumber, role, accessToken, refreshToken);
+  int get hashCode => Object.hash(
+    id,
+    email,
+    name,
+    phone,
+    documentNumber,
+    role,
+    accessToken,
+    refreshToken,
+  );
 }
 
 // ...existing code...

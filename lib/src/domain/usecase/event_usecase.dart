@@ -22,6 +22,7 @@ class EventUsecase {
       required DateTime? initialDate,
     required DateTime? finalDate,
     required String token,
+    required String responsiblePersonId,
   }) {
     return repository.createEvent(
       name: name,
@@ -37,6 +38,7 @@ class EventUsecase {
       initialDate: initialDate,
       finalDate: finalDate,
       token: token,
+      responsiblePersonId: responsiblePersonId,
     );
   }
 

@@ -137,6 +137,7 @@ class EnrollmentRepositoryImpl implements EnrollmentRepository {
           return EnrollmentEntity(
             id: enrollmentMap['enrollmentId'] as String,
             userId: userMap?['id'] as String?,
+            username: userMap?['name'] as String?,
             eventId: responseData['eventId'] as String?,
             status: EnrollmentStatus.fromString(enrollmentMap['status'] as String),
             enrollmentDate: DateTime.parse(enrollmentMap['enrollmentDate'] as String),

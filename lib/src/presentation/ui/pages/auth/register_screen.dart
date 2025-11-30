@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:jenix_event_manager/src/core/validators/fields_validators.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/organization_area_enum.dart';
 import 'package:jenix_event_manager/src/inject/riverpod_presentation.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/buttons/custom_button_widget.dart';
 import 'package:jenix_event_manager/src/presentation/ui/custom_widgets/form/custom_form_element.dart';
@@ -31,6 +32,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool disableValidationInPhone = true;
   String _phoneCode = "+57";
   bool _loading = false;
+  OrganizationAreaEnum? _selectedOrganizationArea = OrganizationAreaEnum.allFaculties;
 
   String? _nameError;
   String? _institutionalEmailError;
@@ -176,6 +178,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       _buildPhoneField(),
 
                       const SizedBox(height: 14),
+                      _buildOrganizationAreaField(),
+
+                      const SizedBox(height: 14),
                       CustomFormElement(
                         labelTitle: LocaleKeys.authRegisterPasswordHint.tr(),
                         isRequired: true,
@@ -317,6 +322,53 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
+  Widget _buildOrganizationAreaField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Facultad',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontFamily: 'OpenSansHebrew',
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A2B44),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white24),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: DropdownButton<OrganizationAreaEnum>(
+            value: _selectedOrganizationArea,
+            isExpanded: true,
+            underline: const SizedBox(),
+            hint: const Text(
+              'Selecciona tu facultad',
+              style: TextStyle(color: Colors.white54),
+            ),
+            dropdownColor: const Color(0xFF1A2B44),
+            items: OrganizationAreaEnum.values.map((area) {
+              return DropdownMenuItem(
+                value: area,
+                child: Text(
+                  area.displayName,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() => _selectedOrganizationArea = value);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildTermsCheckbox() {
     return Row(
       children: [
@@ -408,7 +460,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _performRegistration();
   }
 
-  Future<void> _performRegistration() async {
+    Future<void> _performRegistration() async {
     setState(() => _loading = true);
     final authController = ref.read(authenticationControllerProvider);
     final fullPhone = '$_phoneCode${_phoneNumberController.text.trim()}';
@@ -420,10 +472,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         name: _nameController.text.trim(),
         phone: fullPhone,
         documentNumber: _nitController.text.trim(),
+        organizationArea: _selectedOrganizationArea ?? OrganizationAreaEnum.allFaculties,
         rememberMe: true,
-      );
-
-      if (!mounted) return;
+      );      if (!mounted) return;
       setState(() => _loading = false);
 
       result.fold(

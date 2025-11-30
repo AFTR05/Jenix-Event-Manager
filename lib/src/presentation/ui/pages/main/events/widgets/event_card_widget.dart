@@ -116,7 +116,7 @@ class EventCardWidget extends ConsumerWidget {
                       Expanded(
                         child: InfoChip(
                           icon: Icons.location_on_outlined,
-                          label: event.room.type,
+                          label: event.room?.type ?? (event.modality.name == 'virtual' ? 'Virtual' : 'Por definir'),
                           isDark: isDark,
                           context: context,
                         ),

@@ -63,12 +63,16 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
         // Filtrar solo eventos creados por el usuario autenticado
         final allEvents = List<EventEntity>.from(res.right);
         final userEvents = allEvents
-            //.where((event) => event.responsablePerson?.id == currentUser?.id)
+            .where(
+              (event) =>
+                  (event.responsablePerson?.id ?? event.responsablePersonId) ==
+                  currentUser?.id,
+            )
             .toList();
-        
+
         // Ordenar por fecha inicial (más próximos primero)
         userEvents.sort((a, b) => a.initialDate.compareTo(b.initialDate));
-        
+
         setState(() => _events = userEvents);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -121,10 +125,16 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
   Widget build(BuildContext context) {
     // Tamaños responsivos
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? JenixColorsApp.backgroundColor : JenixColorsApp.backgroundWhite;
-    final gradientStart = isDark ? JenixColorsApp.primaryColor : JenixColorsApp.infoLight;
-    final gradientEnd = isDark ? JenixColorsApp.surfaceColor : JenixColorsApp.infoLight;
-    
+    final backgroundColor = isDark
+        ? JenixColorsApp.backgroundColor
+        : JenixColorsApp.backgroundWhite;
+    final gradientStart = isDark
+        ? JenixColorsApp.primaryColor
+        : JenixColorsApp.infoLight;
+    final gradientEnd = isDark
+        ? JenixColorsApp.surfaceColor
+        : JenixColorsApp.infoLight;
+
     final paddingMain = _getResponsiveDimension(16);
     final marginBottom = _getResponsiveDimension(16);
     final borderRadius = _getResponsiveDimension(18);
@@ -155,22 +165,33 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
             child: _isLoading
                 ? const Center(
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(JenixColorsApp.accentColor),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        JenixColorsApp.accentColor,
+                      ),
                     ),
                   )
                 : _events.isEmpty
-                    ? const Center(
-                        child: Text('No hay eventos',
-                            style: TextStyle(color: Colors.white70)),
-                      )
-                    : _buildListView(_events, marginBottom, borderRadius, contentPadding),
+                ? const Center(
+                    child: Text(
+                      'No hay eventos',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  )
+                : _buildListView(
+                    _events,
+                    marginBottom,
+                    borderRadius,
+                    contentPadding,
+                  ),
           ),
           if (_isProcessing)
             Container(
               color: Colors.black54,
               child: const Center(
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(JenixColorsApp.accentColor),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    JenixColorsApp.accentColor,
+                  ),
                 ),
               ),
             ),
@@ -179,9 +200,14 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
     );
   }
 
-  Widget _buildListView(List<EventEntity> events, double marginBottom, double borderRadius, double contentPadding) {
+  Widget _buildListView(
+    List<EventEntity> events,
+    double marginBottom,
+    double borderRadius,
+    double contentPadding,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return ListView.builder(
       itemCount: events.length,
       itemBuilder: (context, index) {
@@ -194,9 +220,13 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
         return Container(
           margin: EdgeInsets.only(bottom: marginBottom),
           decoration: BoxDecoration(
-            color: isDark ? JenixColorsApp.surfaceColor.withOpacity(0.9) : JenixColorsApp.backgroundWhite,
+            color: isDark
+                ? JenixColorsApp.surfaceColor.withOpacity(0.9)
+                : JenixColorsApp.backgroundWhite,
             borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(color: isDark ? Colors.white24 : JenixColorsApp.lightGrayBorder),
+            border: Border.all(
+              color: isDark ? Colors.white24 : JenixColorsApp.lightGrayBorder,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(isDark ? 0.5 : 0.1),
@@ -207,7 +237,10 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
           ),
           child: ListTile(
             contentPadding: EdgeInsets.all(contentPadding),
-            leading: (event.urlImage != null && event.urlImage!.isNotEmpty && event.urlImage != 'Por defecto')
+            leading:
+                (event.urlImage != null &&
+                    event.urlImage!.isNotEmpty &&
+                    event.urlImage != 'Por defecto')
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
@@ -217,7 +250,9 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                       fit: BoxFit.cover,
                       errorBuilder: (_, _, _) => Icon(
                         Icons.event,
-                        color: isDark ? Colors.white70 : JenixColorsApp.subtitleColor,
+                        color: isDark
+                            ? Colors.white70
+                            : JenixColorsApp.subtitleColor,
                         size: imageSize * 0.6,
                       ),
                     ),
@@ -226,10 +261,18 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                     width: imageSize,
                     height: imageSize,
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1A2B44) : JenixColorsApp.backgroundLightGray,
+                      color: isDark
+                          ? const Color(0xFF1A2B44)
+                          : JenixColorsApp.backgroundLightGray,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.event, color: isDark ? Colors.white70 : JenixColorsApp.subtitleColor, size: imageSize * 0.6),
+                    child: Icon(
+                      Icons.event,
+                      color: isDark
+                          ? Colors.white70
+                          : JenixColorsApp.subtitleColor,
+                      size: imageSize * 0.6,
+                    ),
                   ),
             title: Text(
               event.name,
@@ -245,19 +288,46 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 4),
-                Text('Sala: ${event.room.type}', 
-                  style: TextStyle(color: isDark ? Colors.white70 : JenixColorsApp.subtitleColor, fontSize: subtitleFontSize)),
-                Text('Área: ${event.organizationArea}', 
-                  style: TextStyle(color: isDark ? Colors.white70 : JenixColorsApp.subtitleColor, fontSize: subtitleFontSize)),
-                Text('Modalidad: ${event.modality.label}', 
-                  style: TextStyle(color: isDark ? Colors.white70 : JenixColorsApp.subtitleColor, fontSize: subtitleFontSize)),
+                Text(
+                  'Sala: ${event.room?.type ?? (event.modality.name == 'virtual' ? 'Virtual' : 'Por definir')}',
+                  style: TextStyle(
+                    color: isDark
+                        ? Colors.white70
+                        : JenixColorsApp.subtitleColor,
+                    fontSize: subtitleFontSize,
+                  ),
+                ),
+                Text(
+                  'Área: ${event.organizationArea}',
+                  style: TextStyle(
+                    color: isDark
+                        ? Colors.white70
+                        : JenixColorsApp.subtitleColor,
+                    fontSize: subtitleFontSize,
+                  ),
+                ),
+                Text(
+                  'Modalidad: ${event.modality.label}',
+                  style: TextStyle(
+                    color: isDark
+                        ? Colors.white70
+                        : JenixColorsApp.subtitleColor,
+                    fontSize: subtitleFontSize,
+                  ),
+                ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
                     Expanded(
                       child: Text(
                         'Inicio: ${dateFormat.format(event.initialDate)}',
-                        style: TextStyle(color: isDark ? Colors.white : JenixColorsApp.darkColorText, fontSize: smallTextFontSize, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: isDark
+                              ? Colors.white
+                              : JenixColorsApp.darkColorText,
+                          fontSize: smallTextFontSize,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -267,7 +337,13 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                     Expanded(
                       child: Text(
                         'Fin: ${dateFormat.format(event.finalDate)}',
-                        style: TextStyle(color: isDark ? Colors.white : JenixColorsApp.darkColorText, fontSize: smallTextFontSize, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: isDark
+                              ? Colors.white
+                              : JenixColorsApp.darkColorText,
+                          fontSize: smallTextFontSize,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -275,8 +351,13 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
               ],
             ),
             trailing: PopupMenuButton<String>(
-              color: isDark ? JenixColorsApp.surfaceColor : JenixColorsApp.backgroundWhite,
-              icon: Icon(Icons.more_vert, color: isDark ? Colors.white70 : JenixColorsApp.subtitleColor),
+              color: isDark
+                  ? JenixColorsApp.surfaceColor
+                  : JenixColorsApp.backgroundWhite,
+              icon: Icon(
+                Icons.more_vert,
+                color: isDark ? Colors.white70 : JenixColorsApp.subtitleColor,
+              ),
               onSelected: (value) {
                 if (value == 'edit' && !_isEventPassed(event)) {
                   _openForm(event: event);
@@ -298,12 +379,23 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                     value: 'edit',
                     child: Row(
                       children: [
-                        Icon(Icons.edit, color: isPassed ? JenixColorsApp.lightGray : (isDark ? Colors.white70 : JenixColorsApp.accentColor)),
+                        Icon(
+                          Icons.edit,
+                          color: isPassed
+                              ? JenixColorsApp.lightGray
+                              : (isDark
+                                    ? Colors.white70
+                                    : JenixColorsApp.accentColor),
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Editar',
                           style: TextStyle(
-                            color: isPassed ? JenixColorsApp.lightGray : (isDark ? Colors.white : JenixColorsApp.darkColorText),
+                            color: isPassed
+                                ? JenixColorsApp.lightGray
+                                : (isDark
+                                      ? Colors.white
+                                      : JenixColorsApp.darkColorText),
                             fontSize: menuTextSize,
                           ),
                         ),
@@ -314,11 +406,21 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                     value: 'enrollments',
                     child: Row(
                       children: [
-                        Icon(Icons.people, color: isDark ? JenixColorsApp.successColor : JenixColorsApp.infoColor),
+                        Icon(
+                          Icons.people,
+                          color: isDark
+                              ? JenixColorsApp.successColor
+                              : JenixColorsApp.infoColor,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Ver inscripciones',
-                          style: TextStyle(color: isDark ? JenixColorsApp.successColor : JenixColorsApp.infoColor, fontSize: menuTextSize),
+                          style: TextStyle(
+                            color: isDark
+                                ? JenixColorsApp.successColor
+                                : JenixColorsApp.infoColor,
+                            fontSize: menuTextSize,
+                          ),
                         ),
                       ],
                     ),
@@ -327,12 +429,20 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(Icons.delete, color: isDark ? JenixColorsApp.errorColor : const Color(0xFFD32F2F), size: _getResponsiveDimension(18)),
+                        Icon(
+                          Icons.delete,
+                          color: isDark
+                              ? JenixColorsApp.errorColor
+                              : const Color(0xFFD32F2F),
+                          size: _getResponsiveDimension(18),
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Eliminar',
                           style: TextStyle(
-                            color: isDark ? JenixColorsApp.errorColor : const Color(0xFFD32F2F),
+                            color: isDark
+                                ? JenixColorsApp.errorColor
+                                : const Color(0xFFD32F2F),
                             fontSize: menuTextSize,
                           ),
                         ),

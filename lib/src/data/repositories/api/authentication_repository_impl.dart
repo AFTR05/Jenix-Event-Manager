@@ -2,6 +2,7 @@ import 'package:either_dart/either.dart';
 import 'package:jenix_event_manager/src/core/exceptions/failure.dart';
 import 'package:jenix_event_manager/src/data/sources/api_source.dart';
 import 'package:jenix_event_manager/src/data/sources/http/consumer_api.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/organization_area_enum.dart';
 import 'package:jenix_event_manager/src/domain/entities/user_entity.dart';
 import 'package:jenix_event_manager/src/domain/repository/authentication_repository.dart';
 
@@ -103,6 +104,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     required String name,
     required String phone,
     required String documentNumber,
+    required OrganizationAreaEnum organizationArea,
   }) async {
     final url = "$path/local/signup";
     final resultRequest = await ConsumerAPI.requestJSON<Map<String, dynamic>>(
@@ -114,6 +116,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         "name": name,
         "phone": phone,
         "documentNumber": documentNumber,
+        "organizationArea": organizationArea.toString(),
       },
     );
     return resultRequest.fold((failure) => Left(failure), (json) {

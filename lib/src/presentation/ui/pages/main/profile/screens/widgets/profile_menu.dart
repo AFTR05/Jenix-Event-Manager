@@ -36,13 +36,13 @@ class _ProfileMenuState extends ConsumerState<ProfileMenu> {
       iconAsset: 'assets/images/icons/user_edit_icon.svg',
       route: RoutesApp.editProfile,
     ),
-    ProfileMenuItem(
-      label: LocaleKeys.selectLanguageLabel.tr(),
-      icon: Icons.language_outlined,
-      onTap: (context, ref) {
-        _showLanguageSelectionBottomSheet(context);
-      },
-    ),
+    //ProfileMenuItem(
+    //  label: LocaleKeys.selectLanguageLabel.tr(),
+    //  icon: Icons.language_outlined,
+    //  onTap: (context, ref) {
+    //    _showLanguageSelectionBottomSheet(context);
+    //  },
+    //),
     if (ref.read(loginProviderProvider)?.role == RoleEnum.admin) ...[
       ProfileMenuItem(
         label: LocaleKeys.profileMyEventsLabel.tr(),

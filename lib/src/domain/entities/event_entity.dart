@@ -9,11 +9,12 @@ class EventEntity {
   final DateTime finalDate;
   final String? beginHour;
   final String? endHour;
-  final RoomEntity room;
+  final RoomEntity? room;
   final String organizationArea;
   final String description;
   final String state;
-  final UserEntity? responsablePerson; // <- puede ser nulo
+  final UserEntity? responsablePerson;
+  final String? responsablePersonId; // <- puede ser nulo
   final ModalityType modality;
   final int maxAttendees;
   final String? urlImage;
@@ -28,10 +29,11 @@ class EventEntity {
     this.endHour,
     required this.initialDate,
     required this.finalDate,
-    required this.room,
+    this.room,
     required this.organizationArea,
     required this.description,
     required this.state,
+    this.responsablePersonId,
     this.responsablePerson, // <- opcional
     required this.modality,
     required this.maxAttendees,
@@ -49,12 +51,15 @@ class EventEntity {
       endHour: json['endHour'],
       initialDate: DateTime.parse(json['initialDate']),
       finalDate: DateTime.parse(json['finalDate']),
-      room: RoomEntity.fromJson(json['room']),
+      room: json['room'] != null
+          ? RoomEntity.fromJson(json['room'])
+          : null, // <-RoomEntity.fromJson(json['room']),
       organizationArea: json['organizationArea'] ?? '',
       description: json['description'] ?? '',
       state: json['state'] ?? '',
-      responsablePerson: json['responsablePerson'] != null
-          ? UserEntity.fromJson(json['responsablePerson'])
+      responsablePersonId: json['responsiblePersonId'],
+      responsablePerson: json['responsiblePerson'] != null
+          ? UserEntity.fromMap(json['responsiblePerson'])
           : null, // <- si es nulo, asigna null
       modality: json['modality'] is String
           ? ModalityType.values.firstWhere(
@@ -81,10 +86,11 @@ class EventEntity {
         'endHour': endHour,
         'initialDate': initialDate.toIso8601String(),
         'finalDate': finalDate.toIso8601String(),
-        'room': room.toJson(),
+        'room': room?.toJson(),
         'organizationArea': organizationArea,
         'description': description,
         'state': state,
+        'responsiblePersonId': responsablePersonId,
         'responsablePerson': responsablePerson?.toJson(), // <- puede ser null
         'modality': modality.name,
         'maxAttendees': maxAttendees,

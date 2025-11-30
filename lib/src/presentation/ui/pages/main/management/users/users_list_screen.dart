@@ -323,6 +323,7 @@ class _UsersListScreenState extends ConsumerState<UsersListScreen> {
                   Text("Correo: ${user.email}", style: TextStyle(color: isDark ? const Color(0xFF9DA9B9) : Colors.black54, fontSize: _getResponsiveFontSize(12))),
                   Text("Teléfono: ${user.phone}", style: TextStyle(color: isDark ? const Color(0xFF9DA9B9) : Colors.black54, fontSize: _getResponsiveFontSize(12))),
                   Text("Rol: ${user.role.displayName}", style: TextStyle(color: isDark ? const Color(0xFF9DA9B9) : Colors.black54, fontSize: _getResponsiveFontSize(12))),
+                  Text("Facultad: ${user.organizationArea?.displayName ?? 'No asignada'}", style: TextStyle(color: isDark ? const Color(0xFF9DA9B9) : Colors.black54, fontSize: _getResponsiveFontSize(12))),
                 ],
               ),
             ),

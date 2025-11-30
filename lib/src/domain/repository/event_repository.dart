@@ -17,6 +17,7 @@ abstract class EventRepository {
       required DateTime? initialDate,
     required DateTime? finalDate,
     required String token,
+    required String responsiblePersonId,
   });
 
   Future<Either<Failure, List<EventEntity>>> getAllEvents({

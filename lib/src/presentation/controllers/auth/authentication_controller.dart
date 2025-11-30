@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:either_dart/either.dart';
+import 'package:jenix_event_manager/src/domain/entities/enum/organization_area_enum.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jenix_event_manager/src/core/exceptions/failure.dart';
 import 'package:jenix_event_manager/src/domain/entities/user_entity.dart';
@@ -136,6 +137,7 @@ class AuthenticationController {
     required String name,
     required String phone,
     required String documentNumber,
+    required OrganizationAreaEnum organizationArea, 
     bool rememberMe = true,
   }) async {
     final either = await authenticationUsecase.register(
@@ -144,6 +146,7 @@ class AuthenticationController {
       name: name,
       phone: phone,
       documentNumber: documentNumber,
+      organizationArea: organizationArea,
     );
 
     await either.fold((failure) async => null, (user) async {
