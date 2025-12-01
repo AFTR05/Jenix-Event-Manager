@@ -34,7 +34,7 @@ abstract class EventRepository {
     required String name,
     String? beginHour,
     String? endHour,
-    required String roomId,
+    String? roomId,
     required String organizationArea,
     required String description,
     required String state,

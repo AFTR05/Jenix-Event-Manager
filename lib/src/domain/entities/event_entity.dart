@@ -61,12 +61,7 @@ class EventEntity {
       responsablePerson: json['responsiblePerson'] != null
           ? UserEntity.fromMap(json['responsiblePerson'])
           : null, // <- si es nulo, asigna null
-      modality: json['modality'] is String
-          ? ModalityType.values.firstWhere(
-              (m) => m.name == json['modality'],
-              orElse: () => ModalityType.presential,
-            )
-          : ModalityType.values[json['modality'] ?? 0],
+      modality: ModalityType.fromValue(json['modality']),
       maxAttendees: json['maxAttendees'] ?? 0,
       urlImage: json['urlImage'] ?? '',
       isActive: json['isActive'] ?? true,

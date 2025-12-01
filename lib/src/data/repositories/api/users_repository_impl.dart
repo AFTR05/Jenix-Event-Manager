@@ -65,7 +65,7 @@ class UsersRepositoryImpl implements UsersRepository {
     if (phone != null) body['phone'] = phone;
     if (documentNumber != null) body['documentNumber'] = documentNumber;
     final resultRequest = await ConsumerAPI.requestJSON<Map<String, dynamic>>(
-      url: path,
+      url: '$path/$userId',
       method: HTTPMethod.patch,
       headers: _getHeaders(token: token, includeContentType: true),
       jsonObject: body,
